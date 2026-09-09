@@ -12,12 +12,16 @@ import (
 // Stable across releases — changing it would break controller dedup.
 var taskIDNamespace = uuid.MustParse("1b06ab0c-eede-481f-b6ee-e91b0708fba9")
 
-// DeriveTaskID returns a UUID5 derived deterministically from the (short-id,
-// date) pair (e.g. ("SENTRY-TEST-1", "2026-08-23")).
+// DeriveTaskIDKafka returns a UUID5 derived deterministically from the
+// (issue-key, date) pair for Kafka-native consumers.
 //
-// Uniqueness set rationale (per [[Watcher Writing Guide]] § Deterministic task_identifier):
-//   - Same (short-id, date) → same task_id → controller dedup makes re-emit a no-op.
+// Uniqueness set rationale (per the consumer contract):
+//   - Same (issue-key, date) → same task_id → controller dedup makes re-emit a
+//     no-op (including full-topic replays after a restart).
 //   - A new date for the same issue → new name → new task_id → fresh daily task.
-func DeriveTaskID(shortID, date string) uuid.UUID {
-	return uuid.NewSHA1(taskIDNamespace, []byte("sentry:"+shortID+":"+date))
+//   - The "kafka:" prefix keeps this identity space disjoint from the
+//     collector's "sentry:" space (cmd/create-tasks), so a derived task never
+//     collides with a collector-emitted task for the same date.
+func DeriveTaskIDKafka(issueKey, date string) uuid.UUID {
+	return uuid.NewSHA1(taskIDNamespace, []byte("kafka:"+issueKey+":"+date))
 }

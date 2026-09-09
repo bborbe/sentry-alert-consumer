@@ -4,31 +4,33 @@
 
 package pkg
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+)
 
 //counterfeiter:generate -o ../mocks/metrics.go --fake-name Metrics . Metrics
 
-// Metrics is the observable counter surface required by [[Watcher Writing Guide]]
-// § Required observability.
+// Metrics is the observable counter surface of the consumer.
 type Metrics interface {
-	// IncPollCycle — result: "success" | "sentry_error"
-	IncPollCycle(result string)
+	// IncMessages — result: "processed" | "parse_error" | "envelope_error" |
+	// "build_error" | "publish_error"
+	IncMessages(result string)
 
-	// IncPublished — status: "create" | "error"
+	// IncEvents — outcome: "forwarded" | "rejected" | "upstream_error"
+	IncEvents(outcome string)
+
+	// SetLastEvent records the received_at (RFC3339) of the last processed
+	// event as a Unix timestamp — the silence signal an alert thresholds on.
+	SetLastEvent(receivedAt string)
+
+	// IncPublished — status: "create" | "error" (task publish attempts)
 	IncPublished(status string)
-
-	// IncFilterSkipped — reason: "project_not_in_scope" | "already_seen" |
-	// "missing_short_id" | "invalid_date" | "build_error"
-	IncFilterSkipped(reason string)
-
-	// IncIssuesScanned — sanity check on the per-cycle scan size.
-	IncIssuesScanned(count int)
 }
 
-// metricNamespace is the single Prometheus metric namespace for this binary
-// (must match the binary name per [[Watcher Writing Guide]]). A lone default,
-// not a member of a closed enum set, so it stays an untyped string.
-const metricNamespace = "sentry_watcher"
+// metricNamespace is the single Prometheus metric namespace for this binary.
+const metricNamespace = "sentry_alert_consumer"
 
 // NewMetrics returns the Prometheus-backed Metrics implementation registered
 // against the supplied Registerer. Pass nil for the default registry.
@@ -39,66 +41,68 @@ func NewMetrics(registerer prometheus.Registerer) Metrics {
 		registerer = prometheus.DefaultRegisterer
 	}
 	m := &prometheusMetrics{
-		pollCycleTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
+		messagesTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Namespace: metricNamespace,
-			Name:      "poll_cycle_total",
-			Help:      "Total poll cycles by result.",
+			Name:      "messages_total",
+			Help:      "Total topic messages processed by result.",
 		}, []string{"result"}),
+		eventsTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Namespace: metricNamespace,
+			Name:      "events_total",
+			Help:      "Total events by tee outcome.",
+		}, []string{"outcome"}),
+		lastEventTimestamp: prometheus.NewGauge(prometheus.GaugeOpts{
+			Namespace: metricNamespace,
+			Name:      "last_event_timestamp",
+			Help:      "Unix timestamp of the last processed event (0 = none since start).",
+		}),
 		publishedTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Namespace: metricNamespace,
 			Name:      "published_total",
 			Help:      "Total task-publish attempts by status.",
 		}, []string{"status"}),
-		filterSkippedTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
-			Namespace: metricNamespace,
-			Name:      "filter_skipped_total",
-			Help:      "Total issues filtered out by reason.",
-		}, []string{"reason"}),
-		issuesScannedTotal: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: metricNamespace,
-			Name:      "issues_scanned_total",
-			Help:      "Total Sentry issues scanned across poll cycles.",
-		}),
 	}
 	registerer.MustRegister(
-		m.pollCycleTotal,
+		m.messagesTotal,
+		m.eventsTotal,
+		m.lastEventTimestamp,
 		m.publishedTotal,
-		m.filterSkippedTotal,
-		m.issuesScannedTotal,
 	)
-	for _, r := range []string{"success", "sentry_error"} {
-		m.pollCycleTotal.WithLabelValues(r).Add(0)
+	for _, r := range []string{
+		"processed", "parse_error", "envelope_error", "build_error", "publish_error",
+	} {
+		m.messagesTotal.WithLabelValues(r).Add(0)
+	}
+	for _, o := range []string{"forwarded", "rejected", "upstream_error"} {
+		m.eventsTotal.WithLabelValues(o).Add(0)
 	}
 	for _, s := range []string{"create", "error"} {
 		m.publishedTotal.WithLabelValues(s).Add(0)
-	}
-	for _, r := range []string{
-		"project_not_in_scope", "already_seen", "missing_short_id", "invalid_date", "build_error",
-	} {
-		m.filterSkippedTotal.WithLabelValues(r).Add(0)
 	}
 	return m
 }
 
 type prometheusMetrics struct {
-	pollCycleTotal     *prometheus.CounterVec
+	messagesTotal      *prometheus.CounterVec
+	eventsTotal        *prometheus.CounterVec
+	lastEventTimestamp prometheus.Gauge
 	publishedTotal     *prometheus.CounterVec
-	filterSkippedTotal *prometheus.CounterVec
-	issuesScannedTotal prometheus.Counter
 }
 
-func (m *prometheusMetrics) IncPollCycle(result string) {
-	m.pollCycleTotal.WithLabelValues(result).Inc()
+func (m *prometheusMetrics) IncMessages(result string) {
+	m.messagesTotal.WithLabelValues(result).Inc()
+}
+
+func (m *prometheusMetrics) IncEvents(outcome string) {
+	m.eventsTotal.WithLabelValues(outcome).Inc()
+}
+
+func (m *prometheusMetrics) SetLastEvent(receivedAt string) {
+	if t, err := time.Parse(time.RFC3339, receivedAt); err == nil {
+		m.lastEventTimestamp.Set(float64(t.Unix()))
+	}
 }
 
 func (m *prometheusMetrics) IncPublished(status string) {
 	m.publishedTotal.WithLabelValues(status).Inc()
-}
-
-func (m *prometheusMetrics) IncFilterSkipped(reason string) {
-	m.filterSkippedTotal.WithLabelValues(reason).Inc()
-}
-
-func (m *prometheusMetrics) IncIssuesScanned(count int) {
-	m.issuesScannedTotal.Add(float64(count))
 }
