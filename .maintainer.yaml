@@ -1,0 +1,6 @@
+# maintainer-bot per-repo config (ben-s-pull-request-reviewer[bot]).
+# No release.autoRelease — sentry-watcher is a k8s watcher deployed via the
+# maintainer Helm chart (mirror + keel), so the release is manual (tag + make
+# buca), not bot-tagged.
+prReviewer:
+  autoApprove: true
