@@ -3,31 +3,32 @@ module github.com/bborbe/sentry-alert-consumer
 go 1.27.0
 
 require (
+	github.com/IBM/sarama v1.60.1
 	github.com/bborbe/agent v0.81.1
+	github.com/bborbe/cqrs v0.6.6
+	github.com/bborbe/errors v1.5.20
+	github.com/bborbe/http v1.26.20
+	github.com/bborbe/kafka v1.25.8
+	github.com/bborbe/log v1.6.22
+	github.com/bborbe/run v1.9.37
 	github.com/bborbe/sentry v1.9.26
 	github.com/bborbe/service v1.10.9
 	github.com/golang/glog v1.2.5
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/mux v1.8.1
 	github.com/onsi/ginkgo/v2 v2.32.1
 	github.com/onsi/gomega v1.42.1
 	github.com/prometheus/client_golang v1.24.1
 )
 
 require (
-	github.com/IBM/sarama v1.60.1 // indirect
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/bborbe/argument/v2 v2.12.35 // indirect
 	github.com/bborbe/collection v1.20.23 // indirect
-	github.com/bborbe/cqrs v0.6.6 // indirect
-	github.com/bborbe/errors v1.5.20 // indirect
-	github.com/bborbe/http v1.26.20 // indirect
 	github.com/bborbe/k8s v1.14.9 // indirect
-	github.com/bborbe/kafka v1.25.8 // indirect
 	github.com/bborbe/kv v1.21.9 // indirect
-	github.com/bborbe/log v1.6.22 // indirect
 	github.com/bborbe/math v1.3.21 // indirect
 	github.com/bborbe/parse v1.10.21 // indirect
-	github.com/bborbe/run v1.9.37 // indirect
 	github.com/bborbe/strimzi v1.8.12 // indirect
 	github.com/bborbe/time v1.27.10 // indirect
 	github.com/bborbe/validation v1.4.21 // indirect
@@ -59,7 +60,6 @@ require (
 	github.com/google/gnostic-models v0.7.1 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/pprof v0.0.0-20260802141513-ef3492d7dac3 // indirect
-	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
