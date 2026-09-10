@@ -5,6 +5,7 @@
 package pkg
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -27,18 +28,39 @@ type Metrics interface {
 
 	// IncPublished — status: "create" | "error" (task publish attempts)
 	IncPublished(status string)
+
+	// SetKafkaLag records the consumer's own lag (broker highwater minus the
+	// highest consumed offset) for a partition — the broken-consumer signal
+	// an alert thresholds on. Sourced from this consumer, not from the
+	// strimzi-topic-reader's per-read cache.
+	SetKafkaLag(partition int32, lag float64)
 }
 
 // metricNamespace is the single Prometheus metric namespace for this binary.
 const metricNamespace = "sentry_alert_consumer"
 
+// Int64Formatter formats an integer for use as a Prometheus label value.
+// Injected so the metrics adapter has no hidden strconv dependency.
+type Int64Formatter interface {
+	Format(value int64) string
+}
+
+type strconvInt64Formatter struct{}
+
+func (strconvInt64Formatter) Format(value int64) string {
+	return strconv.FormatInt(value, 10)
+}
+
 // NewMetrics returns the Prometheus-backed Metrics implementation registered
 // against the supplied Registerer. Pass nil for the default registry.
 // Pre-initialises every label combination so Prometheus exposes a zero series
 // before the first event fires.
-func NewMetrics(registerer prometheus.Registerer) Metrics {
+func NewMetrics(registerer prometheus.Registerer, formatter Int64Formatter) Metrics {
 	if registerer == nil {
 		registerer = prometheus.DefaultRegisterer
+	}
+	if formatter == nil {
+		formatter = strconvInt64Formatter{}
 	}
 	m := &prometheusMetrics{
 		messagesTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
@@ -61,12 +83,19 @@ func NewMetrics(registerer prometheus.Registerer) Metrics {
 			Name:      "published_total",
 			Help:      "Total task-publish attempts by status.",
 		}, []string{"status"}),
+		kafkaLag: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: metricNamespace,
+			Name:      "kafka_lag",
+			Help:      "Messages behind the broker highwater per partition (0 = caught up).",
+		}, []string{"partition"}),
+		formatter: formatter,
 	}
 	registerer.MustRegister(
 		m.messagesTotal,
 		m.eventsTotal,
 		m.lastEventTimestamp,
 		m.publishedTotal,
+		m.kafkaLag,
 	)
 	for _, r := range []string{
 		"processed", "parse_error", "envelope_error", "build_error", "publish_error",
@@ -87,6 +116,8 @@ type prometheusMetrics struct {
 	eventsTotal        *prometheus.CounterVec
 	lastEventTimestamp prometheus.Gauge
 	publishedTotal     *prometheus.CounterVec
+	kafkaLag           *prometheus.GaugeVec
+	formatter          Int64Formatter
 }
 
 func (m *prometheusMetrics) IncMessages(result string) {
@@ -105,4 +136,8 @@ func (m *prometheusMetrics) SetLastEvent(receivedAt string) {
 
 func (m *prometheusMetrics) IncPublished(status string) {
 	m.publishedTotal.WithLabelValues(status).Inc()
+}
+
+func (m *prometheusMetrics) SetKafkaLag(partition int32, lag float64) {
+	m.kafkaLag.WithLabelValues(m.formatter.Format(int64(partition))).Set(lag)
 }
