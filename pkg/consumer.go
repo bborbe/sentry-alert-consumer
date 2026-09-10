@@ -6,6 +6,7 @@ package pkg
 
 import (
 	"context"
+	"sync"
 
 	"github.com/IBM/sarama"
 	"github.com/golang/glog"
@@ -23,6 +24,9 @@ type Consumer struct {
 	metrics   Metrics
 	publisher TaskPublisher
 	cfg       TaskConfig
+
+	mu       sync.Mutex
+	consumed map[int32]int64 // highest consumed offset per partition
 }
 
 // NewConsumer returns a Consumer publishing through publisher and counting
@@ -32,13 +36,32 @@ func NewConsumer(publisher TaskPublisher, metrics Metrics, cfg TaskConfig) *Cons
 		metrics:   metrics,
 		publisher: publisher,
 		cfg:       cfg,
+		consumed:  make(map[int32]int64),
 	}
+}
+
+// ConsumedOffsets returns a copy of the highest consumed offset per partition
+// — the input for the lag tracker (highwater minus consumed).
+func (c *Consumer) ConsumedOffsets() map[int32]int64 {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	out := make(map[int32]int64, len(c.consumed))
+	for partition, offset := range c.consumed {
+		out[partition] = offset
+	}
+	return out
 }
 
 // ConsumeMessage implements libkafka.MessageHandler (one call per topic
 // message). It never returns a non-nil error to the consume loop: a per-record
 // failure is counted and skipped, keeping the stream alive.
 func (c *Consumer) ConsumeMessage(ctx context.Context, msg *sarama.ConsumerMessage) error {
+	c.mu.Lock()
+	if offset := c.consumed[msg.Partition]; msg.Offset > offset {
+		c.consumed[msg.Partition] = msg.Offset
+	}
+	c.mu.Unlock()
+
 	record, err := ParseRecord(ctx, msg.Value)
 	if err != nil {
 		c.metrics.IncMessages("parse_error")

@@ -110,6 +110,12 @@ func (a *application) Run(ctx context.Context, _ libsentry.Client) error {
 		log.DefaultSamplerFactory,
 	)
 
+	// The lag tracker polls the broker highwater on a fixed cadence and exports
+	// this consumer's own lag — the broken-consumer signal the lag alert
+	// thresholds on. Sourced from this consumer's position, not the
+	// strimzi-topic-reader's per-read cache.
+	lagTracker := pkg.NewLagTracker(saramaClient, a.KafkaTopic, consumer, metrics, 15*time.Second)
+
 	glog.V(2).Infof(
 		"sentry-alert-consumer starting stage=%s topic=%s listen=%s",
 		a.Stage, a.KafkaTopic, a.Listen,
@@ -117,6 +123,7 @@ func (a *application) Run(ctx context.Context, _ libsentry.Client) error {
 
 	return run.CancelOnFirstFinish(ctx,
 		run.Func(loop.Consume),
+		run.Func(lagTracker.Run),
 		a.createHTTPServer(),
 	)
 }

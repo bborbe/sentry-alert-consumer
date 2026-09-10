@@ -5,6 +5,7 @@
 package pkg
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -27,6 +28,12 @@ type Metrics interface {
 
 	// IncPublished — status: "create" | "error" (task publish attempts)
 	IncPublished(status string)
+
+	// SetKafkaLag records the consumer's own lag (broker highwater minus the
+	// highest consumed offset) for a partition — the broken-consumer signal
+	// an alert thresholds on. Sourced from this consumer, not from the
+	// strimzi-topic-reader's per-read cache.
+	SetKafkaLag(partition int32, lag float64)
 }
 
 // metricNamespace is the single Prometheus metric namespace for this binary.
@@ -61,12 +68,18 @@ func NewMetrics(registerer prometheus.Registerer) Metrics {
 			Name:      "published_total",
 			Help:      "Total task-publish attempts by status.",
 		}, []string{"status"}),
+		kafkaLag: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: metricNamespace,
+			Name:      "kafka_lag",
+			Help:      "Messages behind the broker highwater per partition (0 = caught up).",
+		}, []string{"partition"}),
 	}
 	registerer.MustRegister(
 		m.messagesTotal,
 		m.eventsTotal,
 		m.lastEventTimestamp,
 		m.publishedTotal,
+		m.kafkaLag,
 	)
 	for _, r := range []string{
 		"processed", "parse_error", "envelope_error", "build_error", "publish_error",
@@ -87,6 +100,7 @@ type prometheusMetrics struct {
 	eventsTotal        *prometheus.CounterVec
 	lastEventTimestamp prometheus.Gauge
 	publishedTotal     *prometheus.CounterVec
+	kafkaLag           *prometheus.GaugeVec
 }
 
 func (m *prometheusMetrics) IncMessages(result string) {
@@ -105,4 +119,8 @@ func (m *prometheusMetrics) SetLastEvent(receivedAt string) {
 
 func (m *prometheusMetrics) IncPublished(status string) {
 	m.publishedTotal.WithLabelValues(status).Inc()
+}
+
+func (m *prometheusMetrics) SetKafkaLag(partition int32, lag float64) {
+	m.kafkaLag.WithLabelValues(strconv.FormatInt(int64(partition), 10)).Set(lag)
 }

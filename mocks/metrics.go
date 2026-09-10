@@ -26,6 +26,12 @@ type Metrics struct {
 	incPublishedArgsForCall []struct {
 		arg1 string
 	}
+	SetKafkaLagStub        func(int32, float64)
+	setKafkaLagMutex       sync.RWMutex
+	setKafkaLagArgsForCall []struct {
+		arg1 int32
+		arg2 float64
+	}
 	SetLastEventStub        func(string)
 	setLastEventMutex       sync.RWMutex
 	setLastEventArgsForCall []struct {
@@ -129,6 +135,39 @@ func (fake *Metrics) IncPublishedArgsForCall(i int) string {
 	defer fake.incPublishedMutex.RUnlock()
 	argsForCall := fake.incPublishedArgsForCall[i]
 	return argsForCall.arg1
+}
+
+func (fake *Metrics) SetKafkaLag(arg1 int32, arg2 float64) {
+	fake.setKafkaLagMutex.Lock()
+	fake.setKafkaLagArgsForCall = append(fake.setKafkaLagArgsForCall, struct {
+		arg1 int32
+		arg2 float64
+	}{arg1, arg2})
+	stub := fake.SetKafkaLagStub
+	fake.recordInvocation("SetKafkaLag", []interface{}{arg1, arg2})
+	fake.setKafkaLagMutex.Unlock()
+	if stub != nil {
+		fake.SetKafkaLagStub(arg1, arg2)
+	}
+}
+
+func (fake *Metrics) SetKafkaLagCallCount() int {
+	fake.setKafkaLagMutex.RLock()
+	defer fake.setKafkaLagMutex.RUnlock()
+	return len(fake.setKafkaLagArgsForCall)
+}
+
+func (fake *Metrics) SetKafkaLagCalls(stub func(int32, float64)) {
+	fake.setKafkaLagMutex.Lock()
+	defer fake.setKafkaLagMutex.Unlock()
+	fake.SetKafkaLagStub = stub
+}
+
+func (fake *Metrics) SetKafkaLagArgsForCall(i int) (int32, float64) {
+	fake.setKafkaLagMutex.RLock()
+	defer fake.setKafkaLagMutex.RUnlock()
+	argsForCall := fake.setKafkaLagArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *Metrics) SetLastEvent(arg1 string) {
