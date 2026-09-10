@@ -65,7 +65,7 @@ var _ = ginkgo.Describe("BuildIssue", func() {
 		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
 		issue, err := pkg.BuildIssue(ctx, env, rec)
 		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
-		gomega.Expect(issue.Key).To(gomega.Equal("event:abc123"))
+		gomega.Expect(issue.Key).To(gomega.Equal("event-abc123"))
 	})
 
 	ginkgo.It("falls back to a body hash for an unparseable envelope", func() {
@@ -86,5 +86,27 @@ var _ = ginkgo.Describe("BuildIssue", func() {
 		recNoTime.ReceivedAt = ""
 		_, err := pkg.BuildIssue(ctx, pkg.Envelope{}, recNoTime)
 		gomega.Expect(err).To(gomega.HaveOccurred())
+	})
+
+	ginkgo.It("never derives a key with the title-forbidden colon", func() {
+		// CreateTaskCommand title validation rejects ':' — a colon anywhere in
+		// the issue key would kill every publish (observed 2026-09-10 on the
+		// "event:<id>" per-event fallback). Every fallback path must stay
+		// colon-free.
+		env, err := pkg.ParseEnvelope(ctx, `{"event_id":"abc123"}
+{"type":"event"}
+{"event_id":"abc123","timestamp":"2026-09-09T20:09:00Z","exception":{"values":[{"type":"RuntimeError","value":"boom","module":"mymod"}]}}`)
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		issue, err := pkg.BuildIssue(ctx, env, rec)
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		gomega.Expect(issue.Key).To(gomega.Not(gomega.ContainSubstring(":")))
+
+		perEvent, err := pkg.BuildIssue(ctx, pkg.Envelope{EventID: "abc123"}, rec)
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		gomega.Expect(perEvent.Key).To(gomega.Not(gomega.ContainSubstring(":")))
+
+		bodyFallback, err := pkg.BuildIssue(ctx, pkg.Envelope{}, rec)
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		gomega.Expect(bodyFallback.Key).To(gomega.Not(gomega.ContainSubstring(":")))
 	})
 })

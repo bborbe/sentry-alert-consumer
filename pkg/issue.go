@@ -69,7 +69,11 @@ func deriveIssueKey(env Envelope, rec Record) string {
 		return key
 	}
 	if env.EventID != "" {
-		return "event:" + env.EventID // per-event identity, no hash needed
+		// Per-event identity, no hash needed. The hyphen (not a colon)
+		// separator keeps the key out of the CreateTaskCommand title's
+		// forbidden-character set (observed 2026-09-10: "event:<id>" made
+		// every per-event task fail title validation).
+		return "event-" + env.EventID
 	}
 	return hashKey("body:" + rec.Body)
 }
