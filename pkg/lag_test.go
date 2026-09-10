@@ -17,6 +17,16 @@ import (
 	"github.com/bborbe/sentry-alert-consumer/pkg"
 )
 
+type fakeTicker struct{}
+
+func (fakeTicker) Chan() <-chan time.Time { return nil }
+
+func (fakeTicker) Stop() {}
+
+type fakeLogger struct{}
+
+func (fakeLogger) Errorf(_ string, _ ...any) {}
+
 var _ = ginkgo.Describe("LagTracker", func() {
 	ctx := context.Background()
 	cfg := pkg.TaskConfig{Stage: "dev", Assignee: "sentry-analyzer-agent"}
@@ -46,7 +56,8 @@ var _ = ginkgo.Describe("LagTracker", func() {
 			"develop-raw-sentry-alert-input",
 			consumedAt(0, 41),
 			metrics,
-			time.Hour,
+			fakeTicker{},
+			fakeLogger{},
 		)
 
 		tracker.Update(ctx)
@@ -68,7 +79,8 @@ var _ = ginkgo.Describe("LagTracker", func() {
 			"develop-raw-sentry-alert-input",
 			consumedAt(0, 41),
 			metrics,
-			time.Hour,
+			fakeTicker{},
+			fakeLogger{},
 		)
 
 		tracker.Update(ctx)
@@ -88,7 +100,8 @@ var _ = ginkgo.Describe("LagTracker", func() {
 			"develop-raw-sentry-alert-input",
 			consumedAt(0, 41),
 			metrics,
-			time.Hour,
+			fakeTicker{},
+			fakeLogger{},
 		)
 
 		tracker.Update(ctx)

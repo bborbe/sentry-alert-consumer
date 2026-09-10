@@ -39,13 +39,28 @@ type Metrics interface {
 // metricNamespace is the single Prometheus metric namespace for this binary.
 const metricNamespace = "sentry_alert_consumer"
 
+// Int64Formatter formats an integer for use as a Prometheus label value.
+// Injected so the metrics adapter has no hidden strconv dependency.
+type Int64Formatter interface {
+	Format(value int64) string
+}
+
+type strconvInt64Formatter struct{}
+
+func (strconvInt64Formatter) Format(value int64) string {
+	return strconv.FormatInt(value, 10)
+}
+
 // NewMetrics returns the Prometheus-backed Metrics implementation registered
 // against the supplied Registerer. Pass nil for the default registry.
 // Pre-initialises every label combination so Prometheus exposes a zero series
 // before the first event fires.
-func NewMetrics(registerer prometheus.Registerer) Metrics {
+func NewMetrics(registerer prometheus.Registerer, formatter Int64Formatter) Metrics {
 	if registerer == nil {
 		registerer = prometheus.DefaultRegisterer
+	}
+	if formatter == nil {
+		formatter = strconvInt64Formatter{}
 	}
 	m := &prometheusMetrics{
 		messagesTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
@@ -73,6 +88,7 @@ func NewMetrics(registerer prometheus.Registerer) Metrics {
 			Name:      "kafka_lag",
 			Help:      "Messages behind the broker highwater per partition (0 = caught up).",
 		}, []string{"partition"}),
+		formatter: formatter,
 	}
 	registerer.MustRegister(
 		m.messagesTotal,
@@ -101,6 +117,7 @@ type prometheusMetrics struct {
 	lastEventTimestamp prometheus.Gauge
 	publishedTotal     *prometheus.CounterVec
 	kafkaLag           *prometheus.GaugeVec
+	formatter          Int64Formatter
 }
 
 func (m *prometheusMetrics) IncMessages(result string) {
@@ -122,5 +139,5 @@ func (m *prometheusMetrics) IncPublished(status string) {
 }
 
 func (m *prometheusMetrics) SetKafkaLag(partition int32, lag float64) {
-	m.kafkaLag.WithLabelValues(strconv.FormatInt(int64(partition), 10)).Set(lag)
+	m.kafkaLag.WithLabelValues(m.formatter.Format(int64(partition))).Set(lag)
 }

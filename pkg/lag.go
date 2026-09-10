@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/IBM/sarama"
-	"github.com/golang/glog"
 )
 
 //counterfeiter:generate -o ../mocks/offset-getter.go --fake-name OffsetGetter . OffsetGetter
@@ -18,6 +17,18 @@ import (
 // narrow slice of sarama.Client so the tracker is testable without a broker.
 type OffsetGetter interface {
 	GetOffset(topic string, partition int32, offset int64) (int64, error)
+}
+
+// Ticker fires on a fixed cadence. The concrete time.NewTicker-backed
+// implementation lives at the call site so the tracker stays clock-free.
+type Ticker interface {
+	Chan() <-chan time.Time
+	Stop()
+}
+
+// Logger receives the tracker's error output.
+type Logger interface {
+	Errorf(format string, args ...any)
 }
 
 // LagTracker reports the consumer's OWN Kafka lag per partition: broker
@@ -30,7 +41,8 @@ type LagTracker struct {
 	topic    string
 	consumer *Consumer
 	metrics  Metrics
-	interval time.Duration
+	ticker   Ticker
+	logger   Logger
 }
 
 // NewLagTracker returns a LagTracker polling the broker highwater for every
@@ -40,28 +52,29 @@ func NewLagTracker(
 	topic string,
 	consumer *Consumer,
 	metrics Metrics,
-	interval time.Duration,
+	ticker Ticker,
+	logger Logger,
 ) *LagTracker {
 	return &LagTracker{
 		client:   client,
 		topic:    topic,
 		consumer: consumer,
 		metrics:  metrics,
-		interval: interval,
+		ticker:   ticker,
+		logger:   logger,
 	}
 }
 
 // Run polls the lag until ctx is cancelled. The first pass runs immediately so
 // the gauge is populated shortly after startup.
 func (l *LagTracker) Run(ctx context.Context) error {
-	ticker := time.NewTicker(l.interval)
-	defer ticker.Stop()
+	defer l.ticker.Stop()
 	l.Update(ctx)
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
-		case <-ticker.C:
+		case <-l.ticker.Chan():
 			l.Update(ctx)
 		}
 	}
@@ -70,9 +83,14 @@ func (l *LagTracker) Run(ctx context.Context) error {
 // Update computes lag for every consumed partition and records it as a gauge.
 func (l *LagTracker) Update(ctx context.Context) {
 	for partition, consumed := range l.consumer.ConsumedOffsets() {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+		}
 		highwater, err := l.client.GetOffset(l.topic, partition, sarama.OffsetNewest)
 		if err != nil {
-			glog.Errorf(
+			l.logger.Errorf(
 				"get highwater for topic %s partition %d failed err=%v",
 				l.topic,
 				partition,

@@ -64,7 +64,7 @@ func (a *application) Run(ctx context.Context, _ libsentry.Client) error {
 		return errors.Errorf(ctx, "KAFKA_TOPIC must be set (e.g. develop-raw-sentry-alert-input)")
 	}
 
-	metrics := pkg.NewMetrics(nil)
+	metrics := pkg.NewMetrics(nil, nil)
 
 	syncProducer, err := libkafka.NewSyncProducerWithName(
 		ctx,
@@ -114,7 +114,14 @@ func (a *application) Run(ctx context.Context, _ libsentry.Client) error {
 	// this consumer's own lag — the broken-consumer signal the lag alert
 	// thresholds on. Sourced from this consumer's position, not the
 	// strimzi-topic-reader's per-read cache.
-	lagTracker := pkg.NewLagTracker(saramaClient, a.KafkaTopic, consumer, metrics, 15*time.Second)
+	lagTracker := pkg.NewLagTracker(
+		saramaClient,
+		a.KafkaTopic,
+		consumer,
+		metrics,
+		tickerAdapter{ticker: time.NewTicker(15 * time.Second)},
+		glogLogger{},
+	)
 
 	glog.V(2).Infof(
 		"sentry-alert-consumer starting stage=%s topic=%s listen=%s",
@@ -126,6 +133,23 @@ func (a *application) Run(ctx context.Context, _ libsentry.Client) error {
 		run.Func(lagTracker.Run),
 		a.createHTTPServer(),
 	)
+}
+
+// tickerAdapter adapts a time.Ticker to the pkg.Ticker interface so the
+// lag tracker stays clock-free.
+type tickerAdapter struct {
+	ticker *time.Ticker
+}
+
+func (a tickerAdapter) Chan() <-chan time.Time { return a.ticker.C }
+
+func (a tickerAdapter) Stop() { a.ticker.Stop() }
+
+// glogLogger adapts glog to the pkg.Logger interface.
+type glogLogger struct{}
+
+func (glogLogger) Errorf(format string, args ...any) {
+	glog.Errorf(format, args...)
 }
 
 // createHTTPServer serves the mandatory triple (/healthz, /readiness,
