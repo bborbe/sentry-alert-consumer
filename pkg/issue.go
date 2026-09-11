@@ -25,6 +25,22 @@ type Issue struct {
 	Outcome    string
 	ReceivedAt string
 	Date       string // UTC calendar date ("2006-01-02") of the event
+	// Exception snapshot carried into the task body so the analyzer can
+	// classify derived-key (no-ID) tasks from the envelope's own payload —
+	// the title alone is not enough to differentiate real bugs from noise.
+	ExceptionType   string
+	ExceptionValue  string
+	ExceptionModule string
+	Trace           []Frame
+}
+
+// Frame is one stack frame from the envelope's exception, in stack order
+// (innermost first). InApp preserves Sentry's unknown classification.
+type Frame struct {
+	Filename string
+	Function string
+	LineNo   int
+	InApp    *bool
 }
 
 // BuildIssue derives the grouping identity for one topic record per the
@@ -38,6 +54,7 @@ type Issue struct {
 func BuildIssue(ctx context.Context, env Envelope, rec Record) (Issue, error) {
 	key := deriveIssueKey(env, rec)
 	title := deriveTitle(env)
+	exceptionType, exceptionValue, exceptionModule, frames := exceptionFromEvent(env.Event)
 
 	timestamp := rec.ReceivedAt
 	if env.Event != nil && env.Event.Timestamp != "" {
@@ -49,14 +66,36 @@ func BuildIssue(ctx context.Context, env Envelope, rec Record) (Issue, error) {
 	}
 
 	return Issue{
-		Key:        key,
-		EventID:    env.EventID,
-		Title:      title,
-		Project:    rec.Project,
-		Outcome:    rec.Outcome,
-		ReceivedAt: rec.ReceivedAt,
-		Date:       date,
+		Key:             key,
+		EventID:         env.EventID,
+		Title:           title,
+		Project:         rec.Project,
+		Outcome:         rec.Outcome,
+		ReceivedAt:      rec.ReceivedAt,
+		Date:            date,
+		ExceptionType:   exceptionType,
+		ExceptionValue:  exceptionValue,
+		ExceptionModule: exceptionModule,
+		Trace:           frames,
 	}, nil
+}
+
+// exceptionFromEvent extracts the first exception's type, value, module and
+// stack frames from the event payload, for the derived-key task body. All four
+// return zero values when the payload holds no exception.
+func exceptionFromEvent(ev *eventPayload) (string, string, string, []Frame) {
+	if ev == nil {
+		return "", "", "", nil
+	}
+	if values := ev.Exception.Values; len(values) > 0 {
+		v := values[0]
+		var frames []Frame
+		for _, f := range v.Stacktrace.Frames {
+			frames = append(frames, Frame(f))
+		}
+		return v.Type, v.Value, v.Module, frames
+	}
+	return "", "", "", nil
 }
 
 // deriveIssueKey produces the envelope-derived issue identity. The first
