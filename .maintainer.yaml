@@ -4,3 +4,12 @@
 # buca), not bot-tagged.
 prReviewer:
   autoApprove: true
+
+# Consent for github-update-go-agent. The key must be present and explicitly
+# true: the gate reads a missing key as Go's zero value (false), which silently
+# ejects the repo from the fleet sweep with no failure anywhere. This repo was
+# on Go 1.27.0 when the consent was added, so the omission was invisible — it
+# would only have surfaced as the repo quietly not updating on the next Go
+# release.
+goUpdate:
+  autoUpdate: true
