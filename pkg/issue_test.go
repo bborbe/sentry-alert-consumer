@@ -36,6 +36,36 @@ var _ = ginkgo.Describe("BuildIssue", func() {
 		gomega.Expect(issue.Outcome).To(gomega.Equal("rejected"))
 	})
 
+	ginkgo.It("carries the exception snapshot for the derived-key task body", func() {
+		env, err := pkg.ParseEnvelope(ctx, `{"event_id":"abc123"}
+{"type":"event"}
+{"event_id":"abc123","timestamp":"2026-09-09T20:09:00Z","exception":{"values":[{"type":"ConnectionRefusedError","value":"refused","module":"mt5.connector","stacktrace":{"frames":[{"filename":"mt5linux.py","function":"connect","lineno":42,"in_app":true}]}}]}}`)
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		issue, err := pkg.BuildIssue(ctx, env, rec)
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		gomega.Expect(issue.ExceptionType).To(gomega.Equal("ConnectionRefusedError"))
+		gomega.Expect(issue.ExceptionValue).To(gomega.Equal("refused"))
+		gomega.Expect(issue.ExceptionModule).To(gomega.Equal("mt5.connector"))
+		gomega.Expect(issue.Trace).To(gomega.HaveLen(1))
+		gomega.Expect(issue.Trace[0].Filename).To(gomega.Equal("mt5linux.py"))
+		gomega.Expect(issue.Trace[0].LineNo).To(gomega.Equal(42))
+		gomega.Expect(issue.Trace[0].InApp).To(gomega.Not(gomega.BeNil()))
+		gomega.Expect(*issue.Trace[0].InApp).To(gomega.BeTrue())
+	})
+
+	ginkgo.It("leaves the exception snapshot empty without an exception", func() {
+		env, err := pkg.ParseEnvelope(ctx, `{"event_id":"abc123"}
+{"type":"event"}
+{"event_id":"abc123","timestamp":"2026-09-09T20:09:00Z","message":{"formatted":"boom happened"}}`)
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		issue, err := pkg.BuildIssue(ctx, env, rec)
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		gomega.Expect(issue.ExceptionType).To(gomega.Equal(""))
+		gomega.Expect(issue.ExceptionValue).To(gomega.Equal(""))
+		gomega.Expect(issue.ExceptionModule).To(gomega.Equal(""))
+		gomega.Expect(issue.Trace).To(gomega.BeEmpty())
+	})
+
 	ginkgo.It("groups identical exceptions into the same key", func() {
 		body := `{"event_id":"abc123"}
 {"type":"event"}

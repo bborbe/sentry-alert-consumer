@@ -5,6 +5,8 @@
 package pkg_test
 
 import (
+	"strings"
+
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 
@@ -42,6 +44,45 @@ var _ = ginkgo.Describe("BuildCreateCommand", func() {
 		gomega.Expect(cmd.Frontmatter["issue_url"]).To(gomega.Equal(""))
 		gomega.Expect(cmd.Body).To(gomega.ContainSubstring("outcome rejected"))
 		gomega.Expect(cmd.Body).To(gomega.ContainSubstring("- Event: evt-1"))
+	})
+
+	ginkgo.It("carries the exception snapshot into the task body", func() {
+		withTrace := issue
+		inApp := true
+		withTrace.ExceptionType = "ConnectionRefusedError"
+		withTrace.ExceptionValue = "refused"
+		withTrace.ExceptionModule = "mt5.connector.mt5linux"
+		withTrace.Trace = []pkg.Frame{
+			{Filename: "mt5linux.py", Function: "connect", LineNo: 42, InApp: &inApp},
+			{Filename: "lib.py", Function: "helper", LineNo: 7},
+		}
+		cmd := pkg.BuildCreateCommand(withTrace, cfg)
+		gomega.Expect(cmd.Body).
+			To(gomega.ContainSubstring("- Exception: ConnectionRefusedError: refused"))
+		gomega.Expect(cmd.Body).To(gomega.ContainSubstring("- Module: mt5.connector.mt5linux"))
+		gomega.Expect(cmd.Body).To(gomega.ContainSubstring("- Trace:"))
+		gomega.Expect(cmd.Body).
+			To(gomega.ContainSubstring("- mt5linux.py:42 in connect (in_app=1)"))
+		gomega.Expect(cmd.Body).To(gomega.ContainSubstring("- lib.py:7 in helper (in_app=unknown)"))
+	})
+
+	ginkgo.It("omits the exception block when the issue has none", func() {
+		cmd := pkg.BuildCreateCommand(issue, cfg)
+		gomega.Expect(cmd.Body).To(gomega.Not(gomega.ContainSubstring("- Exception:")))
+		gomega.Expect(cmd.Body).To(gomega.Not(gomega.ContainSubstring("- Trace:")))
+	})
+
+	ginkgo.It("caps the trace at five frames", func() {
+		withTrace := issue
+		withTrace.ExceptionType = "RuntimeError"
+		withTrace.ExceptionValue = "boom"
+		var frames []pkg.Frame
+		for i := 0; i < 8; i++ {
+			frames = append(frames, pkg.Frame{Filename: "f.go", Function: "fn", LineNo: i})
+		}
+		withTrace.Trace = frames
+		cmd := pkg.BuildCreateCommand(withTrace, cfg)
+		gomega.Expect(strings.Count(cmd.Body, "\n  - ")).To(gomega.Equal(5))
 	})
 
 	ginkgo.It("derives a deterministic task identifier from the kafka key", func() {

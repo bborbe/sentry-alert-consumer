@@ -28,6 +28,22 @@ var _ = ginkgo.Describe("parseEnvelope", func() {
 		gomega.Expect(env.Event.Message.Formatted).To(gomega.Equal("boom happened"))
 	})
 
+	ginkgo.It("extracts the exception stacktrace frames, preserving unknown in_app", func() {
+		env, err := pkg.ParseEnvelope(ctx, `{"event_id":"abc123"}
+{"type":"event"}
+{"event_id":"abc123","exception":{"values":[{"type":"ConnectionRefusedError","value":"refused","module":"m","stacktrace":{"frames":[{"filename":"mt5linux.py","function":"connect","lineno":42,"in_app":true},{"filename":"lib.py","function":"helper","lineno":7,"in_app":false},{"filename":"vendor.py","function":"x"}]}}]}}`)
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		v := env.Event.Exception.Values[0]
+		gomega.Expect(v.Stacktrace.Frames).To(gomega.HaveLen(3))
+		gomega.Expect(v.Stacktrace.Frames[0].Filename).To(gomega.Equal("mt5linux.py"))
+		gomega.Expect(v.Stacktrace.Frames[0].LineNo).To(gomega.Equal(42))
+		gomega.Expect(v.Stacktrace.Frames[0].InApp).To(gomega.Not(gomega.BeNil()))
+		gomega.Expect(*v.Stacktrace.Frames[0].InApp).To(gomega.BeTrue())
+		gomega.Expect(*v.Stacktrace.Frames[1].InApp).To(gomega.BeFalse())
+		// absent in_app → nil (unknown preserved, not collapsed to false)
+		gomega.Expect(v.Stacktrace.Frames[2].InApp).To(gomega.BeNil())
+	})
+
 	ginkgo.It("degrades to the header identity when the event payload is missing", func() {
 		env, err := pkg.ParseEnvelope(ctx, `{"event_id":"abc123"}
 {"type":"event","length":5}`)

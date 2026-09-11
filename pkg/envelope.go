@@ -41,9 +41,26 @@ type exception struct {
 }
 
 type exceptionValue struct {
-	Type   string `json:"type"`
-	Value  string `json:"value"`
-	Module string `json:"module"`
+	Type       string         `json:"type"`
+	Value      string         `json:"value"`
+	Module     string         `json:"module"`
+	Stacktrace exceptionTrace `json:"stacktrace"`
+}
+
+// exceptionTrace is the exception's stacktrace, with frames in stack order
+// (innermost first, as Sentry SDKs send them).
+type exceptionTrace struct {
+	Frames []exceptionFrame `json:"frames"`
+}
+
+// exceptionFrame is one stack frame. InApp is nil when Sentry did not classify
+// the frame (absent or null in the payload), so the task body can preserve the
+// unknown case rather than collapsing it to false.
+type exceptionFrame struct {
+	Filename string `json:"filename"`
+	Function string `json:"function"`
+	LineNo   int    `json:"lineno"`
+	InApp    *bool  `json:"in_app"`
 }
 
 // Envelope holds the identity fields extracted from one raw Sentry envelope.
