@@ -7,11 +7,15 @@
 package factory
 
 import (
+	"context"
+	"strings"
+
 	task "github.com/bborbe/agent/command/task"
 	"github.com/bborbe/cqrs/base"
 	"github.com/bborbe/cqrs/cdb"
 	libkafka "github.com/bborbe/kafka"
 	"github.com/bborbe/log"
+	"github.com/golang/glog"
 
 	"github.com/bborbe/sentry-alert-consumer/pkg"
 )
@@ -28,13 +32,38 @@ func CreateKafkaSender(
 	return task.NewCreateCommandSender(sender, defaultVault)
 }
 
-// CreateConsumer wires the publisher + metrics + task config into a ready
-// Consumer. Pure composition — no I/O.
+// CreateConsumer wires the publisher + metrics + task config + enrichment
+// client into a ready Consumer. Pure composition — no I/O.
 func CreateConsumer(
 	sender task.CreateCommandSender,
 	metrics pkg.Metrics,
 	cfg pkg.TaskConfig,
+	sentry pkg.SentryClient,
 ) *pkg.Consumer {
 	publisher := pkg.NewTaskPublisher(sender, metrics)
-	return pkg.NewConsumer(publisher, metrics, cfg)
+	return pkg.NewConsumer(publisher, metrics, cfg, sentry)
+}
+
+// CreateSentryClient returns the event→issue enrichment client. An empty token
+// disables enrichment — the binary still runs, every lookup reports the event
+// as unknown, and tasks keep their envelope-derived key — and the disabled
+// state is logged once at startup.
+func CreateSentryClient(url, org, token string) pkg.SentryClient {
+	if strings.TrimSpace(token) == "" {
+		glog.Warningf(
+			"SENTRY_API_TOKEN empty — event→issue enrichment disabled, tasks keep the derived key",
+		)
+		return disabledSentryClient{}
+	}
+	return pkg.NewSentryClient(url, org, token)
+}
+
+// disabledSentryClient is the enrichment-off SentryClient: it resolves nothing
+// and reports every event as unknown, so the consumer behaves exactly as it did
+// before enrichment existed.
+type disabledSentryClient struct{}
+
+// IssueRef reports every event as unknown to Sentry.
+func (disabledSentryClient) IssueRef(_ context.Context, _ string) (pkg.IssueRef, error) {
+	return pkg.IssueRef{}, pkg.ErrEventNotFound
 }

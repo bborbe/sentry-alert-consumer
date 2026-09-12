@@ -6,6 +6,7 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+- feat: enrich forwarded events with Sentry's numeric issue id (`GET /api/0/organizations/{org}/eventids/{event_id}/`) so the emitted task carries the numeric `short_id` + `issue_url` the analyzer's live-state fetch (`sentry-read.sh`) requires; rejected events skip the lookup (guaranteed 404 on a quota-limited org), and a miss or a failed lookup still publishes the derived-key task
 - chore: add `goUpdate.autoUpdate` to `.maintainer.yaml` so github-update-go-agent keeps the repo in the fleet sweep — the key was absent and read as `false`, silently excluding it
 
 ## v0.1.3
