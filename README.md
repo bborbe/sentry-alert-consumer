@@ -30,7 +30,16 @@ For each message on the alert topic:
    - title: exception value → message → "(no message)"
    - date: the event timestamp's UTC calendar date, falling back to
      `received_at`
-4. **Publish one `CreateTaskCommand`** per (issue-key, date). Task identity is
+4. **Enrich forwarded events** — only for `outcome: forwarded`, resolve the
+   event's numeric Sentry issue id via
+   `GET {SENTRY_URL}/api/0/organizations/{SENTRY_ORG}/eventids/{event_id}/`
+   (scope `org:read`) and emit it as `short_id` + `issue_url`, so the analyzer
+   can run its live-state fetch (`sentry-read.sh`, which requires `^[0-9]+$`).
+   A rejected event was never stored by Sentry, so its lookup is a guaranteed
+   404 that only burns quota — it is skipped. A miss (forwarded but dropped by
+   quota) or any lookup failure keeps the derived key and still publishes the
+   task: enrichment never drops an alert.
+5. **Publish one `CreateTaskCommand`** per (issue-key, date). Task identity is
    `UUID5("kafka:" + issue-key + ":" + date)` over the same namespace as the
    collector's `/create-tasks`, so the two identity spaces never collide and
    controller dedup makes re-emits (including full-topic replays after a
@@ -41,10 +50,18 @@ The emitted task contract is preserved from `cmd/create-tasks`:
 derived from the project slug (`nuke-prod`→prod, `nuke-dev`→dev), `status:
 in_progress`, Personal-vault target.
 
+## Configuration
+
+| Env | Default | Purpose |
+|-----|---------|---------|
+| `SENTRY_API_TOKEN` | *(empty)* | Sentry API token (scope `org:read`) for event→issue enrichment; empty disables enrichment — the binary runs and tasks keep the derived key |
+| `SENTRY_URL` | `https://bborbe.sentry.io` | Sentry base URL for the enrichment lookup |
+| `SENTRY_ORG` | `bborbe` | Sentry organization slug for the enrichment lookup |
+
 ## Observability
 
 - `sentry_alert_consumer_messages_total{result}` — processed / parse_error /
-  envelope_error / build_error / publish_error
+  envelope_error / build_error / publish_error / enrich_error
 - `sentry_alert_consumer_events_total{outcome}` — forwarded / rejected /
   upstream_error (the rejected stream is the whole point of this pipeline)
 - `sentry_alert_consumer_published_total{status}` — create / error

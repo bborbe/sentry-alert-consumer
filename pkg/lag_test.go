@@ -39,7 +39,10 @@ var _ = ginkgo.Describe("LagTracker", func() {
 		publisher.PublishCreateStub = func(_ context.Context, _ task.CreateCommand) bool {
 			return true
 		}
-		c := pkg.NewConsumer(publisher, metrics, cfg)
+		// enrichment-off client: this suite asserts lag, not enrichment.
+		sentry := &mocks.SentryClient{}
+		sentry.IssueRefReturns(pkg.IssueRef{}, pkg.ErrEventNotFound)
+		c := pkg.NewConsumer(publisher, metrics, cfg, sentry)
 		msg := &sarama.ConsumerMessage{Partition: partition, Offset: offset, Value: []byte(record)}
 		gomega.Expect(c.ConsumeMessage(ctx, msg)).To(gomega.Succeed())
 		return c

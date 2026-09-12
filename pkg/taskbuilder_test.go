@@ -46,6 +46,25 @@ var _ = ginkgo.Describe("BuildCreateCommand", func() {
 		gomega.Expect(cmd.Body).To(gomega.ContainSubstring("- Event: evt-1"))
 	})
 
+	ginkgo.DescribeTable("identity",
+		func(numericID, issueURL, wantShortID, wantIssueURL string) {
+			enriched := issue
+			enriched.NumericID = numericID
+			enriched.IssueURL = issueURL
+			cmd := pkg.BuildCreateCommand(enriched, cfg)
+			gomega.Expect(cmd.Frontmatter["short_id"]).To(gomega.Equal(wantShortID))
+			gomega.Expect(cmd.Frontmatter["issue_url"]).To(gomega.Equal(wantIssueURL))
+		},
+		ginkgo.Entry(
+			"carries the numeric sentry issue id when enriched",
+			"42",
+			"https://bborbe.sentry.io/issues/42/",
+			"42",
+			"https://bborbe.sentry.io/issues/42/",
+		),
+		ginkgo.Entry("keeps the derived key when not enriched", "", "", "abc123def456", ""),
+	)
+
 	ginkgo.It("carries the exception snapshot into the task body", func() {
 		withTrace := issue
 		inApp := true

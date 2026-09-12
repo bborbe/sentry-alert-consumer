@@ -9,8 +9,13 @@ import (
 	"sync"
 
 	"github.com/IBM/sarama"
+	"github.com/bborbe/errors"
 	"github.com/golang/glog"
 )
+
+// outcomeForwarded is the tee outcome that means Sentry accepted the event —
+// the only outcome worth an eventids lookup.
+const outcomeForwarded = "forwarded"
 
 // Consumer processes messages from the {branch}-raw-sentry-alert-input topic:
 // parse the tee record, derive the envelope-based issue identity, and publish
@@ -23,18 +28,25 @@ import (
 type Consumer struct {
 	metrics   Metrics
 	publisher TaskPublisher
+	sentry    SentryClient
 	cfg       TaskConfig
 
 	mu       sync.Mutex
 	consumed map[int32]int64 // highest consumed offset per partition
 }
 
-// NewConsumer returns a Consumer publishing through publisher and counting
-// through metrics.
-func NewConsumer(publisher TaskPublisher, metrics Metrics, cfg TaskConfig) *Consumer {
+// NewConsumer returns a Consumer publishing through publisher, counting through
+// metrics and enriching forwarded events through sentry.
+func NewConsumer(
+	publisher TaskPublisher,
+	metrics Metrics,
+	cfg TaskConfig,
+	sentry SentryClient,
+) *Consumer {
 	return &Consumer{
 		metrics:   metrics,
 		publisher: publisher,
+		sentry:    sentry,
 		cfg:       cfg,
 		consumed:  make(map[int32]int64),
 	}
@@ -87,6 +99,8 @@ func (c *Consumer) ConsumeMessage(ctx context.Context, msg *sarama.ConsumerMessa
 		return nil
 	}
 
+	c.enrichIssue(ctx, &issue)
+
 	cmd := BuildCreateCommand(issue, c.cfg)
 	if !c.publisher.PublishCreate(ctx, cmd) {
 		c.metrics.IncMessages("publish_error")
@@ -98,4 +112,41 @@ func (c *Consumer) ConsumeMessage(ctx context.Context, msg *sarama.ConsumerMessa
 		issue.Key, issue.Project, issue.Outcome, issue.Date,
 	)
 	return nil
+}
+
+// enrichIssue resolves the numeric Sentry issue id for one derived issue and
+// writes it back. Only forwarded events are looked up: a rejected (or
+// upstream_error) event was never stored by Sentry, so its lookup is a
+// guaranteed 404 that burns API quota.
+//
+// Enrichment is best-effort by contract — a record is never dropped because
+// enrichment failed. A miss keeps the derived key (the forwarded-but-dropped-by-
+// quota case this enrichment exists for); any other failure is counted and
+// logged and the task is still published with the derived key.
+func (c *Consumer) enrichIssue(ctx context.Context, issue *Issue) {
+	if issue.Outcome != outcomeForwarded || issue.EventID == "" {
+		return
+	}
+	ref, err := c.sentry.IssueRef(ctx, issue.EventID)
+	if err != nil {
+		if errors.Is(err, ErrEventNotFound) {
+			glog.V(2).Infof(
+				"enrichment miss eventID=%s issue=%s — keeping derived key",
+				issue.EventID,
+				issue.Key,
+			)
+			return
+		}
+		c.metrics.IncMessages("enrich_error")
+		glog.Warningf(
+			"enrichment failed eventID=%s issue=%s err=%v",
+			issue.EventID,
+			issue.Key,
+			err,
+		)
+		return
+	}
+	issue.NumericID = ref.NumericID
+	issue.IssueURL = ref.URL
+	glog.V(2).Infof("enriched issue=%s numericID=%s", issue.Key, ref.NumericID)
 }

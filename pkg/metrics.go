@@ -16,7 +16,7 @@ import (
 // Metrics is the observable counter surface of the consumer.
 type Metrics interface {
 	// IncMessages — result: "processed" | "parse_error" | "envelope_error" |
-	// "build_error" | "publish_error"
+	// "build_error" | "publish_error" | "enrich_error"
 	IncMessages(result string)
 
 	// IncEvents — outcome: "forwarded" | "rejected" | "upstream_error"
@@ -99,6 +99,7 @@ func NewMetrics(registerer prometheus.Registerer, formatter Int64Formatter) Metr
 	)
 	for _, r := range []string{
 		"processed", "parse_error", "envelope_error", "build_error", "publish_error",
+		"enrich_error",
 	} {
 		m.messagesTotal.WithLabelValues(r).Add(0)
 	}

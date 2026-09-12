@@ -44,6 +44,13 @@ type application struct {
 	SentryDSN   string `required:"false" arg:"sentry-dsn"   env:"SENTRY_DSN"   usage:"SentryDSN"    display:"length"`
 	SentryProxy string `required:"false" arg:"sentry-proxy" env:"SENTRY_PROXY" usage:"Sentry Proxy"`
 
+	// SentryAPIToken enables the event→issue enrichment. display:"length" is
+	// mandatory: without it argument.Parse() prints the token value to stdout
+	// at startup. Empty disables enrichment (tasks keep the derived key).
+	SentryAPIToken string `required:"false" arg:"sentry-api-token" env:"SENTRY_API_TOKEN" usage:"Sentry API token for event→issue enrichment"         display:"length"`
+	SentryURL      string `required:"false" arg:"sentry-url"       env:"SENTRY_URL"       usage:"Sentry base URL for event→issue enrichment"                           default:"https://bborbe.sentry.io"`
+	SentryOrg      string `required:"false" arg:"sentry-org"       env:"SENTRY_ORG"       usage:"Sentry organization slug for event→issue enrichment"                  default:"bborbe"`
+
 	Listen       string           `required:"false" arg:"listen"        env:"LISTEN"        usage:"HTTP listen address (healthz/readiness/metrics)"              default:":9090"`
 	Stage        string           `required:"true"  arg:"stage"         env:"STAGE"         usage:"Deployment stage (dev|prod)"                                  default:"dev"`
 	KafkaBrokers libkafka.Brokers `required:"true"  arg:"kafka-brokers" env:"KAFKA_BROKERS" usage:"Comma-separated Kafka broker list"`
@@ -91,12 +98,13 @@ func (a *application) Run(ctx context.Context, _ libsentry.Client) error {
 	}()
 
 	sender := factory.CreateKafkaSender(syncProducer, a.TopicPrefix, a.TargetVault)
+	sentryClient := factory.CreateSentryClient(a.SentryURL, a.SentryOrg, a.SentryAPIToken)
 	consumer := factory.CreateConsumer(sender, metrics, pkg.TaskConfig{
 		Stage:    a.Stage,
 		Assignee: a.TaskAssignee,
 		Status:   a.TaskStatus,
 		Phase:    a.TaskPhase,
-	})
+	}, sentryClient)
 
 	// Start from the oldest offset so no event is missed on first start; the
 	// simple offset manager is in-memory, so a restart replays from the

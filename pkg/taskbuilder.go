@@ -30,12 +30,16 @@ type TaskConfig struct {
 //   - task_identifier derives from the Kafka issue key (UUID5 namespace
 //     "kafka:" + issue-key + ":" + date) instead of the Sentry short-id, so a
 //     derived task never collides with a collector-emitted task
-//   - short_id carries the derived key until enrichment supplies the Sentry
-//     short-id
-//   - issue_url is empty (the envelope carries no permalink; enrichment owns
-//     the mapping)
+//   - short_id carries the numeric Sentry issue id when enrichment resolved
+//     the event, and the envelope-derived key otherwise
+//   - issue_url carries the canonical Sentry issue URL when enriched, and is
+//     empty otherwise (the envelope carries no permalink)
 func BuildCreateCommand(issue Issue, cfg TaskConfig) task.CreateCommand {
 	taskIDStr := DeriveTaskIDKafka(issue.Key, issue.Date).String()
+	shortID := issue.Key
+	if issue.NumericID != "" {
+		shortID = issue.NumericID
+	}
 	title := "Analyze Sentry issue " + issue.Key + " - " + issue.Date
 	body := "# Analyze Sentry issue " + issue.Key + " - " + issue.Date + "\n\n" +
 		"Kafka alert (received " + issue.ReceivedAt + ", outcome " + issue.Outcome +
@@ -56,10 +60,10 @@ func BuildCreateCommand(issue Issue, cfg TaskConfig) task.CreateCommand {
 			"stage":           DeriveStage(issue.Project, cfg.Stage),
 			"task_identifier": taskIDStr,
 			"title":           title,
-			"short_id":        issue.Key,
+			"short_id":        shortID,
 			"project":         issue.Project,
 			"date":            issue.Date,
-			"issue_url":       "",
+			"issue_url":       issue.IssueURL,
 		},
 		Body: body,
 	}

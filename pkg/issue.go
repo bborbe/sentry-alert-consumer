@@ -25,6 +25,13 @@ type Issue struct {
 	Outcome    string
 	ReceivedAt string
 	Date       string // UTC calendar date ("2006-01-02") of the event
+	// NumericID is Sentry's internal numeric issue id, set only when
+	// enrichment resolved the event. Empty on the derived-key path — the
+	// analyzer's live-state fetch (sentry-read.sh) needs the numeric form.
+	NumericID string
+	// IssueURL is the canonical Sentry issue URL matching NumericID; empty
+	// when the issue was not enriched (the envelope carries no permalink).
+	IssueURL string
 	// Exception snapshot carried into the task body so the analyzer can
 	// classify derived-key (no-ID) tasks from the envelope's own payload —
 	// the title alone is not enough to differentiate real bugs from noise.
