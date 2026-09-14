@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v0.1.5
 
 - feat: retry the Sentry `eventids` lookup with bounded backoff (≤3 attempts, ≤2s total) on 429/502/503/504/transport failures, honouring `Retry-After` in both delay-seconds and HTTP-date form — burst rate limiting (three 429s ~230ms apart, observed on dev) previously abandoned enrichment on the first 429; 404 and a bare 500 stay terminal so a permanent miss never burns quota
 - feat: split the `enrich_error` metric label — `enrich_retry_exhausted` now marks a lookup the client retried and gave up on, distinguishing sustained rate limiting from a one-off failure
