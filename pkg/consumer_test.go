@@ -186,5 +186,29 @@ var _ = ginkgo.Describe("Consumer", func() {
 			gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("enrich_error"))
 			gomega.Expect(metrics.IncMessagesArgsForCall(1)).To(gomega.Equal("processed"))
 		})
+
+		ginkgo.It("counts an exhausted retry apart from a one-off failure", func() {
+			metrics := &mocks.Metrics{}
+			publisher := &mocks.TaskPublisher{}
+			publisher.PublishCreateReturns(true)
+			sentry := &mocks.SentryClient{}
+			sentry.IssueRefReturns(pkg.IssueRef{}, errors.Wrapf(
+				ctx, pkg.ErrRetriesExhausted, "sentry lookup failed after retries",
+			))
+			c := pkg.NewConsumer(publisher, metrics, cfg, sentry)
+
+			err := c.ConsumeMessage(ctx, msg(forwardedRecord))
+			gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+
+			// Still best-effort: the task is published with its derived key.
+			gomega.Expect(publisher.PublishCreateCallCount()).To(gomega.Equal(1))
+			_, cmd := publisher.PublishCreateArgsForCall(0)
+			gomega.Expect(cmd.Frontmatter["short_id"]).To(gomega.Equal("event-abc123"))
+			// …but the sustained failure lands on its own label value.
+			gomega.Expect(metrics.IncMessagesCallCount()).To(gomega.Equal(2))
+			gomega.Expect(metrics.IncMessagesArgsForCall(0)).
+				To(gomega.Equal("enrich_retry_exhausted"))
+			gomega.Expect(metrics.IncMessagesArgsForCall(1)).To(gomega.Equal("processed"))
+		})
 	})
 })
