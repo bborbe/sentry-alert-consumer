@@ -8,8 +8,10 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"github.com/bborbe/errors"
+	libtime "github.com/bborbe/time"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 
@@ -149,4 +151,152 @@ var _ = ginkgo.Describe("SentryClient", func() {
 		gomega.Expect(errors.Is(err, pkg.ErrEventNotFound)).To(gomega.BeFalse())
 		gomega.Expect(ref).To(gomega.Equal(pkg.IssueRef{}))
 	})
+})
+
+var _ = ginkgo.Describe("SentryClient retry", func() {
+	ctx := context.Background()
+
+	// newSequenceServer replies with statuses in order (the last one repeats
+	// once the sequence is exhausted) and counts every call, so each spec can
+	// assert exactly how many lookups were issued.
+	newSequenceServer := func(calls *int, retryAfter string, statuses ...int) *httptest.Server {
+		return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			status := statuses[len(statuses)-1]
+			if *calls < len(statuses) {
+				status = statuses[*calls]
+			}
+			*calls++
+			if status != http.StatusOK && retryAfter != "" {
+				w.Header().Set("Retry-After", retryAfter)
+			}
+			w.WriteHeader(status)
+			if status == http.StatusOK {
+				_, _ = w.Write([]byte(`{"event":{"groupID":"42"}}`))
+			}
+		}))
+	}
+
+	// newRecordingWaiter captures each backoff instead of sleeping, so the
+	// schedule is asserted directly and the suite never waits in real time.
+	newRecordingWaiter := func(waits *[]time.Duration) libtime.WaiterDuration {
+		return libtime.WaiterDurationFunc(func(_ context.Context, d libtime.Duration) error {
+			*waits = append(*waits, d.Duration())
+			return nil
+		})
+	}
+
+	ginkgo.It("retries a 429 and enriches from the follow-up 200", func() {
+		var calls int
+		var waits []time.Duration
+		server := newSequenceServer(&calls, "", http.StatusTooManyRequests, http.StatusOK)
+		defer server.Close()
+
+		client := pkg.NewSentryClientWithWaiter(
+			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
+		)
+		ref, err := client.IssueRef(ctx, "abc-123")
+
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		gomega.Expect(ref.NumericID).To(gomega.Equal("42"))
+		gomega.Expect(calls).To(gomega.Equal(2))
+		gomega.Expect(waits).To(gomega.Equal([]time.Duration{100 * time.Millisecond}))
+	})
+
+	ginkgo.It("applies the Retry-After delay Sentry supplies", func() {
+		var calls int
+		var waits []time.Duration
+		server := newSequenceServer(&calls, "2", http.StatusTooManyRequests, http.StatusOK)
+		defer server.Close()
+
+		client := pkg.NewSentryClientWithWaiter(
+			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
+		)
+		ref, err := client.IssueRef(ctx, "abc-123")
+
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		gomega.Expect(ref.NumericID).To(gomega.Equal("42"))
+		// The header wins over the 100ms exponential default.
+		gomega.Expect(waits).To(gomega.Equal([]time.Duration{2 * time.Second}))
+	})
+
+	ginkgo.It("falls back to exponential backoff when no Retry-After is sent", func() {
+		var calls int
+		var waits []time.Duration
+		server := newSequenceServer(&calls, "", http.StatusTooManyRequests)
+		defer server.Close()
+
+		client := pkg.NewSentryClientWithWaiter(
+			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
+		)
+		_, err := client.IssueRef(ctx, "abc-123")
+
+		gomega.Expect(err).To(gomega.HaveOccurred())
+		gomega.Expect(waits).To(gomega.Equal([]time.Duration{
+			100 * time.Millisecond,
+			200 * time.Millisecond,
+		}))
+	})
+
+	ginkgo.It("gives up after three 429s and reports retries exhausted", func() {
+		var calls int
+		var waits []time.Duration
+		server := newSequenceServer(&calls, "", http.StatusTooManyRequests)
+		defer server.Close()
+
+		client := pkg.NewSentryClientWithWaiter(
+			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
+		)
+		ref, err := client.IssueRef(ctx, "abc-123")
+
+		gomega.Expect(err).To(gomega.HaveOccurred())
+		gomega.Expect(errors.Is(err, pkg.ErrRetriesExhausted)).To(gomega.BeTrue())
+		gomega.Expect(errors.Is(err, pkg.ErrEventNotFound)).To(gomega.BeFalse())
+		gomega.Expect(ref).To(gomega.Equal(pkg.IssueRef{}))
+		gomega.Expect(calls).To(gomega.Equal(3))
+		// Total waiting stays inside the 2s budget.
+		var total time.Duration
+		for _, w := range waits {
+			total += w
+		}
+		gomega.Expect(total).To(gomega.BeNumerically("<=", 2*time.Second))
+	})
+
+	ginkgo.It("abandons the retry rather than honour a Retry-After beyond the budget", func() {
+		var calls int
+		var waits []time.Duration
+		server := newSequenceServer(&calls, "60", http.StatusServiceUnavailable)
+		defer server.Close()
+
+		client := pkg.NewSentryClientWithWaiter(
+			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
+		)
+		_, err := client.IssueRef(ctx, "abc-123")
+
+		gomega.Expect(errors.Is(err, pkg.ErrRetriesExhausted)).To(gomega.BeTrue())
+		gomega.Expect(calls).To(gomega.Equal(1))
+		gomega.Expect(waits).To(gomega.BeEmpty())
+	})
+
+	ginkgo.DescribeTable("does not retry a terminal status",
+		func(status int) {
+			var calls int
+			var waits []time.Duration
+			server := newSequenceServer(&calls, "", status)
+			defer server.Close()
+
+			client := pkg.NewSentryClientWithWaiter(
+				server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
+			)
+			_, err := client.IssueRef(ctx, "abc-123")
+
+			gomega.Expect(err).To(gomega.HaveOccurred())
+			gomega.Expect(errors.Is(err, pkg.ErrRetriesExhausted)).To(gomega.BeFalse())
+			gomega.Expect(calls).To(gomega.Equal(1))
+			gomega.Expect(waits).To(gomega.BeEmpty())
+		},
+		ginkgo.Entry("404 is an expected miss", http.StatusNotFound),
+		// A bare 500 can mean "resource absent" on some APIs, so retrying it
+		// would burn Sentry quota on a permanent miss.
+		ginkgo.Entry("500 may mean the resource is absent", http.StatusInternalServerError),
+	)
 })

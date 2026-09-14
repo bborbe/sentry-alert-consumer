@@ -137,11 +137,19 @@ func (c *Consumer) enrichIssue(ctx context.Context, issue *Issue) {
 			)
 			return
 		}
-		c.metrics.IncMessages("enrich_error")
+		// Split the outcome: a sustained failure (the client retried and gave
+		// up) means Sentry is rate-limiting or down and is worth alerting on;
+		// a single non-retryable failure is noise by comparison.
+		result := "enrich_error"
+		if errors.Is(err, ErrRetriesExhausted) {
+			result = "enrich_retry_exhausted"
+		}
+		c.metrics.IncMessages(result)
 		glog.Warningf(
-			"enrichment failed eventID=%s issue=%s err=%v",
+			"enrichment failed eventID=%s issue=%s result=%s err=%v",
 			issue.EventID,
 			issue.Key,
+			result,
 			err,
 		)
 		return
