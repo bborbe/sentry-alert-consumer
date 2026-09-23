@@ -6,6 +6,7 @@ package pkg_test
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
@@ -34,6 +35,32 @@ var _ = ginkgo.Describe("BuildIssue", func() {
 		gomega.Expect(issue.Title).To(gomega.Equal("boom"))
 		gomega.Expect(issue.Date).To(gomega.Equal("2026-09-09"))
 		gomega.Expect(issue.Outcome).To(gomega.Equal("rejected"))
+	})
+
+	ginkgo.It("collapses 50 bare-array events on one exception into a single task", func() {
+		// Regression for the 2026-09-21/22 flood: sentry-go sends "exception" as
+		// a bare array, the payload failed to unmarshal, and every event fell
+		// through to a per-event "event-<id>" key — so one repeating error
+		// ("kafka: broker not connected") produced one task per event, 1,945
+		// files in a day. With the array form accepted, all 50 events share one
+		// issue key and therefore one UUID5 task id, which controller dedup
+		// collapses to a single CreateTaskCommand.
+		keys := make(map[string]struct{})
+		taskIDs := make(map[string]struct{})
+		for i := 0; i < 50; i++ {
+			eventID := fmt.Sprintf("%032x", i)
+			env, err := pkg.ParseEnvelope(ctx, fmt.Sprintf(`{"event_id":"%s"}
+{"type":"event","length":11246}
+{"event_id":"%s","timestamp":"2026-09-09T20:09:00Z","exception":[{"type":"*errors.errorString","value":"kafka: broker not connected"}]}`, eventID, eventID))
+			gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+			issue, err := pkg.BuildIssue(ctx, env, rec)
+			gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+			gomega.Expect(issue.Key).To(gomega.Not(gomega.HavePrefix("event-")))
+			keys[issue.Key] = struct{}{}
+			taskIDs[pkg.DeriveTaskIDKafka(issue.Key, issue.Date).String()] = struct{}{}
+		}
+		gomega.Expect(keys).To(gomega.HaveLen(1))
+		gomega.Expect(taskIDs).To(gomega.HaveLen(1))
 	})
 
 	ginkgo.It("carries the exception snapshot for the derived-key task body", func() {
