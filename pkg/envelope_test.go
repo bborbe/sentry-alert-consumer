@@ -28,6 +28,26 @@ var _ = ginkgo.Describe("parseEnvelope", func() {
 		gomega.Expect(env.Event.Message.Formatted).To(gomega.Equal("boom happened"))
 	})
 
+	ginkgo.It("accepts the bare-array exception form sentry-go emits", func() {
+		// sentry-go serialises Exception []Exception with json tag "exception",
+		// so bborbe Go services put "exception":[{...}] on the topic — not the
+		// protocol's {"values":[...]}. Before this was accepted the payload
+		// failed to unmarshal, Event stayed nil, and every event fell through to
+		// the per-event identity fallback (2026-09-21/22 flood).
+		env, err := pkg.ParseEnvelope(
+			ctx,
+			`{"event_id":"abc123","sent_at":"2026-09-23T16:00:33Z","sdk":{"name":"sentry.go","version":"0.49.0"}}
+{"type":"event","length":11246}
+{"event_id":"abc123","level":"error","platform":"go","exception":[{"type":"*errors.errorString","value":"kafka: broker not connected","mechanism":{"type":"chained","source":"unwrap"}}]}`,
+		)
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		gomega.Expect(env.Event).To(gomega.Not(gomega.BeNil()))
+		gomega.Expect(env.Event.Exception.Values).To(gomega.HaveLen(1))
+		gomega.Expect(env.Event.Exception.Values[0].Type).To(gomega.Equal("*errors.errorString"))
+		gomega.Expect(env.Event.Exception.Values[0].Value).
+			To(gomega.Equal("kafka: broker not connected"))
+	})
+
 	ginkgo.It("extracts the exception stacktrace frames, preserving unknown in_app", func() {
 		env, err := pkg.ParseEnvelope(ctx, `{"event_id":"abc123"}
 {"type":"event"}

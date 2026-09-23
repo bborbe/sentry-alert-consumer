@@ -5,6 +5,7 @@
 package pkg
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"strings"
@@ -36,8 +37,37 @@ type message struct {
 	Message   string `json:"message"`
 }
 
+// exception is the event's exception container. The Sentry protocol defines the
+// object form {"values":[...]} and most SDKs send it, but sentry-go serialises
+// Exception []Exception as a bare array (v0.49.0, interfaces.go:397), so the
+// bborbe Go services put "exception":[{...}] on the topic. Both shapes are
+// accepted — a payload that fails to unmarshal is dropped silently by
+// parseEventPayload, which is how every Go event came to fall through to the
+// per-event identity fallback and produced the 2026-09-21/22 task flood.
 type exception struct {
 	Values []exceptionValue `json:"values"`
+}
+
+// UnmarshalJSON accepts both the protocol object form {"values":[...]} and the
+// bare-array form [...] that sentry-go emits.
+func (e *exception) UnmarshalJSON(data []byte) error {
+	trimmed := bytes.TrimSpace(data)
+	if len(trimmed) > 0 && trimmed[0] == '[' {
+		var values []exceptionValue
+		if err := json.Unmarshal(trimmed, &values); err != nil {
+			return err
+		}
+		e.Values = values
+		return nil
+	}
+	var obj struct {
+		Values []exceptionValue `json:"values"`
+	}
+	if err := json.Unmarshal(trimmed, &obj); err != nil {
+		return err
+	}
+	e.Values = obj.Values
+	return nil
 }
 
 type exceptionValue struct {

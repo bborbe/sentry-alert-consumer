@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+- fix: accept the bare-array `exception` form sentry-go puts on the topic — `eventPayload.Exception` declared only the Sentry protocol's `{"values":[...]}` object, so every Go event's payload failed to unmarshal, `Envelope.Event` stayed nil, and `deriveIssueKey` fell through to a per-event `event-<id>` key for *every* event; the parse failure was swallowed silently (`parseEventPayload` returns nil with no log and no metric), which is why the mismatch ran undetected until the 2026-09-21/22 flood produced 1,189 then 1,945 Analyze-Sentry task files and fired `AgentQueueHigh` on nukeprod. Both shapes are now accepted, so events sharing one exception hash to one issue key and controller dedup collapses the burst to a single task.
+
 ## v0.1.5
 
 - feat: retry the Sentry `eventids` lookup with bounded backoff (≤3 attempts, ≤2s total) on 429/502/503/504/transport failures, honouring `Retry-After` in both delay-seconds and HTTP-date form — burst rate limiting (three 429s ~230ms apart, observed on dev) previously abandoned enrichment on the first 429; 404 and a bare 500 stay terminal so a permanent miss never burns quota
