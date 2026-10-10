@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v0.2.0
 
 - fix: accept the bare-string `message` form (`"message":"<text>"`) the Sentry protocol allows — `message` declared only the `{"formatted":...}` object, so such payloads failed to unmarshal, `Envelope.Event` stayed nil, and the task fell to a "(no message)" `event-<id>` key; the sentry-heartbeat emitter sends exactly this form
 - feat: skip the sentry-heartbeat liveness event (`logger: sentry-heartbeat`) before any task or enrichment lookup, counted as `skipped_heartbeat` — every 2h heartbeat previously became an unanalyzable analyzer task (~12/day)
