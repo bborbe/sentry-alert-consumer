@@ -48,6 +48,18 @@ var _ = ginkgo.Describe("parseEnvelope", func() {
 			To(gomega.Equal("kafka: broker not connected"))
 	})
 
+	ginkgo.It("accepts the bare-string message form", func() {
+		// The sentry-heartbeat emitter sends "message":"<text>"; before this was
+		// accepted the payload failed to unmarshal and Event stayed nil.
+		env, err := pkg.ParseEnvelope(ctx, `{"event_id":"abc123","sent_at":"2026-10-10T16:00:00Z"}
+{"type":"event","length":10}
+{"event_id":"abc123","timestamp":"2026-10-10T16:00:00Z","level":"error","logger":"sentry-heartbeat","message":"sentry-heartbeat","tags":{"source":"sentry-heartbeat"}}`)
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		gomega.Expect(env.Event).To(gomega.Not(gomega.BeNil()))
+		gomega.Expect(env.Event.Message.Formatted).To(gomega.Equal("sentry-heartbeat"))
+		gomega.Expect(env.Event.Logger).To(gomega.Equal("sentry-heartbeat"))
+	})
+
 	ginkgo.It("extracts the exception stacktrace frames, preserving unknown in_app", func() {
 		env, err := pkg.ParseEnvelope(ctx, `{"event_id":"abc123"}
 {"type":"event"}

@@ -17,7 +17,7 @@ import (
 type Metrics interface {
 	// IncMessages — result: "processed" | "parse_error" | "envelope_error" |
 	// "build_error" | "publish_error" | "enrich_error" |
-	// "enrich_retry_exhausted"
+	// "enrich_retry_exhausted" | "skipped_heartbeat"
 	//
 	// "enrich_error" is a single non-retryable enrichment failure;
 	// "enrich_retry_exhausted" means the client retried and gave up, i.e.
@@ -105,7 +105,7 @@ func NewMetrics(registerer prometheus.Registerer, formatter Int64Formatter) Metr
 	)
 	for _, r := range []string{
 		"processed", "parse_error", "envelope_error", "build_error", "publish_error",
-		"enrich_error", "enrich_retry_exhausted",
+		"enrich_error", "enrich_retry_exhausted", "skipped_heartbeat",
 	} {
 		m.messagesTotal.WithLabelValues(r).Add(0)
 	}
