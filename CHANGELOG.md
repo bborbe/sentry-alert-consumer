@@ -9,6 +9,7 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 - fix: accept the bare-string `message` form (`"message":"<text>"`) the Sentry protocol allows — `message` declared only the `{"formatted":...}` object, so such payloads failed to unmarshal, `Envelope.Event` stayed nil, and the task fell to a "(no message)" `event-<id>` key; the sentry-heartbeat emitter sends exactly this form
 - feat: skip the sentry-heartbeat liveness event (`logger: sentry-heartbeat`) before any task or enrichment lookup, counted as `skipped_heartbeat` — every 2h heartbeat previously became an unanalyzable analyzer task (~12/day)
 - chore: bump Go 1.27.1 → 1.27.2 and golang.org/x/net v0.59.0 → v0.60.0 to clear GO-2026-6599..6611 stdlib/net/http advisories failing `vulncheck`
+- chore: bump golangci-lint v2.13.1 → v2.14.0 — v2.13.1 cannot read Go 1.27.2 stdlib export data (version 5 > max 4), failing `lint` typecheck
 
 ## v0.1.6
 
