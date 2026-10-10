@@ -63,6 +63,20 @@ var _ = ginkgo.Describe("Consumer", func() {
 		gomega.Expect(metrics.SetLastEventCallCount()).To(gomega.Equal(1))
 	})
 
+	ginkgo.It("skips the sentry-heartbeat liveness event without a task", func() {
+		metrics := &mocks.Metrics{}
+		publisher := &mocks.TaskPublisher{}
+		sentry := noEnrichment()
+		c := pkg.NewConsumer(publisher, metrics, cfg, sentry)
+
+		record := `{"body":"{\"event_id\":\"hb1\",\"sent_at\":\"2026-10-10T16:00:00Z\"}\n{\"type\":\"event\",\"length\":10}\n{\"event_id\":\"hb1\",\"level\":\"error\",\"logger\":\"sentry-heartbeat\",\"message\":\"sentry-heartbeat\",\"tags\":{\"source\":\"sentry-heartbeat\"}}\n","project":"4505397462827008","received_at":"2026-10-10T16:00:04Z","outcome":"forwarded"}`
+		err := c.ConsumeMessage(ctx, msg(record))
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		gomega.Expect(publisher.PublishCreateCallCount()).To(gomega.Equal(0))
+		gomega.Expect(sentry.IssueRefCallCount()).To(gomega.Equal(0))
+		gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("skipped_heartbeat"))
+	})
+
 	ginkgo.It("counts and skips a record that fails to parse", func() {
 		metrics := &mocks.Metrics{}
 		publisher := &mocks.TaskPublisher{}

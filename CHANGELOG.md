@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+- fix: accept the bare-string `message` form (`"message":"<text>"`) the Sentry protocol allows — `message` declared only the `{"formatted":...}` object, so such payloads failed to unmarshal, `Envelope.Event` stayed nil, and the task fell to a "(no message)" `event-<id>` key; the sentry-heartbeat emitter sends exactly this form
+- feat: skip the sentry-heartbeat liveness event (`logger: sentry-heartbeat`) before any task or enrichment lookup, counted as `skipped_heartbeat` — every 2h heartbeat previously became an unanalyzable analyzer task (~12/day)
+- chore: bump Go 1.27.1 → 1.27.2 and golang.org/x/net v0.59.0 → v0.60.0 to clear GO-2026-6599..6611 stdlib/net/http advisories failing `vulncheck`
+- chore: bump golangci-lint v2.13.1 → v2.14.0 — v2.13.1 cannot read Go 1.27.2 stdlib export data (version 5 > max 4), failing `lint` typecheck
+
 ## v0.1.6
 
 - fix: accept the bare-array `exception` form sentry-go puts on the topic — `eventPayload.Exception` declared only the Sentry protocol's `{"values":[...]}` object, so every Go event's payload failed to unmarshal, `Envelope.Event` stayed nil, and `deriveIssueKey` fell through to a per-event `event-<id>` key for *every* event; the parse failure was swallowed silently (`parseEventPayload` returns nil with no log and no metric), which is why the mismatch ran undetected until the 2026-09-21/22 flood produced 1,189 then 1,945 Analyze-Sentry task files and fired `AgentQueueHigh` on nukeprod. Both shapes are now accepted, so events sharing one exception hash to one issue key and controller dedup collapses the burst to a single task.

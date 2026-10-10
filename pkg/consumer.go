@@ -17,6 +17,11 @@ import (
 // the only outcome worth an eventids lookup.
 const outcomeForwarded = "forwarded"
 
+// heartbeatLogger is the logger the sentry-heartbeat emitter (sentry-watcher
+// pkg.HeartbeatTag) stamps on its synthetic liveness event. The heartbeat
+// proves ingestion is alive; it is not a bug, so it never becomes a task.
+const heartbeatLogger = "sentry-heartbeat"
+
 // Consumer processes messages from the {branch}-raw-sentry-alert-input topic:
 // parse the tee record, derive the envelope-based issue identity, and publish
 // one CreateTaskCommand per (issue-key, date).
@@ -90,6 +95,12 @@ func (c *Consumer) ConsumeMessage(ctx context.Context, msg *sarama.ConsumerMessa
 		// Fall through with the empty envelope: BuildIssue falls back to a
 		// body-hash identity, so the record is still analysed, never dropped.
 		env = Envelope{EventID: ""}
+	}
+
+	if env.Event != nil && env.Event.Logger == heartbeatLogger {
+		c.metrics.IncMessages("skipped_heartbeat")
+		glog.V(2).Infof("skip heartbeat eventID=%s project=%s", env.EventID, record.Project)
+		return nil
 	}
 
 	issue, err := BuildIssue(ctx, env, record)

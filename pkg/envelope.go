@@ -27,14 +27,43 @@ type eventPayload struct {
 	EventID   string    `json:"event_id"`
 	Timestamp string    `json:"timestamp"`
 	Level     string    `json:"level"`
+	Logger    string    `json:"logger"`
 	Message   *message  `json:"message"`
 	LogEntry  *message  `json:"logentry"`
 	Exception exception `json:"exception"`
 }
 
+// message is the event's message. The Sentry protocol accepts both the object
+// form {"formatted":...,"message":...} and a bare string; the sentry-heartbeat
+// emitter sends the string form. Before the string was accepted the whole
+// payload failed to unmarshal, so every heartbeat became a "(no message)"
+// per-event task.
 type message struct {
 	Formatted string `json:"formatted"`
 	Message   string `json:"message"`
+}
+
+// UnmarshalJSON accepts both the object form and the bare-string form.
+func (m *message) UnmarshalJSON(data []byte) error {
+	trimmed := bytes.TrimSpace(data)
+	if len(trimmed) > 0 && trimmed[0] == '"' {
+		var s string
+		if err := json.Unmarshal(trimmed, &s); err != nil {
+			return err
+		}
+		m.Formatted = s
+		return nil
+	}
+	var obj struct {
+		Formatted string `json:"formatted"`
+		Message   string `json:"message"`
+	}
+	if err := json.Unmarshal(trimmed, &obj); err != nil {
+		return err
+	}
+	m.Formatted = obj.Formatted
+	m.Message = obj.Message
+	return nil
 }
 
 // exception is the event's exception container. The Sentry protocol defines the
