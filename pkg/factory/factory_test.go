@@ -8,6 +8,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"github.com/bborbe/errors"
 	"github.com/onsi/ginkgo/v2"
@@ -26,7 +27,7 @@ var _ = ginkgo.Describe("CreateSentryClient", func() {
 	ginkgo.DescribeTable("disables enrichment without a token",
 		func(token string) {
 			client := factory.CreateSentryClient("https://bborbe.sentry.io", "bborbe", token)
-			ref, err := client.IssueRef(ctx, "abc-123")
+			ref, err := client.IssueRef(ctx, "abc-123", time.Now())
 			gomega.Expect(errors.Is(err, pkg.ErrEventNotFound)).To(gomega.BeTrue())
 			gomega.Expect(ref).To(gomega.Equal(pkg.IssueRef{}))
 		},
@@ -44,7 +45,7 @@ var _ = ginkgo.Describe("CreateSentryClient", func() {
 		defer server.Close()
 
 		client := factory.CreateSentryClient(server.URL, "bborbe", "tok")
-		ref, err := client.IssueRef(ctx, "abc-123")
+		ref, err := client.IssueRef(ctx, "abc-123", time.Now())
 
 		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
 		gomega.Expect(ref.NumericID).To(gomega.Equal("9"))

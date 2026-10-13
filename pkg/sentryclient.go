@@ -49,7 +49,14 @@ var ErrRetriesExhausted = errors.New(context.Background(), "sentry lookup retrie
 type SentryClient interface {
 	// IssueRef resolves eventID to its Sentry issue. Returns ErrEventNotFound
 	// when Sentry holds no record of the event.
-	IssueRef(ctx context.Context, eventID string) (IssueRef, error)
+	//
+	// eventTimestamp is the event's own creation time, and it gates the
+	// dedicated 404 schedule: a 404 inside Sentry's ingest-indexing window is
+	// transient, but the same 404 on an event already past that window is a
+	// real miss and must not cost the schedule's wait. A zero value means
+	// "age unknown" and is treated as old — the schedule is skipped rather
+	// than holding a Kafka record for 10 s on an age we cannot establish.
+	IssueRef(ctx context.Context, eventID string, eventTimestamp time.Time) (IssueRef, error)
 }
 
 // sentryClientTimeout bounds one lookup so a slow Sentry cannot stall the
@@ -72,6 +79,33 @@ const (
 	// sentryBaseBackoff is the first wait; each retry doubles it (100ms, 200ms).
 	sentryBaseBackoff = 100 * time.Millisecond
 )
+
+// sentry404Schedule is the dedicated 404 retry schedule: absolute offsets from
+// the first attempt, so the gaps are 1 s, 2 s, 3 s, 4 s — 10 s of waiting and
+// 4 extra lookups.
+//
+// It exists because a 404 from the eventids endpoint is ambiguous. Sentry
+// returns it both for an event it never stored and for one it has stored but
+// not yet indexed. Two reproduced misses landed 2.58 s and 0.91 s after the
+// event's date_created and resolved on a later lookup, so the second class is
+// real — and the error-retry budget above (≈300 ms total) is two orders of
+// magnitude too short to clear it.
+//
+// The bound is deliberately the same order as the per-lookup
+// sentryClientTimeout already accepted on the consume loop.
+var sentry404Schedule = []time.Duration{
+	1 * time.Second,
+	3 * time.Second,
+	6 * time.Second,
+	10 * time.Second,
+}
+
+// sentry404MaxEventAge bounds the schedule to events that could still be inside
+// Sentry's indexing window. An event older than this was replayed from the
+// topic rather than freshly forwarded, so its 404 is a real miss: retrying it
+// would hold a partition for 10 s per record, and a replay burst of 45 misses
+// would stall the consumer for roughly 7.5 minutes.
+const sentry404MaxEventAge = 30 * time.Second
 
 // NewSentryClient returns the HTTP SentryClient for the documented eventids
 // endpoint ({url}/api/0/organizations/{org}/eventids/{event_id}/, scope
@@ -110,17 +144,78 @@ type eventIDResponse struct {
 	ProjectSlug string `json:"projectSlug"`
 }
 
-// IssueRef implements SentryClient against the eventids endpoint, retrying the
-// transient failure classes with bounded backoff.
+// IssueRef implements SentryClient: one bounded error-retry pass, then — only
+// when the 404 came back for an event young enough that Sentry may still be
+// indexing it — the dedicated 404 schedule.
+//
+// The two budgets are deliberately separate. The error-retry budget answers
+// "is Sentry having a moment?"; the 404 schedule answers "has Sentry finished
+// indexing this event yet?". A 404 that arrives for an event past the indexing
+// window is a real miss and costs exactly the one call already made.
+func (c *sentryClient) IssueRef(
+	ctx context.Context,
+	eventID string,
+	eventTimestamp time.Time,
+) (IssueRef, error) {
+	ref, err := c.issueRefWithErrorRetry(ctx, eventID)
+	if !errors.Is(err, ErrEventNotFound) {
+		return ref, err
+	}
+	if time.Since(eventTimestamp) > sentry404MaxEventAge {
+		return IssueRef{}, err
+	}
+	return c.issueRefWith404Schedule(ctx, eventID)
+}
+
+// issueRefWith404Schedule re-tries a 404 at the fixed offsets in
+// sentry404Schedule. Only a 404 continues the schedule: a success ends it, and
+// so does any other outcome, because the error-retry budget has already been
+// spent on the first attempt and the point here is to outlast Sentry's
+// indexing lag rather than to retry the world. A 429 met during the schedule
+// therefore surfaces as ErrRetriesExhausted, the same classification the
+// caller would have seen without the schedule.
+func (c *sentryClient) issueRefWith404Schedule(
+	ctx context.Context,
+	eventID string,
+) (IssueRef, error) {
+	var previous time.Duration
+	for i, offset := range sentry404Schedule {
+		wait := offset - previous
+		previous = offset
+		if waitErr := c.waiter.Wait(ctx, libtime.Duration(wait)); waitErr != nil {
+			// Context cancelled mid-schedule — the consume loop is shutting
+			// down, so surface that rather than the Sentry outcome.
+			return IssueRef{}, errors.Wrap(ctx, waitErr, "wait before sentry 404 retry")
+		}
+		glog.V(2).Infof(
+			"404, retrying eventID=%s attempt=%d offset=%v", eventID, i+2, offset,
+		)
+		ref, err := c.issueRefWithErrorRetry(ctx, eventID)
+		if err == nil {
+			return ref, nil
+		}
+		if !errors.Is(err, ErrEventNotFound) {
+			return IssueRef{}, err
+		}
+	}
+	return IssueRef{}, ErrEventNotFound
+}
+
+// issueRefWithErrorRetry performs the bounded retry against the transient
+// failure classes.
 //
 // Retryable: 429, 502, 503, 504, and transport errors. NOT retryable: 404
-// (ErrEventNotFound — control flow) and a bare 500. Some APIs return 500 for a
-// missing resource, so retrying it burns quota on a permanent miss; if Sentry
-// is genuinely broken it says so with a gateway status.
+// (ErrEventNotFound — control flow, handled by IssueRef's own schedule) and a
+// bare 500. Some APIs return 500 for a missing resource, so retrying it burns
+// quota on a permanent miss; if Sentry is genuinely broken it says so with a
+// gateway status.
 //
 // When every attempt fails the last error is wrapped in ErrRetriesExhausted so
 // the caller can distinguish a sustained failure from a one-off.
-func (c *sentryClient) IssueRef(ctx context.Context, eventID string) (IssueRef, error) {
+func (c *sentryClient) issueRefWithErrorRetry(
+	ctx context.Context,
+	eventID string,
+) (IssueRef, error) {
 	var remaining = sentryRetryBudget
 	var lastErr error
 

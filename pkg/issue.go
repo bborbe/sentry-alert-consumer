@@ -25,6 +25,13 @@ type Issue struct {
 	Outcome    string
 	ReceivedAt string
 	Date       string // UTC calendar date ("2006-01-02") of the event
+	// EventTimestamp is the event's own creation time in RFC3339, resolved the
+	// same way Date is (the envelope's event timestamp, falling back to the
+	// record's received_at). It is never empty on an Issue that exists —
+	// deriveDate rejects an empty input — and it gates the consumer's
+	// dedicated 404 retry schedule, which must not fire for an event replayed
+	// from the topic long after Sentry finished indexing it.
+	EventTimestamp string
 	// NumericID is Sentry's internal numeric issue id, set only when
 	// enrichment resolved the event. Empty on the derived-key path — the
 	// analyzer's live-state fetch (sentry-read.sh) needs the numeric form.
@@ -80,6 +87,7 @@ func BuildIssue(ctx context.Context, env Envelope, rec Record) (Issue, error) {
 		Outcome:         rec.Outcome,
 		ReceivedAt:      rec.ReceivedAt,
 		Date:            date,
+		EventTimestamp:  timestamp,
 		ExceptionType:   exceptionType,
 		ExceptionValue:  exceptionValue,
 		ExceptionModule: exceptionModule,

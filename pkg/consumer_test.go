@@ -110,7 +110,10 @@ var _ = ginkgo.Describe("Consumer", func() {
 
 		err := c.ConsumeMessage(ctx, msg(forwardedRecord))
 		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
-		gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("publish_error"))
+		// This consumer runs the no-enrichment client, so the miss is counted
+		// first; the publish failure this spec is about follows it.
+		gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("enrich_miss"))
+		gomega.Expect(metrics.IncMessagesArgsForCall(1)).To(gomega.Equal("publish_error"))
 	})
 
 	ginkgo.Describe("enrichment", func() {
@@ -129,7 +132,7 @@ var _ = ginkgo.Describe("Consumer", func() {
 			gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
 
 			gomega.Expect(sentry.IssueRefCallCount()).To(gomega.Equal(1))
-			_, eventID := sentry.IssueRefArgsForCall(0)
+			_, eventID, _ := sentry.IssueRefArgsForCall(0)
 			gomega.Expect(eventID).To(gomega.Equal("abc123"))
 
 			gomega.Expect(publisher.PublishCreateCallCount()).To(gomega.Equal(1))
@@ -155,7 +158,12 @@ var _ = ginkgo.Describe("Consumer", func() {
 			_, cmd := publisher.PublishCreateArgsForCall(0)
 			gomega.Expect(cmd.Frontmatter["short_id"]).To(gomega.Equal("event-abc123"))
 			gomega.Expect(cmd.Frontmatter["issue_url"]).To(gomega.Equal(""))
-			gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("processed"))
+			// The miss is counted before the record is published: it is the
+			// outcome this path exists to eliminate, so it is observable rather
+			// than a V(2) line only. The derived key is still correct — a miss
+			// is control flow, not a failure.
+			gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("enrich_miss"))
+			gomega.Expect(metrics.IncMessagesArgsForCall(1)).To(gomega.Equal("processed"))
 		})
 
 		ginkgo.It("never calls sentry for a rejected event", func() {

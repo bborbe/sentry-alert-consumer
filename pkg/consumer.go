@@ -7,6 +7,7 @@ package pkg
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/IBM/sarama"
 	"github.com/bborbe/errors"
@@ -138,9 +139,29 @@ func (c *Consumer) enrichIssue(ctx context.Context, issue *Issue) {
 	if issue.Outcome != outcomeForwarded || issue.EventID == "" {
 		return
 	}
-	ref, err := c.sentry.IssueRef(ctx, issue.EventID)
+	// The event's own age gates the client's dedicated 404 schedule: a 404 on
+	// an event replayed from the topic long after Sentry indexed it is a real
+	// miss, not an indexing race, and must not hold the partition for 10 s.
+	// An unparseable timestamp resolves to the zero time, which the client
+	// reads as "old" — the conservative direction, since the alternative is
+	// spending the schedule's wait on an age we cannot establish.
+	eventTime, parseErr := time.Parse(time.RFC3339, issue.EventTimestamp)
+	if parseErr != nil {
+		glog.Warningf(
+			"enrichment event timestamp unparseable eventID=%s timestamp=%q err=%v",
+			issue.EventID,
+			issue.EventTimestamp,
+			parseErr,
+		)
+	}
+	ref, err := c.sentry.IssueRef(ctx, issue.EventID, eventTime)
 	if err != nil {
 		if errors.Is(err, ErrEventNotFound) {
+			// A miss stays control flow — the derived key is still correct —
+			// but it is the outcome this whole path exists to eliminate, so it
+			// is counted rather than logged only. Without the counter the
+			// dashboard reads healthy while every lookup misses.
+			c.metrics.IncMessages("enrich_miss")
 			glog.V(2).Infof(
 				"enrichment miss eventID=%s issue=%s — keeping derived key",
 				issue.EventID,
@@ -167,5 +188,17 @@ func (c *Consumer) enrichIssue(ctx context.Context, issue *Issue) {
 	}
 	issue.NumericID = ref.NumericID
 	issue.IssueURL = ref.URL
-	glog.V(2).Infof("enriched issue=%s numericID=%s", issue.Key, ref.NumericID)
+	// eventID and eventAge exist for the live probe, not for humans reading
+	// one line: the retry line carries the eventID, so the two correlate by
+	// key rather than by log adjacency, and eventAge is the *lookup* offset —
+	// measured from the event's own creation, before the retry waits — rather
+	// than the completion offset, which would fold the +1/+3/+6/+10 s schedule
+	// into the number and make a correct fix look slow.
+	glog.V(2).Infof(
+		"enriched issue=%s eventID=%s numericID=%s eventAge=%s",
+		issue.Key,
+		issue.EventID,
+		ref.NumericID,
+		time.Since(eventTime).Round(time.Millisecond),
+	)
 }

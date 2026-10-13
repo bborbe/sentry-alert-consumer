@@ -9,6 +9,7 @@ package factory
 import (
 	"context"
 	"strings"
+	"time"
 
 	task "github.com/bborbe/agent/command/task"
 	"github.com/bborbe/cqrs/base"
@@ -64,6 +65,10 @@ func CreateSentryClient(url, org, token string) pkg.SentryClient {
 type disabledSentryClient struct{}
 
 // IssueRef reports every event as unknown to Sentry.
-func (disabledSentryClient) IssueRef(_ context.Context, _ string) (pkg.IssueRef, error) {
+func (disabledSentryClient) IssueRef(
+	_ context.Context,
+	_ string,
+	_ time.Time,
+) (pkg.IssueRef, error) {
 	return pkg.IssueRef{}, pkg.ErrEventNotFound
 }

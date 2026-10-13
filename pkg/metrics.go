@@ -17,12 +17,18 @@ import (
 type Metrics interface {
 	// IncMessages — result: "processed" | "parse_error" | "envelope_error" |
 	// "build_error" | "publish_error" | "enrich_error" |
-	// "enrich_retry_exhausted" | "skipped_heartbeat"
+	// "enrich_retry_exhausted" | "enrich_miss" | "skipped_heartbeat"
 	//
 	// "enrich_error" is a single non-retryable enrichment failure;
 	// "enrich_retry_exhausted" means the client retried and gave up, i.e.
 	// Sentry is sustainedly rate-limiting or down. Only the latter is worth
 	// alerting on.
+	//
+	// "enrich_miss" is the final 404 after the dedicated retry schedule:
+	// Sentry holds no record of the event, so the task keeps its derived key.
+	// It is not an error — the derived-key path is correct — but a sustained
+	// rate of misses is the signal that enrichment is not working, and without
+	// the counter that is invisible: a miss logs at V(2) only.
 	IncMessages(result string)
 
 	// IncEvents — outcome: "forwarded" | "rejected" | "upstream_error"
@@ -103,9 +109,15 @@ func NewMetrics(registerer prometheus.Registerer, formatter Int64Formatter) Metr
 		m.publishedTotal,
 		m.kafkaLag,
 	)
+	// Every result label is pre-initialised so the series exists from startup.
+	// A counter that is only created on first use makes rate() read "no data"
+	// until the first occurrence, so an alert on it silently never fires —
+	// green in tests, dead on the dashboard. "enrich_miss" is exactly that
+	// case: it is the label this change introduces and the one an alert would
+	// watch.
 	for _, r := range []string{
 		"processed", "parse_error", "envelope_error", "build_error", "publish_error",
-		"enrich_error", "enrich_retry_exhausted", "skipped_heartbeat",
+		"enrich_error", "enrich_retry_exhausted", "enrich_miss", "skipped_heartbeat",
 	} {
 		m.messagesTotal.WithLabelValues(r).Add(0)
 	}
