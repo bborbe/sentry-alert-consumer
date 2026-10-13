@@ -41,6 +41,13 @@ var _ = ginkgo.Describe("SentryClient", func() {
 		}))
 	}
 
+	// This table is about the wire shape, not the retry schedule, and it runs
+	// the real waiter — so it passes an event already past the indexing window
+	// deliberately: the 404 entry then stays a single call instead of sleeping
+	// the schedule's 10 s. The schedule itself is covered under "SentryClient
+	// retry", where the waiter is injected.
+	staleEventTime := time.Now().Add(-5 * time.Minute)
+
 	ginkgo.DescribeTable("IssueRef",
 		func(status int, body string, assert func(baseURL string, ref pkg.IssueRef, err error)) {
 			var got request
@@ -48,7 +55,7 @@ var _ = ginkgo.Describe("SentryClient", func() {
 			defer server.Close()
 
 			client := pkg.NewSentryClient(server.URL, "myorg", "secret-token")
-			ref, err := client.IssueRef(ctx, "abc-123")
+			ref, err := client.IssueRef(ctx, "abc-123", staleEventTime)
 
 			gomega.Expect(got.method).To(gomega.Equal(http.MethodGet))
 			gomega.Expect(got.path).
@@ -115,7 +122,7 @@ var _ = ginkgo.Describe("SentryClient", func() {
 		defer server.Close()
 
 		client := pkg.NewSentryClient(server.URL+"/", "myorg", "secret-token")
-		ref, err := client.IssueRef(ctx, "abc-123")
+		ref, err := client.IssueRef(ctx, "abc-123", staleEventTime)
 
 		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
 		gomega.Expect(got.path).
@@ -129,7 +136,7 @@ var _ = ginkgo.Describe("SentryClient", func() {
 		defer server.Close()
 
 		client := pkg.NewSentryClient(server.URL, "myorg", "secret-token")
-		_, err := client.IssueRef(ctx, "a b/c")
+		_, err := client.IssueRef(ctx, "a b/c", staleEventTime)
 
 		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
 		gomega.Expect(got.path).
@@ -145,7 +152,7 @@ var _ = ginkgo.Describe("SentryClient", func() {
 		cancel()
 
 		client := pkg.NewSentryClient(server.URL, "myorg", "secret-token")
-		ref, err := client.IssueRef(cancelled, "abc-123")
+		ref, err := client.IssueRef(cancelled, "abc-123", staleEventTime)
 
 		gomega.Expect(err).To(gomega.HaveOccurred())
 		gomega.Expect(errors.Is(err, pkg.ErrEventNotFound)).To(gomega.BeFalse())
@@ -185,6 +192,21 @@ var _ = ginkgo.Describe("SentryClient retry", func() {
 		})
 	}
 
+	// The 404 schedule is gated on the event's own age, so every spec states
+	// which side of the indexing window it exercises. freshEventTime is what a
+	// just-forwarded event looks like; staleEventTime is what a record replayed
+	// from the topic days later looks like.
+	freshEventTime := time.Now()
+	staleEventTime := time.Now().Add(-5 * time.Minute)
+
+	totalWait := func(waits []time.Duration) time.Duration {
+		var total time.Duration
+		for _, w := range waits {
+			total += w
+		}
+		return total
+	}
+
 	ginkgo.It("retries a 429 and enriches from the follow-up 200", func() {
 		var calls int
 		var waits []time.Duration
@@ -194,7 +216,7 @@ var _ = ginkgo.Describe("SentryClient retry", func() {
 		client := pkg.NewSentryClientWithWaiter(
 			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
 		)
-		ref, err := client.IssueRef(ctx, "abc-123")
+		ref, err := client.IssueRef(ctx, "abc-123", freshEventTime)
 
 		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
 		gomega.Expect(ref.NumericID).To(gomega.Equal("42"))
@@ -211,7 +233,7 @@ var _ = ginkgo.Describe("SentryClient retry", func() {
 		client := pkg.NewSentryClientWithWaiter(
 			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
 		)
-		ref, err := client.IssueRef(ctx, "abc-123")
+		ref, err := client.IssueRef(ctx, "abc-123", freshEventTime)
 
 		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
 		gomega.Expect(ref.NumericID).To(gomega.Equal("42"))
@@ -228,7 +250,7 @@ var _ = ginkgo.Describe("SentryClient retry", func() {
 		client := pkg.NewSentryClientWithWaiter(
 			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
 		)
-		_, err := client.IssueRef(ctx, "abc-123")
+		_, err := client.IssueRef(ctx, "abc-123", freshEventTime)
 
 		gomega.Expect(err).To(gomega.HaveOccurred())
 		gomega.Expect(waits).To(gomega.Equal([]time.Duration{
@@ -246,7 +268,7 @@ var _ = ginkgo.Describe("SentryClient retry", func() {
 		client := pkg.NewSentryClientWithWaiter(
 			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
 		)
-		ref, err := client.IssueRef(ctx, "abc-123")
+		ref, err := client.IssueRef(ctx, "abc-123", freshEventTime)
 
 		gomega.Expect(err).To(gomega.HaveOccurred())
 		gomega.Expect(errors.Is(err, pkg.ErrRetriesExhausted)).To(gomega.BeTrue())
@@ -270,33 +292,122 @@ var _ = ginkgo.Describe("SentryClient retry", func() {
 		client := pkg.NewSentryClientWithWaiter(
 			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
 		)
-		_, err := client.IssueRef(ctx, "abc-123")
+		_, err := client.IssueRef(ctx, "abc-123", freshEventTime)
 
 		gomega.Expect(errors.Is(err, pkg.ErrRetriesExhausted)).To(gomega.BeTrue())
 		gomega.Expect(calls).To(gomega.Equal(1))
 		gomega.Expect(waits).To(gomega.BeEmpty())
 	})
 
-	ginkgo.DescribeTable("does not retry a terminal status",
-		func(status int) {
-			var calls int
-			var waits []time.Duration
-			server := newSequenceServer(&calls, "", status)
-			defer server.Close()
+	// A 500 stays terminal whatever the event's age: some APIs return 500 for a
+	// missing resource, so retrying it would burn Sentry quota on a permanent
+	// miss. A 404 is terminal only once the event is past the indexing window —
+	// see the schedule specs below.
+	ginkgo.It("does not retry a 500", func() {
+		var calls int
+		var waits []time.Duration
+		server := newSequenceServer(&calls, "", http.StatusInternalServerError)
+		defer server.Close()
 
-			client := pkg.NewSentryClientWithWaiter(
-				server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
-			)
-			_, err := client.IssueRef(ctx, "abc-123")
+		client := pkg.NewSentryClientWithWaiter(
+			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
+		)
+		_, err := client.IssueRef(ctx, "abc-123", freshEventTime)
 
-			gomega.Expect(err).To(gomega.HaveOccurred())
-			gomega.Expect(errors.Is(err, pkg.ErrRetriesExhausted)).To(gomega.BeFalse())
-			gomega.Expect(calls).To(gomega.Equal(1))
-			gomega.Expect(waits).To(gomega.BeEmpty())
-		},
-		ginkgo.Entry("404 is an expected miss", http.StatusNotFound),
-		// A bare 500 can mean "resource absent" on some APIs, so retrying it
-		// would burn Sentry quota on a permanent miss.
-		ginkgo.Entry("500 may mean the resource is absent", http.StatusInternalServerError),
-	)
+		gomega.Expect(err).To(gomega.HaveOccurred())
+		gomega.Expect(errors.Is(err, pkg.ErrRetriesExhausted)).To(gomega.BeFalse())
+		gomega.Expect(errors.Is(err, pkg.ErrEventNotFound)).To(gomega.BeFalse())
+		gomega.Expect(calls).To(gomega.Equal(1))
+		gomega.Expect(waits).To(gomega.BeEmpty())
+	})
+
+	ginkgo.It("skips the 404 schedule for an event past the indexing window", func() {
+		var calls int
+		var waits []time.Duration
+		server := newSequenceServer(&calls, "", http.StatusNotFound)
+		defer server.Close()
+
+		client := pkg.NewSentryClientWithWaiter(
+			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
+		)
+		ref, err := client.IssueRef(ctx, "abc-123", staleEventTime)
+
+		gomega.Expect(errors.Is(err, pkg.ErrEventNotFound)).To(gomega.BeTrue())
+		gomega.Expect(ref).To(gomega.Equal(pkg.IssueRef{}))
+		// Exactly one lookup and no wait: an event replayed from the topic has
+		// a real miss, and holding the partition 10 s per record would stall a
+		// replay burst of 45 misses for minutes.
+		gomega.Expect(calls).To(gomega.Equal(1))
+		gomega.Expect(waits).To(gomega.BeEmpty())
+	})
+
+	ginkgo.It("retries a 404 on a fresh event and enriches from the follow-up 200", func() {
+		var calls int
+		var waits []time.Duration
+		server := newSequenceServer(
+			&calls, "", http.StatusNotFound, http.StatusNotFound, http.StatusOK,
+		)
+		defer server.Close()
+
+		client := pkg.NewSentryClientWithWaiter(
+			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
+		)
+		ref, err := client.IssueRef(ctx, "abc-123", freshEventTime)
+
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+		gomega.Expect(ref.NumericID).To(gomega.Equal("42"))
+		gomega.Expect(calls).To(gomega.Equal(3))
+		// The offsets are absolute from the first attempt, so the waits are the
+		// gaps between them: 1s to the second attempt, then 2s more to the
+		// third.
+		gomega.Expect(waits).To(gomega.Equal([]time.Duration{
+			1 * time.Second,
+			2 * time.Second,
+		}))
+		gomega.Expect(totalWait(waits)).To(gomega.BeNumerically("<=", 10*time.Second))
+	})
+
+	ginkgo.It("gives up after the full 404 schedule on a fresh event", func() {
+		var calls int
+		var waits []time.Duration
+		server := newSequenceServer(&calls, "", http.StatusNotFound)
+		defer server.Close()
+
+		client := pkg.NewSentryClientWithWaiter(
+			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
+		)
+		ref, err := client.IssueRef(ctx, "abc-123", freshEventTime)
+
+		gomega.Expect(errors.Is(err, pkg.ErrEventNotFound)).To(gomega.BeTrue())
+		gomega.Expect(errors.Is(err, pkg.ErrRetriesExhausted)).To(gomega.BeFalse())
+		gomega.Expect(ref).To(gomega.Equal(pkg.IssueRef{}))
+		// One error-retry attempt plus the four schedule attempts.
+		gomega.Expect(calls).To(gomega.Equal(5))
+		gomega.Expect(waits).To(gomega.Equal([]time.Duration{
+			1 * time.Second,
+			2 * time.Second,
+			3 * time.Second,
+			4 * time.Second,
+		}))
+		gomega.Expect(totalWait(waits)).To(gomega.BeNumerically("<=", 10*time.Second))
+	})
+
+	ginkgo.It("treats a zero event time as old and skips the 404 schedule", func() {
+		var calls int
+		var waits []time.Duration
+		server := newSequenceServer(&calls, "", http.StatusNotFound)
+		defer server.Close()
+
+		client := pkg.NewSentryClientWithWaiter(
+			server.URL, "myorg", "secret-token", newRecordingWaiter(&waits),
+		)
+		// A zero time is what an unparseable timestamp resolves to, so the
+		// conservative direction is asserted rather than left to chance: the
+		// schedule is skipped rather than spent on an age we cannot establish.
+		_, err := client.IssueRef(ctx, "abc-123", time.Time{})
+
+		gomega.Expect(errors.Is(err, pkg.ErrEventNotFound)).To(gomega.BeTrue())
+		gomega.Expect(calls).To(gomega.Equal(1))
+		gomega.Expect(waits).To(gomega.BeEmpty())
+	})
 })

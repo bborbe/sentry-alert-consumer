@@ -7,16 +7,18 @@ package mocks
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/bborbe/sentry-alert-consumer/pkg"
 )
 
 type SentryClient struct {
-	IssueRefStub        func(context.Context, string) (pkg.IssueRef, error)
+	IssueRefStub        func(context.Context, string, time.Time) (pkg.IssueRef, error)
 	issueRefMutex       sync.RWMutex
 	issueRefArgsForCall []struct {
 		arg1 context.Context
 		arg2 string
+		arg3 time.Time
 	}
 	issueRefReturns struct {
 		result1 pkg.IssueRef
@@ -30,19 +32,20 @@ type SentryClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *SentryClient) IssueRef(arg1 context.Context, arg2 string) (pkg.IssueRef, error) {
+func (fake *SentryClient) IssueRef(arg1 context.Context, arg2 string, arg3 time.Time) (pkg.IssueRef, error) {
 	fake.issueRefMutex.Lock()
 	ret, specificReturn := fake.issueRefReturnsOnCall[len(fake.issueRefArgsForCall)]
 	fake.issueRefArgsForCall = append(fake.issueRefArgsForCall, struct {
 		arg1 context.Context
 		arg2 string
-	}{arg1, arg2})
+		arg3 time.Time
+	}{arg1, arg2, arg3})
 	stub := fake.IssueRefStub
 	fakeReturns := fake.issueRefReturns
-	fake.recordInvocation("IssueRef", []interface{}{arg1, arg2})
+	fake.recordInvocation("IssueRef", []interface{}{arg1, arg2, arg3})
 	fake.issueRefMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2)
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -56,17 +59,17 @@ func (fake *SentryClient) IssueRefCallCount() int {
 	return len(fake.issueRefArgsForCall)
 }
 
-func (fake *SentryClient) IssueRefCalls(stub func(context.Context, string) (pkg.IssueRef, error)) {
+func (fake *SentryClient) IssueRefCalls(stub func(context.Context, string, time.Time) (pkg.IssueRef, error)) {
 	fake.issueRefMutex.Lock()
 	defer fake.issueRefMutex.Unlock()
 	fake.IssueRefStub = stub
 }
 
-func (fake *SentryClient) IssueRefArgsForCall(i int) (context.Context, string) {
+func (fake *SentryClient) IssueRefArgsForCall(i int) (context.Context, string, time.Time) {
 	fake.issueRefMutex.RLock()
 	defer fake.issueRefMutex.RUnlock()
 	argsForCall := fake.issueRefArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *SentryClient) IssueRefReturns(result1 pkg.IssueRef, result2 error) {
