@@ -88,6 +88,44 @@ var _ = ginkgo.Describe("Consumer", func() {
 		gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("parse_error"))
 	})
 
+	ginkgo.It("counts an unparseable event payload while still analysing the record", func() {
+		metrics := &mocks.Metrics{}
+		publisher := &mocks.TaskPublisher{}
+		publisher.PublishCreateReturns(true)
+		c := pkg.NewConsumer(publisher, metrics, cfg, noEnrichment())
+
+		// The record and the envelope's "event" item header both parse; only the
+		// payload line does not. Before this counter the record fell silently to
+		// the per-event identity with nothing observable — the shape that hid the
+		// bare-array exception (v0.1.6) and bare-string message (PR #11) defects.
+		record := `{"body":"{\"event_id\":\"abc123\"}\n{\"type\":\"event\"}\nnot-json","project":"nuke-prod","received_at":"2026-09-09T20:10:00Z","outcome":"rejected"}`
+		err := c.ConsumeMessage(ctx, msg(record))
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+
+		// Counted, not fatal: the task is still published on its derived key.
+		gomega.Expect(publisher.PublishCreateCallCount()).To(gomega.Equal(1))
+		_, cmd := publisher.PublishCreateArgsForCall(0)
+		gomega.Expect(cmd.Frontmatter["short_id"]).To(gomega.Equal("event-abc123"))
+		gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("payload_parse_error"))
+		gomega.Expect(metrics.IncMessagesArgsForCall(1)).To(gomega.Equal("processed"))
+	})
+
+	ginkgo.It("does not count a well-formed payload as a parse failure", func() {
+		// The negative control: without it, an implementation that increments on
+		// every message would satisfy the spec above just as well.
+		metrics := &mocks.Metrics{}
+		publisher := &mocks.TaskPublisher{}
+		publisher.PublishCreateReturns(true)
+		c := pkg.NewConsumer(publisher, metrics, cfg, noEnrichment())
+
+		record := `{"body":"{\"event_id\":\"abc123\"}\n{\"type\":\"event\"}\n{\"event_id\":\"abc123\",\"level\":\"error\",\"message\":\"boom\"}","project":"nuke-prod","received_at":"2026-09-09T20:10:00Z","outcome":"rejected"}`
+		err := c.ConsumeMessage(ctx, msg(record))
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+
+		gomega.Expect(metrics.IncMessagesCallCount()).To(gomega.Equal(1))
+		gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("processed"))
+	})
+
 	ginkgo.It("analyses a rejected alert even when the envelope payload is missing", func() {
 		metrics := &mocks.Metrics{}
 		publisher := &mocks.TaskPublisher{}

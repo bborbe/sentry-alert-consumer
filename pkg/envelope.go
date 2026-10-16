@@ -125,17 +125,21 @@ type exceptionFrame struct {
 // Envelope holds the identity fields extracted from one raw Sentry envelope.
 // Event may be nil when the event payload is missing or unparseable — the
 // caller then falls back to the envelope header's event_id (or the body hash),
-// never dropping the record.
+// never dropping the record. PayloadParseFailed tells those two apart: it is
+// true only when an "event" item was present and its payload line did not
+// unmarshal, so the degradation can be counted rather than hidden.
 type Envelope struct {
-	EventID string
-	SentAt  string
-	Event   *eventPayload
+	EventID            string
+	SentAt             string
+	Event              *eventPayload
+	PayloadParseFailed bool
 }
 
 // ParseEnvelope extracts the envelope header (event_id) and, when present and
 // parseable, the first "event" item's payload. It is best-effort by design:
 // only an empty envelope or an unparseable header line is a hard error — a
-// malformed event payload degrades to the header identity instead.
+// malformed event payload degrades to the header identity instead, and reports
+// itself through Envelope.PayloadParseFailed so the caller can count it.
 func ParseEnvelope(ctx context.Context, raw string) (Envelope, error) {
 	lines := splitEnvelopeLines(raw)
 	if len(lines) == 0 {
@@ -146,7 +150,9 @@ func ParseEnvelope(ctx context.Context, raw string) (Envelope, error) {
 		return Envelope{}, errors.Wrapf(ctx, err, "parse envelope header")
 	}
 	e := Envelope{EventID: hdr.EventID, SentAt: hdr.SentAt}
-	if ev := parseEventItem(lines[1:]); ev != nil {
+	ev, parseFailed := parseEventItem(lines[1:])
+	e.PayloadParseFailed = parseFailed
+	if ev != nil {
 		e.Event = ev
 		if e.EventID == "" && ev.EventID != "" {
 			e.EventID = ev.EventID
@@ -166,8 +172,11 @@ func splitEnvelopeLines(raw string) []string {
 }
 
 // parseEventItem scans the item lines after the envelope header for the first
-// "event" item and returns its payload, or nil when absent or unparseable.
-func parseEventItem(lines []string) *eventPayload {
+// "event" item and returns its payload, or nil when absent. The second return
+// value reports an event item whose payload line was present but did not
+// unmarshal — the silent degradation this scan used to hide, and the reason
+// two SDK shapes ran undetected for weeks.
+func parseEventItem(lines []string) (*eventPayload, bool) {
 	for i, line := range lines {
 		trimmed := strings.TrimSpace(line)
 		if trimmed == "" {
@@ -182,15 +191,22 @@ func parseEventItem(lines []string) *eventPayload {
 		if itemHdr.Type != "event" {
 			continue
 		}
-		return parseEventPayload(lines[i+1:])
+		payload, parseFailed := parseEventPayload(lines[i+1:])
+		if parseFailed {
+			return nil, true
+		}
+		return payload, false
 	}
-	return nil
+	return nil, false
 }
 
 // parseEventPayload parses the first non-empty line after the "event" item
 // header as the event payload (SDKs send compact single-line event JSON). A
-// parse failure returns nil — the header's event_id still identifies the event.
-func parseEventPayload(lines []string) *eventPayload {
+// parse failure returns nil with the second value true — the header's event_id
+// still identifies the event, but the failure is no longer silent. A payload
+// line that is absent entirely is not a failure: the second value stays false,
+// so only a present-but-unreadable payload is counted.
+func parseEventPayload(lines []string) (*eventPayload, bool) {
 	for _, line := range lines {
 		payload := strings.TrimSpace(line)
 		if payload == "" {
@@ -198,9 +214,9 @@ func parseEventPayload(lines []string) *eventPayload {
 		}
 		var ev eventPayload
 		if err := json.Unmarshal([]byte(payload), &ev); err != nil {
-			return nil
+			return nil, true
 		}
-		return &ev
+		return &ev, false
 	}
-	return nil
+	return nil, false
 }

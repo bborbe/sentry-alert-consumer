@@ -26,6 +26,7 @@ var _ = ginkgo.Describe("parseEnvelope", func() {
 		gomega.Expect(env.Event.Exception.Values).To(gomega.HaveLen(1))
 		gomega.Expect(env.Event.Exception.Values[0].Type).To(gomega.Equal("RuntimeError"))
 		gomega.Expect(env.Event.Message.Formatted).To(gomega.Equal("boom happened"))
+		gomega.Expect(env.PayloadParseFailed).To(gomega.BeFalse())
 	})
 
 	ginkgo.It("accepts the bare-array exception form sentry-go emits", func() {
@@ -82,6 +83,9 @@ var _ = ginkgo.Describe("parseEnvelope", func() {
 		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
 		gomega.Expect(env.EventID).To(gomega.Equal("abc123"))
 		gomega.Expect(env.Event).To(gomega.BeNil())
+		// Absent is not unparseable: no payload line was ever offered, so this
+		// must not be reported as a parse failure.
+		gomega.Expect(env.PayloadParseFailed).To(gomega.BeFalse())
 	})
 
 	ginkgo.It("degrades to the header identity when the event payload is malformed", func() {
@@ -91,6 +95,11 @@ not-json`)
 		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
 		gomega.Expect(env.EventID).To(gomega.Equal("abc123"))
 		gomega.Expect(env.Event).To(gomega.BeNil())
+		// …but a payload that was present and did not unmarshal is reported, so
+		// the consumer can count the degradation instead of hiding it. This is
+		// the shape that hid the bare-array exception and bare-string message
+		// defects for weeks.
+		gomega.Expect(env.PayloadParseFailed).To(gomega.BeTrue())
 	})
 
 	ginkgo.It("errors on an unparseable header line", func() {
