@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+- fix: report `eventAge` on the `enriched` line as the offset to the **first lookup attempt** rather than the offset to the log line. The field is read as evidence that a lookup happened inside Sentry's ingest-indexing window, but `time.Since(eventTime)` was evaluated *after* `IssueRef` returned, so it folded the dedicated 404 schedule's +1/+3/+6/+10 s waits into the number: a fresh event that retried before succeeding read as an old one, which is precisely the distinction the field exists to make. Observed on dev 2026-10-14 — an event logged `eventAge=7.615s` whose actual first lookup ran at +0.632 s, leaving the parent task's `eventAge < 3 s` criterion readable only by deriving the offset from raw log timestamps. The clock is now injected (`libtime.CurrentDateTimeGetter`) rather than read from `time.Now()`, so the specs assert the logged value exactly, and they are pinned to fail against the previous expression.
+
 ## v0.2.2
 
 - fix: count a present-but-unparseable envelope event payload as `payload_parse_error` and log it with the event_id, instead of dropping it silently — `parseEventPayload` returned nil on a JSON unmarshal failure with no log and no metric, so the record degraded to the header/body-hash identity and was still counted as `processed`; that silence is what let the bare-array exception (v0.1.6) and bare-string message (PR #11) defects run undetected for weeks. The label is pre-initialised so `rate()` has a series from startup, and it stays distinct from `parse_error`, which is a Kafka *record* that did not parse. A payload that is absent entirely is not counted — only one that was present and unreadable.

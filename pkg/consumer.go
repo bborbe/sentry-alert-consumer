@@ -11,6 +11,7 @@ import (
 
 	"github.com/IBM/sarama"
 	"github.com/bborbe/errors"
+	libtime "github.com/bborbe/time"
 	"github.com/golang/glog"
 )
 
@@ -37,24 +38,33 @@ type Consumer struct {
 	sentry    SentryClient
 	cfg       TaskConfig
 
+	// currentDateTimeGetter is injected rather than read from time.Now() so the
+	// lookup offset below is deterministic under test: the enriched line's
+	// eventAge is a value the specs assert exactly, and a test cannot assert a
+	// value it does not control.
+	currentDateTimeGetter libtime.CurrentDateTimeGetter
+
 	mu       sync.Mutex
 	consumed map[int32]int64 // highest consumed offset per partition
 }
 
 // NewConsumer returns a Consumer publishing through publisher, counting through
-// metrics and enriching forwarded events through sentry.
+// metrics, enriching forwarded events through sentry and reading the clock
+// through currentDateTimeGetter.
 func NewConsumer(
 	publisher TaskPublisher,
 	metrics Metrics,
 	cfg TaskConfig,
 	sentry SentryClient,
+	currentDateTimeGetter libtime.CurrentDateTimeGetter,
 ) *Consumer {
 	return &Consumer{
-		metrics:   metrics,
-		publisher: publisher,
-		sentry:    sentry,
-		cfg:       cfg,
-		consumed:  make(map[int32]int64),
+		metrics:               metrics,
+		publisher:             publisher,
+		sentry:                sentry,
+		cfg:                   cfg,
+		currentDateTimeGetter: currentDateTimeGetter,
+		consumed:              make(map[int32]int64),
 	}
 }
 
@@ -168,6 +178,11 @@ func (c *Consumer) enrichIssue(ctx context.Context, issue *Issue) {
 			parseErr,
 		)
 	}
+	// lookupStart is read *before* the lookup, not after it: the enriched line's
+	// eventAge is the offset to the first attempt, so it must not absorb the
+	// client's 404 schedule waits. Reading the clock here is what keeps the
+	// number comparable across a fast success and a schedule that retried.
+	lookupStart := c.currentDateTimeGetter.Now()
 	ref, err := c.sentry.IssueRef(ctx, issue.EventID, eventTime)
 	if err != nil {
 		if errors.Is(err, ErrEventNotFound) {
@@ -213,6 +228,6 @@ func (c *Consumer) enrichIssue(ctx context.Context, issue *Issue) {
 		issue.Key,
 		issue.EventID,
 		ref.NumericID,
-		time.Since(eventTime).Round(time.Millisecond),
+		lookupStart.Time().Sub(eventTime).Round(time.Millisecond),
 	)
 }

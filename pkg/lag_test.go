@@ -10,6 +10,7 @@ import (
 
 	"github.com/IBM/sarama"
 	task "github.com/bborbe/agent/command/task"
+	libtime "github.com/bborbe/time"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 
@@ -42,7 +43,7 @@ var _ = ginkgo.Describe("LagTracker", func() {
 		// enrichment-off client: this suite asserts lag, not enrichment.
 		sentry := &mocks.SentryClient{}
 		sentry.IssueRefReturns(pkg.IssueRef{}, pkg.ErrEventNotFound)
-		c := pkg.NewConsumer(publisher, metrics, cfg, sentry)
+		c := pkg.NewConsumer(publisher, metrics, cfg, sentry, libtime.NewCurrentDateTime())
 		msg := &sarama.ConsumerMessage{Partition: partition, Offset: offset, Value: []byte(record)}
 		gomega.Expect(c.ConsumeMessage(ctx, msg)).To(gomega.Succeed())
 		return c
