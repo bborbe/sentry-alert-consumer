@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v0.2.3
 
 - fix: report `eventAge` on the `enriched` line as the offset to the **first lookup attempt** rather than the offset to the log line. The field is read as evidence that a lookup happened inside Sentry's ingest-indexing window, but `time.Since(eventTime)` was evaluated *after* `IssueRef` returned, so it folded the dedicated 404 schedule's +1/+3/+6/+10 s waits into the number: a fresh event that retried before succeeding read as an old one, which is precisely the distinction the field exists to make. Observed on dev 2026-10-14 — an event logged `eventAge=7.615s` whose actual first lookup ran at +0.632 s, leaving the parent task's `eventAge < 3 s` criterion readable only by deriving the offset from raw log timestamps. The clock is now injected (`libtime.CurrentDateTimeGetter`) rather than read from `time.Now()`, so the specs assert the logged value exactly, and they are pinned to fail against the previous expression.
 
