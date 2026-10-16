@@ -16,8 +16,13 @@ import (
 // Metrics is the observable counter surface of the consumer.
 type Metrics interface {
 	// IncMessages — result: "processed" | "parse_error" | "envelope_error" |
-	// "build_error" | "publish_error" | "enrich_error" |
+	// "payload_parse_error" | "build_error" | "publish_error" | "enrich_error" |
 	// "enrich_retry_exhausted" | "enrich_miss" | "skipped_heartbeat"
+	//
+	// "parse_error" and "payload_parse_error" are different failures and must
+	// not be conflated: the first is a Kafka *record* that did not parse, the
+	// second a record that parsed fine but whose envelope event payload did not
+	// unmarshal — the record still becomes a task, on a fallback identity.
 	//
 	// "enrich_error" is a single non-retryable enrichment failure;
 	// "enrich_retry_exhausted" means the client retried and gave up, i.e.
@@ -116,7 +121,8 @@ func NewMetrics(registerer prometheus.Registerer, formatter Int64Formatter) Metr
 	// case: it is the label this change introduces and the one an alert would
 	// watch.
 	for _, r := range []string{
-		"processed", "parse_error", "envelope_error", "build_error", "publish_error",
+		"processed", "parse_error", "envelope_error", "payload_parse_error",
+		"build_error", "publish_error",
 		"enrich_error", "enrich_retry_exhausted", "enrich_miss", "skipped_heartbeat",
 	} {
 		m.messagesTotal.WithLabelValues(r).Add(0)

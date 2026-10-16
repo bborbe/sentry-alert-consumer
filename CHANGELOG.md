@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+- fix: count a present-but-unparseable envelope event payload as `payload_parse_error` and log it with the event_id, instead of dropping it silently — `parseEventPayload` returned nil on a JSON unmarshal failure with no log and no metric, so the record degraded to the header/body-hash identity and was still counted as `processed`; that silence is what let the bare-array exception (v0.1.6) and bare-string message (PR #11) defects run undetected for weeks. The label is pre-initialised so `rate()` has a series from startup, and it stays distinct from `parse_error`, which is a Kafka *record* that did not parse. A payload that is absent entirely is not counted — only one that was present and unreadable.
+
 ## v0.2.1
 
 - fix: retry a 404 from the eventids lookup on a dedicated schedule (+1/+3/+6/+10 s, 4 extra lookups) when the event is still inside Sentry's ingest-indexing window, so an event Sentry has stored but not yet indexed is enriched instead of silently keeping its derived key. A 404 was treated as permanent, so every lookup landing within a few seconds of the event's creation produced a derived-key task and an `unanalyzable` verdict — reproduced at +2.58 s and +0.91 s after `date_created`, and measured on the prod consumer as 0 successes in 61 attempts. The schedule is deliberately separate from the error-retry budget (which stays at 3 attempts / 2 s and still does not retry a 404): the error budget answers "is Sentry having a moment?", the schedule answers "has Sentry finished indexing this event yet?". It is skipped for events older than 30 s, because a record replayed from the topic has a real miss and holding a partition 10 s per record would stall a 45-miss replay burst for minutes. The miss is now counted as `enrich_miss` (pre-initialised, so `rate()` has a series from startup) rather than logged at V(2) only — the counter is what makes a return of this failure visible instead of silent.

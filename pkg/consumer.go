@@ -97,6 +97,20 @@ func (c *Consumer) ConsumeMessage(ctx context.Context, msg *sarama.ConsumerMessa
 		// body-hash identity, so the record is still analysed, never dropped.
 		env = Envelope{EventID: ""}
 	}
+	if env.PayloadParseFailed {
+		// The "event" item was present but its payload did not unmarshal. The
+		// record still becomes a task on a fallback identity, so without this
+		// counter the failure is invisible — which is how two SDK shapes ran
+		// undetected for weeks (bare-array exception, v0.1.6; bare-string
+		// message, PR #11). Counted, not fatal: the consume loop must not die
+		// on a single bad payload.
+		c.metrics.IncMessages("payload_parse_error")
+		glog.Warningf(
+			"parse event payload failed eventID=%s project=%s",
+			env.EventID,
+			record.Project,
+		)
+	}
 
 	if env.Event != nil && env.Event.Logger == heartbeatLogger {
 		c.metrics.IncMessages("skipped_heartbeat")
