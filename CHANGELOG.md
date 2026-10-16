@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v0.2.2
 
 - fix: count a present-but-unparseable envelope event payload as `payload_parse_error` and log it with the event_id, instead of dropping it silently — `parseEventPayload` returned nil on a JSON unmarshal failure with no log and no metric, so the record degraded to the header/body-hash identity and was still counted as `processed`; that silence is what let the bare-array exception (v0.1.6) and bare-string message (PR #11) defects run undetected for weeks. The label is pre-initialised so `rate()` has a series from startup, and it stays distinct from `parse_error`, which is a Kafka *record* that did not parse. A payload that is absent entirely is not counted — only one that was present and unreadable.
 
