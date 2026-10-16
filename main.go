@@ -27,6 +27,7 @@ import (
 	"github.com/bborbe/run"
 	libsentry "github.com/bborbe/sentry"
 	"github.com/bborbe/service"
+	libtime "github.com/bborbe/time"
 	"github.com/golang/glog"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -104,7 +105,7 @@ func (a *application) Run(ctx context.Context, _ libsentry.Client) error {
 		Assignee: a.TaskAssignee,
 		Status:   a.TaskStatus,
 		Phase:    a.TaskPhase,
-	}, sentryClient)
+	}, sentryClient, libtime.NewCurrentDateTime())
 
 	// Start from the oldest offset so no event is missed on first start; the
 	// simple offset manager is in-memory, so a restart replays from the

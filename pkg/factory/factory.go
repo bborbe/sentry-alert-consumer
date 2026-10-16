@@ -16,6 +16,7 @@ import (
 	"github.com/bborbe/cqrs/cdb"
 	libkafka "github.com/bborbe/kafka"
 	"github.com/bborbe/log"
+	libtime "github.com/bborbe/time"
 	"github.com/golang/glog"
 
 	"github.com/bborbe/sentry-alert-consumer/pkg"
@@ -34,15 +35,18 @@ func CreateKafkaSender(
 }
 
 // CreateConsumer wires the publisher + metrics + task config + enrichment
-// client into a ready Consumer. Pure composition — no I/O.
+// client + clock into a ready Consumer. Pure composition — no I/O, and the
+// clock arrives as a parameter rather than being created here so the caller
+// owns which clock the consumer reads.
 func CreateConsumer(
 	sender task.CreateCommandSender,
 	metrics pkg.Metrics,
 	cfg pkg.TaskConfig,
 	sentry pkg.SentryClient,
+	currentDateTimeGetter libtime.CurrentDateTimeGetter,
 ) *pkg.Consumer {
 	publisher := pkg.NewTaskPublisher(sender, metrics)
-	return pkg.NewConsumer(publisher, metrics, cfg, sentry)
+	return pkg.NewConsumer(publisher, metrics, cfg, sentry, currentDateTimeGetter)
 }
 
 // CreateSentryClient returns the event→issue enrichment client. An empty token
