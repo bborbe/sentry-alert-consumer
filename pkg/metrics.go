@@ -17,7 +17,8 @@ import (
 type Metrics interface {
 	// IncMessages — result: "processed" | "parse_error" | "envelope_error" |
 	// "payload_parse_error" | "build_error" | "publish_error" | "enrich_error" |
-	// "enrich_retry_exhausted" | "enrich_miss" | "skipped_heartbeat"
+	// "enrich_retry_exhausted" | "enrich_miss" | "skipped_heartbeat" |
+	// "skipped_non_forwarded"
 	//
 	// "parse_error" and "payload_parse_error" are different failures and must
 	// not be conflated: the first is a Kafka *record* that did not parse, the
@@ -124,6 +125,7 @@ func NewMetrics(registerer prometheus.Registerer, formatter Int64Formatter) Metr
 		"processed", "parse_error", "envelope_error", "payload_parse_error",
 		"build_error", "publish_error",
 		"enrich_error", "enrich_retry_exhausted", "enrich_miss", "skipped_heartbeat",
+		"skipped_non_forwarded",
 	} {
 		m.messagesTotal.WithLabelValues(r).Add(0)
 	}

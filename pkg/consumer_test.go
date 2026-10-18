@@ -65,17 +65,56 @@ var _ = ginkgo.Describe("Consumer", func() {
 		}
 		c := pkg.NewConsumer(publisher, metrics, cfg, noEnrichment(), wallClock)
 
-		record := `{"body":"{\"event_id\":\"abc123\"}","project":"nuke-prod","received_at":"2026-09-09T20:10:00Z","outcome":"rejected"}`
-		err := c.ConsumeMessage(ctx, msg(record))
+		err := c.ConsumeMessage(ctx, msg(forwardedRecord))
 		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
 
 		gomega.Expect(publisher.PublishCreateCallCount()).To(gomega.Equal(1))
 		_, cmd := publisher.PublishCreateArgsForCall(0)
 		gomega.Expect(cmd.Title).To(gomega.ContainSubstring("Analyze Sentry issue"))
-		gomega.Expect(metrics.IncMessagesCallCount()).To(gomega.Equal(1))
-		gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("processed"))
-		gomega.Expect(metrics.IncEventsArgsForCall(0)).To(gomega.Equal("rejected"))
+		// enrich_miss first (noEnrichment reports the event unknown to Sentry),
+		// then the publish decision.
+		gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("enrich_miss"))
+		gomega.Expect(metrics.IncMessagesArgsForCall(1)).To(gomega.Equal("processed"))
+		gomega.Expect(metrics.IncEventsArgsForCall(0)).To(gomega.Equal("forwarded"))
 		gomega.Expect(metrics.SetLastEventCallCount()).To(gomega.Equal(1))
+	})
+
+	ginkgo.It("publishes nothing for a rejected record", func() {
+		// The regression this guards: a rejected event was never stored by Sentry,
+		// so it has no issue identity and deriveIssueKey falls back to the
+		// per-event "event-<EventID>" key, which nothing can dedup — one analyzer
+		// task per rejected event, measured 2026-10-18 at ~73 of 74 records.
+		metrics := &mocks.Metrics{}
+		publisher := &mocks.TaskPublisher{}
+		sentry := noEnrichment()
+		c := pkg.NewConsumer(publisher, metrics, cfg, sentry, wallClock)
+
+		record := `{"body":"{\"event_id\":\"abc123\"}","project":"nuke-prod","received_at":"2026-09-09T20:10:00Z","outcome":"rejected"}`
+		err := c.ConsumeMessage(ctx, msg(record))
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+
+		gomega.Expect(publisher.PublishCreateCallCount()).To(gomega.Equal(0))
+		gomega.Expect(sentry.IssueRefCallCount()).To(gomega.Equal(0))
+		// The outcome stays observable even though nothing is published.
+		gomega.Expect(metrics.IncEventsArgsForCall(0)).To(gomega.Equal("rejected"))
+		gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("skipped_non_forwarded"))
+		gomega.Expect(metrics.SetLastEventCallCount()).To(gomega.Equal(1))
+	})
+
+	ginkgo.It("publishes nothing for an upstream_error record", func() {
+		// Same class as rejected: Sentry never stored the event, so there is no
+		// issue to analyse and no stable key to dedup on.
+		metrics := &mocks.Metrics{}
+		publisher := &mocks.TaskPublisher{}
+		c := pkg.NewConsumer(publisher, metrics, cfg, noEnrichment(), wallClock)
+
+		record := `{"body":"{\"event_id\":\"abc123\"}","project":"nuke-prod","received_at":"2026-09-09T20:10:00Z","outcome":"upstream_error"}`
+		err := c.ConsumeMessage(ctx, msg(record))
+		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+
+		gomega.Expect(publisher.PublishCreateCallCount()).To(gomega.Equal(0))
+		gomega.Expect(metrics.IncEventsArgsForCall(0)).To(gomega.Equal("upstream_error"))
+		gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("skipped_non_forwarded"))
 	})
 
 	ginkgo.It("skips the sentry-heartbeat liveness event without a task", func() {
@@ -113,7 +152,7 @@ var _ = ginkgo.Describe("Consumer", func() {
 		// payload line does not. Before this counter the record fell silently to
 		// the per-event identity with nothing observable — the shape that hid the
 		// bare-array exception (v0.1.6) and bare-string message (PR #11) defects.
-		record := `{"body":"{\"event_id\":\"abc123\"}\n{\"type\":\"event\"}\nnot-json","project":"nuke-prod","received_at":"2026-09-09T20:10:00Z","outcome":"rejected"}`
+		record := `{"body":"{\"event_id\":\"abc123\"}\n{\"type\":\"event\"}\nnot-json","project":"nuke-prod","received_at":"2026-09-09T20:10:00Z","outcome":"forwarded"}`
 		err := c.ConsumeMessage(ctx, msg(record))
 		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
 
@@ -122,7 +161,10 @@ var _ = ginkgo.Describe("Consumer", func() {
 		_, cmd := publisher.PublishCreateArgsForCall(0)
 		gomega.Expect(cmd.Frontmatter["short_id"]).To(gomega.Equal("event-abc123"))
 		gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("payload_parse_error"))
-		gomega.Expect(metrics.IncMessagesArgsForCall(1)).To(gomega.Equal("processed"))
+		// enrich_miss (noEnrichment reports the event unknown) sits between the
+		// parse counter and the publish decision.
+		gomega.Expect(metrics.IncMessagesArgsForCall(1)).To(gomega.Equal("enrich_miss"))
+		gomega.Expect(metrics.IncMessagesArgsForCall(2)).To(gomega.Equal("processed"))
 	})
 
 	ginkgo.It("does not count a well-formed payload as a parse failure", func() {
@@ -133,24 +175,13 @@ var _ = ginkgo.Describe("Consumer", func() {
 		publisher.PublishCreateReturns(true)
 		c := pkg.NewConsumer(publisher, metrics, cfg, noEnrichment(), wallClock)
 
-		record := `{"body":"{\"event_id\":\"abc123\"}\n{\"type\":\"event\"}\n{\"event_id\":\"abc123\",\"level\":\"error\",\"message\":\"boom\"}","project":"nuke-prod","received_at":"2026-09-09T20:10:00Z","outcome":"rejected"}`
+		record := `{"body":"{\"event_id\":\"abc123\"}\n{\"type\":\"event\"}\n{\"event_id\":\"abc123\",\"level\":\"error\",\"message\":\"boom\"}","project":"nuke-prod","received_at":"2026-09-09T20:10:00Z","outcome":"forwarded"}`
 		err := c.ConsumeMessage(ctx, msg(record))
 		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
 
-		gomega.Expect(metrics.IncMessagesCallCount()).To(gomega.Equal(1))
-		gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("processed"))
-	})
-
-	ginkgo.It("analyses a rejected alert even when the envelope payload is missing", func() {
-		metrics := &mocks.Metrics{}
-		publisher := &mocks.TaskPublisher{}
-		c := pkg.NewConsumer(publisher, metrics, cfg, noEnrichment(), wallClock)
-
-		record := `{"body":"{\"event_id\":\"abc123\"}","project":"nuke-prod","received_at":"2026-09-09T20:10:00Z","outcome":"rejected"}`
-		err := c.ConsumeMessage(ctx, msg(record))
-		gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
-		gomega.Expect(publisher.PublishCreateCallCount()).To(gomega.Equal(1))
-		gomega.Expect(metrics.IncEventsArgsForCall(0)).To(gomega.Equal("rejected"))
+		gomega.Expect(metrics.IncMessagesCallCount()).To(gomega.Equal(2))
+		gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("enrich_miss"))
+		gomega.Expect(metrics.IncMessagesArgsForCall(1)).To(gomega.Equal("processed"))
 	})
 
 	ginkgo.It("does not fail the loop when publishing fails", func() {
@@ -217,28 +248,6 @@ var _ = ginkgo.Describe("Consumer", func() {
 			// is control flow, not a failure.
 			gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("enrich_miss"))
 			gomega.Expect(metrics.IncMessagesArgsForCall(1)).To(gomega.Equal("processed"))
-		})
-
-		ginkgo.It("never calls sentry for a rejected event", func() {
-			metrics := &mocks.Metrics{}
-			publisher := &mocks.TaskPublisher{}
-			publisher.PublishCreateReturns(true)
-			sentry := &mocks.SentryClient{}
-			sentry.IssueRefReturns(pkg.IssueRef{
-				NumericID: "42",
-				URL:       "https://bborbe.sentry.io/issues/42/",
-			}, nil)
-			c := pkg.NewConsumer(publisher, metrics, cfg, sentry, wallClock)
-
-			record := `{"body":"{\"event_id\":\"abc123\"}","project":"nuke-prod","received_at":"2026-09-09T20:10:00Z","outcome":"rejected"}`
-			err := c.ConsumeMessage(ctx, msg(record))
-			gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
-
-			gomega.Expect(sentry.IssueRefCallCount()).To(gomega.Equal(0))
-			gomega.Expect(publisher.PublishCreateCallCount()).To(gomega.Equal(1))
-			_, cmd := publisher.PublishCreateArgsForCall(0)
-			gomega.Expect(cmd.Frontmatter["short_id"]).To(gomega.Equal("event-abc123"))
-			gomega.Expect(cmd.Frontmatter["issue_url"]).To(gomega.Equal(""))
 		})
 
 		ginkgo.It("publishes the derived key when enrichment fails", func() {
