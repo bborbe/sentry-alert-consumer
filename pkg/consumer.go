@@ -99,6 +99,24 @@ func (c *Consumer) ConsumeMessage(ctx context.Context, msg *sarama.ConsumerMessa
 	c.metrics.IncEvents(record.Outcome)
 	c.metrics.SetLastEvent(record.ReceivedAt)
 
+	// Only a forwarded event was stored by Sentry, so only a forwarded event has
+	// an issue to analyse. A rejected or upstream_error record has no issue
+	// identity, so deriveIssueKey falls back to "event-<EventID>" — a per-event
+	// unit that nothing can dedup — and publishing on it produced one analyzer
+	// task per rejected event (measured 2026-10-18 on dev: 73 of 74 processed
+	// records were rejected). Same polarity as enrichIssue, so the two guards
+	// cannot disagree. The outcome is still counted by IncEvents above, so the
+	// rejection rate stays observable.
+	if record.Outcome != outcomeForwarded {
+		c.metrics.IncMessages("skipped_non_forwarded")
+		glog.V(2).Infof(
+			"skip non-forwarded record outcome=%s project=%s",
+			record.Outcome,
+			record.Project,
+		)
+		return nil
+	}
+
 	env, err := ParseEnvelope(ctx, record.Body)
 	if err != nil {
 		c.metrics.IncMessages("envelope_error")

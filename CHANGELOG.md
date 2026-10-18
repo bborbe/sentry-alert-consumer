@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+- fix: publish an analyzer task only for `forwarded` records. A `rejected` or
+  `upstream_error` event was never stored by Sentry, so it has no issue identity
+  and `deriveIssueKey` falls back to the per-event `event-<event_id>` key, which
+  nothing can dedup — one task per rejected event, measured 2026-10-18 on dev at
+  73 of 74 processed records, against a ~12/day baseline. Non-forwarded records
+  are now counted as `messages_total{result="skipped_non_forwarded"}` and skipped
+  before parsing; `events_total{outcome}` still counts every outcome, so the
+  rejection rate stays alertable on its own.
+
 ## v0.2.3
 
 - fix: report `eventAge` on the `enriched` line as the offset to the **first lookup attempt** rather than the offset to the log line. The field is read as evidence that a lookup happened inside Sentry's ingest-indexing window, but `time.Since(eventTime)` was evaluated *after* `IssueRef` returned, so it folded the dedicated 404 schedule's +1/+3/+6/+10 s waits into the number: a fresh event that retried before succeeding read as an old one, which is precisely the distinction the field exists to make. Observed on dev 2026-10-14 — an event logged `eventAge=7.615s` whose actual first lookup ran at +0.632 s, leaving the parent task's `eventAge < 3 s` criterion readable only by deriving the offset from raw log timestamps. The clock is now injected (`libtime.CurrentDateTimeGetter`) rather than read from `time.Now()`, so the specs assert the logged value exactly, and they are pinned to fail against the previous expression.
