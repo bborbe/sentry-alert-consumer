@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v0.2.4
 
 - fix: publish an analyzer task only for `forwarded` records. A `rejected` or
   `upstream_error` event was never stored by Sentry, so it has no issue identity
