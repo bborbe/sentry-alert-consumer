@@ -227,6 +227,34 @@ var _ = ginkgo.Describe("Consumer", func() {
 			gomega.Expect(metrics.IncMessagesArgsForCall(0)).To(gomega.Equal("processed"))
 		})
 
+		ginkgo.It("re-keys the published command on the resolved issue id (SC1)", func() {
+			metrics := &mocks.Metrics{}
+			publisher := &mocks.TaskPublisher{}
+			publisher.PublishCreateReturns(true)
+			sentry := &mocks.SentryClient{}
+			sentry.IssueRefReturns(pkg.IssueRef{
+				NumericID: "42",
+				URL:       "https://bborbe.sentry.io/issues/42/",
+			}, nil)
+			c := pkg.NewConsumer(publisher, metrics, cfg, sentry, wallClock)
+
+			err := c.ConsumeMessage(ctx, msg(forwardedRecord))
+			gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
+
+			gomega.Expect(publisher.PublishCreateCallCount()).To(gomega.Equal(1))
+			_, cmd := publisher.PublishCreateArgsForCall(0)
+
+			// The discriminator. `short_id` is NOT asserted here: it already
+			// carries the numeric id on the unfixed build (taskbuilder reads
+			// NumericID directly), so it cannot tell the fix from no fix. Both
+			// fields below derive from Issue.Key, which is "event-abc123" before
+			// the re-key and "42" after it.
+			gomega.Expect(string(cmd.TaskIdentifier)).To(gomega.Equal(
+				pkg.DeriveTaskIDKafka("42", "2026-09-09").String(),
+			))
+			gomega.Expect(cmd.Title).To(gomega.Equal("Analyze Sentry issue 42 - 2026-09-09"))
+		})
+
 		ginkgo.It("keeps the derived key when sentry does not know the event", func() {
 			metrics := &mocks.Metrics{}
 			publisher := &mocks.TaskPublisher{}

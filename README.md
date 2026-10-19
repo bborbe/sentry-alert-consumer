@@ -42,9 +42,14 @@ For each message on the alert topic:
    (scope `org:read`) and emit it as `short_id` + `issue_url`, so the analyzer
    can run its live-state fetch (`sentry-read.sh`, which requires `^[0-9]+$`).
    A rejected event was never stored by Sentry, so its lookup is a guaranteed
-   404 that only burns quota — it is skipped. A miss (forwarded but dropped by
-   quota) or any lookup failure keeps the derived key and still publishes the
-   task: enrichment never drops an alert.
+   404 that only burns quota — it is skipped. On a **successful** lookup the
+   issue key itself is replaced by the numeric id, so
+   `UUID5("kafka:" + issue-key + ":" + date)` collapses a same-day repeat of one
+   issue into a single task. A miss (forwarded but dropped by quota) or any
+   lookup failure keeps the derived key and still publishes the task:
+   enrichment never drops an alert. The `event-<event_id>` and body-hash
+   fallbacks therefore remain only for those miss and failure paths — they are
+   not dead code.
 6. **Publish one `CreateTaskCommand`** per (issue-key, date). Task identity is
    `UUID5("kafka:" + issue-key + ":" + date)` over the same namespace as the
    collector's `/create-tasks`, so the two identity spaces never collide and
