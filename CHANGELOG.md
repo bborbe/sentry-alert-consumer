@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v0.2.5
 
 - fix: re-key an enriched record on the numeric Sentry issue id. `enrichIssue`
   wrote back `NumericID` and `IssueURL` but never `Key`, so the published
