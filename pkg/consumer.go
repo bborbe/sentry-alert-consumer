@@ -248,4 +248,12 @@ func (c *Consumer) enrichIssue(ctx context.Context, issue *Issue) {
 		ref.NumericID,
 		lookupStart.Time().Sub(eventTime).Round(time.Millisecond),
 	)
+	// Re-key on the resolved issue id: the envelope-derived key is a per-event
+	// or per-payload identity, so a same-day repeat of one issue produced a
+	// second task even though the lookup had resolved both to the same issue.
+	// The enriched line above deliberately logs the *derived* key it replaces,
+	// so the probe can still correlate eventID -> numericID.
+	if ref.NumericID != "" {
+		issue.Key = ref.NumericID
+	}
 }

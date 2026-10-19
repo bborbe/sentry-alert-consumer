@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+- fix: re-key an enriched record on the numeric Sentry issue id. `enrichIssue`
+  wrote back `NumericID` and `IssueURL` but never `Key`, so the published
+  `CreateTaskCommand` stayed keyed on the envelope-derived identity — a
+  per-event `event-<event_id>` for a forwarded event carrying no
+  exception/message, which nothing can dedup. Two events of one issue on the
+  same day therefore produced two analyzer tasks even though the lookup had
+  resolved both to the same issue (measured 2026-10-19 on prod: 3 of 16
+  forwarded records). The re-key covers every successful enrichment, so the
+  32-hex derived hashes collapse too.
+
 ## v0.2.4
 
 - fix: publish an analyzer task only for `forwarded` records. A `rejected` or
