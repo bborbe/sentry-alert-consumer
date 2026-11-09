@@ -61,6 +61,56 @@ The emitted task contract is preserved from `cmd/create-tasks`:
 derived from the project slug (`nuke-prod`→prod, `nuke-dev`→dev), `status:
 in_progress`, Personal-vault target.
 
+## Build
+
+The image can be built on this machine or inside a Kubernetes cluster. Both
+arms build the same `Dockerfile` and publish to the same repository,
+`docker.io/bborbe/sentry-alert-consumer`, differing only in tag.
+
+### Local arm (default)
+
+With no `BUILD_TARGET` set, `make build` runs `docker build` on this machine
+and tags the image `docker.io/bborbe/sentry-alert-consumer:$(VERSION)`. The
+command and the tag are unchanged. `make buca` (and its `upload` / `clean`
+steps) stays local-only: it pushes from this machine and removes the local
+image.
+
+### Cluster arm
+
+```bash
+make build BUILD_TARGET=<cluster> REF=<sha> VERSION=<tag>
+```
+
+`BUILD_TARGET` names a cluster alias (`sun`, `nukedev`, `nukeprod`) or a
+kubectl context. `REF` must be a full 40-character commit SHA that exists on
+`origin`. `VERSION` must be supplied by the caller: the cluster arm refuses
+to run when `VERSION` would resolve from the makefile's own `git describe`
+default, so a released tag cannot be republished by accident.
+
+The arm renders a Kubernetes Job from `hack/build-job.yaml`, applies it
+through `hack/build-cluster.sh`, waits for it, and reports the Job's log
+lines. It pushes `docker.io/bborbe/sentry-alert-consumer:<tag>` to Docker
+Hub. The private registry copy the deployment pulls from is produced by
+nuke's `MIRROR_IMAGES` step, not by this build.
+
+Before the first cluster build, provision the `build` namespace and the
+`buildkit-push` credential once:
+
+```bash
+hack/build-cluster-bootstrap.sh <cluster>
+```
+
+### Two parse-time traps
+
+- `VERSION` is defaulted at parse time in `Makefile.docker` before any guard
+  can read its origin. The cluster arm captures the origin before that
+  default and refuses a defaulted tag; a guard written after the default
+  would never fire.
+- `Makefile` includes `Makefile.docker` before it assigns `SERVICE`, so
+  `$(SERVICE)` may appear only in recipes or recursively-expanded variables.
+  A `:=` or an `ifeq` on it evaluates empty and composes
+  `docker.io/bborbe/:tag`.
+
 ## Configuration
 
 | Env | Default | Purpose |

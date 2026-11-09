@@ -4,4 +4,10 @@
 /.mcp-*
 /run-once
 /vendor/
-
+/.dark-factory.log
+/.dark-factory.lock
+/prompts/completed/*.md
+/prompts/log
+/specs/log
+/prompts/in-progress/*.lock
+/specs/in-progress/*.lock
