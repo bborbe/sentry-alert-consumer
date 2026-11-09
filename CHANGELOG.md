@@ -7,6 +7,7 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 ## Unreleased
 
 - feat: add a `BUILD_TARGET` selector to `Makefile.docker` so `build` can dispatch the cluster runner (`hack/build-cluster.sh`) with a named commit while the default `local` arm keeps the existing `docker build` command and tag
+- chore: add the `hack/` cluster-build helpers (`build-cluster.sh`, `cluster-alias.sh`, `build-job.yaml`, `build-cluster-bootstrap.sh`, `dockerconfig.json.tpl`) and switch the `Dockerfile` build from `-mod=vendor` to `-mod=readonly` so a fresh clone without `vendor/` builds from the module proxy
 - chore: restate the do-not-merge contract in the gate workflow
 - chore: update Go to 1.27.3 and github.com/IBM/sarama to v1.61.1, github.com/bborbe/agent to v0.114.0, github.com/bborbe/cqrs to v0.6.12, github.com/bborbe/errors to v1.6.3, github.com/bborbe/http to v1.26.30, github.com/bborbe/kafka to v1.28.5, github.com/bborbe/log to v1.7.5, github.com/bborbe/run to v1.11.2, github.com/bborbe/sentry to v1.10.5, github.com/bborbe/service to v1.11.1, github.com/bborbe/time to v1.27.18, github.com/onsi/ginkgo/v2 to v2.33.1, github.com/onsi/gomega to v1.44.0, github.com/prometheus/client_golang to v1.25.0
 

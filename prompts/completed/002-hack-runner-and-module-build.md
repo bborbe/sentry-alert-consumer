@@ -1,8 +1,13 @@
 ---
-status: approved
+status: completed
 spec: [001-cluster-build-arm]
+summary: Copied the five cluster-build helper files byte-for-byte into hack/ and switched the Dockerfile build from -mod=vendor to -mod=readonly, with CHANGELOG updated
+execution_id: 03747306-83e4-562c-aa21-2038ffefaab8-exec-002-hack-runner-and-module-build
+dark-factory-version: dev
 created: "2026-11-09T20:07:41Z"
 queued: "2026-11-09T20:31:55Z"
+started: "2026-11-09T20:33:31Z"
+completed: "2026-11-09T20:34:49Z"
 branch: dark-factory/cluster-build-arm
 ---
 
