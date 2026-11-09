@@ -1,0 +1,287 @@
+[21:36:51] [init] session=47a9a42c model=deepseek-v4-flash-max[1m] cwd=/home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8 tools=25
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] [system: thinking_tokens]
+[21:36:52] 💭 Let me start by reading the relevant files. The task is documentation only: add a Build section to README.md and a changelog bullet.
+
+Let me read README.md, CHANGELOG.md, Makefile, Makefile.docker, docs/dod.md. Also the changelog guide.
+
+Let me do parallel reads.
+[21:36:52] I'll start by reading the files I need to modify and the reference docs.
+
+
+[21:36:54] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/README.md
+[21:36:54] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/CHANGELOG.md
+[21:36:54] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile
+[21:36:54] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile.docker
+[21:36:54] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/docs/dod.md
+[21:36:54] [read] /home/node/.claude/plugins/marketplaces/coding/docs/changelog-guide.md
+[21:36:54]   → 90 lines read
+[21:36:54]   → 84 lines read
+[21:36:54]   → 209 lines read
+[21:36:54]   → 88 lines read
+[21:36:54]   → 26 lines read
+[21:36:54]   → 5 lines read
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:55] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:56] [system: thinking_tokens]
+[21:36:57] 💭 Now I'll make the edits. README: add `## Build` after `## How It Works` (which ends at line 62) and before `## Configuration` (line 64). Insert the exact content.
+
+CHANGELOG: add bullet under `## Unreleased`. Requirement says "Add one bullet under the existing `## Unreleased` heading". Keep existing bullets. I'll add it after the existing bullets (or at top). The verification awk checks that any line containing 'cluster build' is under '## Unreleased'. Note existing line 9 contains "cluster runn…
+[21:36:57] Now I'll make the two documentation edits.
+
+
+[21:37:05] [edit] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/README.md
+    - derived from the project slug (`nuke-prod`→prod, `nuke-dev`…
+    + derived from the project slug (`nuke-prod`→prod, `nuke-dev`…
+[21:37:05] [edit] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/CHANGELOG.md
+    - - chore: update Go to 1.27.3 and github.com/IBM/sarama to v…
+    + - chore: update Go to 1.27.3 and github.com/IBM/sarama to v…
+[21:37:05]   → The file /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/README.md has been updat…
+[21:37:05]   → The file /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/CHANGELOG.md has been up…
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:05] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:06] [system: thinking_tokens]
+[21:37:07] 💭 Now run the verification greps and then `make test`? The instructions say fast feedback `make test`, then final `make precommit` once. This is docs-only, but let me run the verification checks first.
+
+Let me run the greps and `make test` maybe. Actually make test may be slow; but instructions say use repeatedly. Docs-only changes don't affect tests, but precommit is required. Let me run the verification grep checks first, then make precommit once.
+
+Note: `make build` is a target but `make test` …
+[21:37:08] $ \\necho "invocation: $(grep -c 'BUILD_TARGET=<cluster> REF=<sha> VERSION=<tag>' README.md)" && \\necho "buca: $(grep -ci 'buca' README.md)" && \\necho "mirror: $(grep -c 'MIRROR_IMAGES' README.md)" &…
+[21:37:09] [system: thinking_tokens]
+[21:37:09] [system: thinking_tokens]
+[21:37:09] [system: thinking_tokens]
+[21:37:09] [system: thinking_tokens]
+[21:37:09] [system: thinking_tokens]
+[21:37:09] 💭 All verification greps pass. Now run `make precommit` once.
+
+Note ROOTDIR="$PWD" make precommit. Let me run exactly that.
+[21:37:09] All verification checks pass. Now running the authoritative final validation once.
+
+
+[21:37:09] $ ROOTDIR="$PWD" make precommit
+[21:37:12] [system: task_started]
+[21:37:41] [system: task_notification]
+[21:37:42] [system: thinking_tokens]
+[21:37:42] [system: thinking_tokens]
+[21:37:42] [system: thinking_tokens]
+[21:37:42] [system: thinking_tokens]
+[21:37:42] [system: thinking_tokens]
+[21:37:42] [system: thinking_tokens]
+[21:37:42] [system: thinking_tokens]
+[21:37:42] [system: thinking_tokens]
+[21:37:42] [system: thinking_tokens]
+[21:37:42] [system: thinking_tokens]
+[21:37:42] [system: thinking_tokens]
+[21:37:42] [system: thinking_tokens]
+[21:37:43] [system: thinking_tokens]
+[21:37:43] [system: thinking_tokens]
+[21:37:43] [system: thinking_tokens]
+[21:37:43] [system: thinking_tokens]
+[21:37:43] [system: thinking_tokens]
+[21:37:43] [system: thinking_tokens]
+[21:37:43] [system: thinking_tokens]
+[21:37:43] [system: thinking_tokens]
+[21:37:43] [system: thinking_tokens]
+[21:37:43] [system: thinking_tokens]
+[21:37:43] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:44] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] [system: thinking_tokens]
+[21:37:45] 💭 precommit passed, exit 0. Note precommit ran gofmt/goimports/golines/addlicense — these could modify files. It said "ready to commit". Let me check git status to see if any files changed beyond README/CHANGELOG (e.g., mocks regenerated). But the instruction says don't commit; dark-factory handles git. The precommit may have regenerated mocks (rm -rf mocks then regenerate). Let me check git status quickly to ensure no unintended changes. This is prudent.
+
+Actually the task says report success if …
+[21:37:45] `make precommit` passed (exit 0). Let me confirm no unrelated files were touched by the formatter/regeneration steps.
+
+
+[21:37:46] $ git status --short 2>&1 | head -50
+[21:37:46] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:47] [system: thinking_tokens]
+[21:37:48] [system: thinking_tokens]
+[21:37:48] [system: thinking_tokens]
+[21:37:48] [system: thinking_tokens]
+[21:37:48] [system: thinking_tokens]
+[21:37:48] [system: thinking_tokens]
+[21:37:48] [system: thinking_tokens]
+[21:37:48] 💭 Only README.md and CHANGELOG.md are my intentional edits. The other changes (.dark-factory.log, prompts, specs) pre-existed per the initial git status snapshot. No Go files/mocks changed. Good.
+
+Now produce the completion report exactly as required, as the very last output. Status success. Summary one sentence. verification command "make precommit", exitCode 0. Also quality criteria: all met (docs-only). No blockers.
+
+Output only the report, nothing else.
+[21:37:48] <!-- DARK-FACTORY-REPORT
+{"status":"success","summary":"Added a Build section to README.md documenting the local and cluster arms, mirror coupling, and parse-time traps, plus a cluster build bullet under CHANGELOG.md's Unreleased heading","blockers":[],"verification":{"command":"make precommit","exitCode":0}}
+DARK-FACTORY-REPORT -->
+[21:37:48] result: <!-- DARK-FACTORY-REPORT
+{"status":"success","summary":"Added a Build section to README.md documenting the local and cluster arms, mirror coupling, and parse-time traps, plus a cluster build bullet under CHANGELOG.md's Unreleased heading","blockers":[],"verification":{"command":"make precommit","exitCode":0}}
+DARK-FACTORY-REPORT --> | duration: 57721ms | cost: $0.4643 | tokens: 387 in / 3098 out

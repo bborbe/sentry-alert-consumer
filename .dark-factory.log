@@ -58,3 +58,17 @@ time=2026-11-09T21:33:31.313+01:00 level=INFO msg="container assigned" prompt_id
 time=2026-11-09T21:34:49.915+01:00 level=INFO msg="docker container exited" prompt_id=002-hack-runner-and-module-build spec_id=001-cluster-build-arm container="" workflow_type=direct container=03747306-83e4-562c-aa21-2038ffefaab8-exec-002-hack-runner-and-module-build exit_code=0 workflow_step=run_claude
 time=2026-11-09T21:34:49.915+01:00 level=INFO msg="completion report" status=success summary="Copied the five cluster-build helper files byte-for-byte into hack/ and switched the Dockerfile build from -mod=vendor to -mod=readonly, with CHANGELOG updated"
 time=2026-11-09T21:34:49.919+01:00 level=INFO msg="moved to completed" prompt_id=002-hack-runner-and-module-build spec_id=001-cluster-build-arm container="" workflow_type=direct container=03747306-83e4-562c-aa21-2038ffefaab8-exec-002-hack-runner-and-module-build
+time=2026-11-09T21:34:49.954+01:00 level=INFO msg="committed changes (autoRelease disabled, skipping tag)" prompt_id=002-hack-runner-and-module-build spec_id=001-cluster-build-arm container="" workflow_type=direct container=03747306-83e4-562c-aa21-2038ffefaab8-exec-002-hack-runner-and-module-build workflow_step=commit
+time=2026-11-09T21:34:49.955+01:00 level=INFO msg="spec awaiting verification" spec=001-cluster-build-arm
+time=2026-11-09T21:34:49.955+01:00 level=INFO msg="watching for queued prompts" dir=prompts/in-progress
+time=2026-11-09T21:34:49.956+01:00 level=INFO msg="nothing to do, waiting for changes"
+time=2026-11-09T21:35:54.426+01:00 level=INFO msg="nothing to do, waiting for changes"
+time=2026-11-09T21:36:49.702+01:00 level=INFO msg="auto-approve: approved generated prompt" prompt=3-docs-build-section.md
+time=2026-11-09T21:36:50.302+01:00 level=INFO msg="lock acquired" prompt_id=003-docs-build-section.md
+time=2026-11-09T21:36:50.302+01:00 level=INFO msg="found queued prompt" prompt_id=003-docs-build-section.md
+time=2026-11-09T21:36:50.302+01:00 level=INFO msg="executing prompt" prompt_id=003-docs-build-section spec_id=001-cluster-build-arm container="" workflow_type=direct title=003-docs-build-section
+time=2026-11-09T21:36:50.302+01:00 level=INFO msg="syncing with remote default branch" prompt_id=003-docs-build-section spec_id=001-cluster-build-arm container="" workflow_type=direct
+time=2026-11-09T21:36:50.811+01:00 level=INFO msg="container assigned" prompt_id=003-docs-build-section spec_id=001-cluster-build-arm container="" workflow_type=direct container_old="" container=03747306-83e4-562c-aa21-2038ffefaab8-exec-003-docs-build-section workflow_step=acquire_container
+time=2026-11-09T21:37:49.156+01:00 level=INFO msg="docker container exited" prompt_id=003-docs-build-section spec_id=001-cluster-build-arm container="" workflow_type=direct container=03747306-83e4-562c-aa21-2038ffefaab8-exec-003-docs-build-section exit_code=0 workflow_step=run_claude
+time=2026-11-09T21:37:49.156+01:00 level=INFO msg="completion report" status=success summary="Added a Build section to README.md documenting the local and cluster arms, mirror coupling, and parse-time traps, plus a cluster build bullet under CHANGELOG.md's Unreleased heading"
+time=2026-11-09T21:37:49.160+01:00 level=INFO msg="moved to completed" prompt_id=003-docs-build-section spec_id=001-cluster-build-arm container="" workflow_type=direct container=03747306-83e4-562c-aa21-2038ffefaab8-exec-003-docs-build-section

@@ -1,7 +1,13 @@
 ---
-status: draft
+status: completed
 spec: [001-cluster-build-arm]
+summary: Added a Build section to README.md documenting the local and cluster arms, mirror coupling, and parse-time traps, plus a cluster build bullet under CHANGELOG.md's Unreleased heading
+execution_id: 03747306-83e4-562c-aa21-2038ffefaab8-exec-003-docs-build-section
+dark-factory-version: dev
 created: "2026-11-09T20:07:41Z"
+queued: "2026-11-09T20:36:49Z"
+started: "2026-11-09T20:36:50Z"
+completed: "2026-11-09T20:37:49Z"
 branch: dark-factory/cluster-build-arm
 ---
 

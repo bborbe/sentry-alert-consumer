@@ -342,3 +342,495 @@ die "job ${NAMESPACE}/${JOB_NAME} failed"
    108		done
 ===variables===
      1	export ROOTDIR ?= $(shell git rev-parse --show-toplevel)
+[21:34:56] [system: task_progress]
+[21:34:56] $ f=/home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md\necho "===go mod vendor==="; grep -n 'go mod vendor' "$f" || echo none\necho "=…
+[21:35:09] [system: task_progress]
+[21:35:09] $ grep -rn 'Branch\b\|branch' /home/node/dark-factory-marketplace/pkg/prompt/*.go 2>/dev/null | grep -iE 'yaml|frontmatter|field|branch' | head -40; echo "---"; ls /home/node/dark-factory-marketplace/p…
+[21:35:11] [system: task_progress]
+[21:35:11] $ grep -rn 'SetBranchIfEmpty\|SetBranch(' /home/node/dark-factory-marketplace/pkg --include='*.go' | grep -v '_test.go' | head; echo "---approve flow---"; sed -n '1,160p' /home/node/dark-factory-market…
+[21:35:11] ⚠ [bash output]
+	pm ApproveManager,
+) (string, error) {
+	filename := StripNumberPrefix(filepath.Base(inboxPath))
+	newPath := filepath.Join(queueDir, filename)
+
+	if err := os.Rename(inboxPath, newPath); err != nil {
+		return "", errors.Wrap(ctx, err, "move file to queue")
+	}
+
+	pf, err := pm.Load(ctx, newPath)
+	if err != nil {
+		return "", errors.Wrap(ctx, err, "load prompt after move")
+	}
+	pf.MarkApproved()
+	if err := pf.Save(ctx); err != nil {
+		return "", errors.Wrap(ctx, err, "save approved prompt")
+	}
+
+	return newPath, nil
+}
+[21:35:13] [system: task_progress]
+[21:35:13] $ sed -n '440,500p' /home/node/dark-factory-marketplace/pkg/generator/generator.go
+[21:35:13] ⚠ [bash output]
+		pf.SetIssueIfEmpty(specIssue)
+		if err := pf.Save(ctx); err != nil {
+			return errors.Wrap(ctx, err, "save prompt after inheritance")
+		}
+	}
+	return nil
+}
+
+// countCompletedPromptsForSpec counts prompts in completedDir that have specID in their spec field.
+func countCompletedPromptsForSpec(
+	ctx context.Context,
+	completedDir string,
+	specID string,
+	pm PromptManager,
+) (int, error) {
+	entries, err := os.ReadDir(completedDir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return 0, nil
+		}
+[21:36:25] [system: task_updated]
+[21:36:25] [system: task_notification]
+[21:36:25]   ← agent reply: # Prompt Audit Report: Document the Build Section and Changelog Entry
+[21:36:26] [system: thinking_tokens]
+[21:36:26] [system: thinking_tokens]
+[21:36:26] [system: thinking_tokens]
+[21:36:26] [system: thinking_tokens]
+[21:36:26] [system: thinking_tokens]
+[21:36:26] [system: thinking_tokens]
+[21:36:27] [system: thinking_tokens]
+[21:36:27] [system: thinking_tokens]
+[21:36:27] [system: thinking_tokens]
+[21:36:27] [system: thinking_tokens]
+[21:36:27] [system: thinking_tokens]
+[21:36:27] [system: thinking_tokens]
+[21:36:27] [system: thinking_tokens]
+[21:36:27] 💭 CLAUDE.md doesn't exist at repo root. Let me check for CLAUDE.md elsewhere or docs/dod.md and .dark-factory.yaml. The command says read project CLAUDE.md for a "Release Checklist" section or "before dark-factory prompt approve" instruction, plus any doc it links.
+
+Let me search.
+[21:36:27] CLAUDE.md isn't at the repo root. Let me check for it elsewhere and inspect the configured validation doc and dark-factory config.
+
+
+[21:36:29] $ echo "=== CLAUDE.md locations ===" && find . -name 'CLAUDE.md' -not -path './.git/*' 2>/dev/null && echo "=== .dark-factory.yaml ===" && cat .dark-factory.yaml 2>/dev/null && echo "=== docs/dod.md ==…
+[21:36:29] $ echo "=== grep release checklist / approve ===" && grep -rniE 'release checklist|prompt approve|before .*approve' --include='*.md' --include='*.yaml' --include='*.yml' . 2>/dev/null | grep -v './.git…
+[21:36:29] ⚠ [bash output]
+- [ ] `make precommit` passes (format + lint + test + security checks)
+- [ ] No new linting warnings or errors
+
+## Code Quality
+
+- [ ] No `//nolint` without explanation
+- [ ] Follows existing code patterns in the file being modified
+
+## Tests
+
+- [ ] New functions have tests
+- [ ] Existing tests still pass
+- [ ] Tests use Ginkgo/Gomega conventions
+- [ ] Counterfeiter for mocks (`mocks/` dir)
+
+## Style
+
+- [ ] Functions over classes for stateless operations
+- [ ] Error handling follows `github.com/bborbe/errors` patterns
+- [ ] No absolute paths — all paths relative or using standard lib
+[21:36:29] ⚠ [bash output]
+=== grep release checklist / approve ===
+specs/in-progress/001-cluster-build-arm.md:121:7. **The lane config is the shape that measured working on this repo.** `.dark-factory.yaml` sets `workflow: direct` with `pr: false` — the pair under which a cluster run completed all three prompts here, where `worktree` + `pr: true` failed at prompt-metadata write. `autoRelease: false` keeps the release manual, `autoGeneratePrompts: true` fires the generator, `autoMerge: false` leaves the merge to the reviewer, `defaultBranch: master` names the base and the `validationPrompt: docs/dod.md` gate stays. This change is **pre-landed and committed on the branch before the spec is approved**, so the lane is correct before the agent is ever asked to run.
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:30] [system: thinking_tokens]
+[21:36:31] [system: thinking_tokens]
+[21:36:31] [system: thinking_tokens]
+[21:36:31] [system: thinking_tokens]
+[21:36:31] [system: thinking_tokens]
+[21:36:31] [system: thinking_tokens]
+[21:36:31] [system: thinking_tokens]
+[21:36:31] [system: thinking_tokens]
+[21:36:31] [system: thinking_tokens]
+[21:36:31] [system: thinking_tokens]
+[21:36:31] [system: thinking_tokens]
+[21:36:31] 💭 No CLAUDE.md anywhere. No "Release Checklist" section. No "before dark-factory prompt approve" instruction. The validationPrompt is docs/dod.md, but that's the per-prompt DoD, not a pre-approve release gate. Let me double-check the repo root for a README with release checklist, and maybe docs/ directory. The command says "Read the project CLAUDE.md for a 'Release Checklist' section or any 'before dark-factory prompt approve' instruction, plus any doc it links". Since no CLAUDE.md exists, gate = …
+[21:36:31] $ echo "=== root files ===" && ls -a && echo "=== docs dir ===" && ls -la docs 2>/dev/null && echo "=== broad checklist search ===" && grep -rniE 'checklist' --include='*.md' . 2>/dev/null | grep -v '.…
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:32] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] [system: thinking_tokens]
+[21:36:33] 💭 No CLAUDE.md, no Release Checklist, no "before prompt approve" instruction. So gate status: none declared. Note: `validationPrompt: docs/dod.md` is a per-prompt Definition of Done, not a pre-approve release gate. I should report that distinction.
+
+Also, interesting: `hack/` now exists (created by sibling prompt 002 perhaps already executed? or it was in git status? No — git status didn't show hack/). Wait the audit agent said `hack/` doesn't exist yet. Let me verify. Actually root listing shows …
+[21:36:33] $ echo "=== hack/ ===" && ls -la hack 2>/dev/null && echo "=== git status ===" && git status --short && echo "=== prompt files ===" && ls -la prompts/
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:34] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:35] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:36] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] [system: thinking_tokens]
+[21:36:37] 💭 Interesting — the `hack/` directory now exists (created 21:33), after the audit agent read it. Actually the audit agent ran at ~21:31-21:34, so sibling prompt 002 may have just completed, creating hack/. The audit's "pending" note is now stale — but that recommendation (note hack/ created by sibling) is now less necessary since files exist. However, the prompt file's mtime is 21:21, and the audit was performed at 21:31ish. Wait, hack/ was created at 21:33. So during audit it didn't exist, now it…
+[21:36:38] $ echo "=== README mtime / build section ===" && ls -l README.md CHANGELOG.md && grep -n '^## ' README.md && echo "=== changelog unreleased ===" && grep -n '^## ' CHANGELOG.md | head -5 && grep -n 'clu…
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:39] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:40] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:41] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] [system: thinking_tokens]
+[21:36:42] 💭 The prompt hasn't been applied to README (no Build section) and CHANGELOG has no "cluster build" bullet. So verification still fails as the audit said — good.
+
+Note CHANGELOG mtime 21:33 but no cluster build bullet. Fine.
+
+Now I have everything. Let me compose the response: relay the audit findings (score 8/10, Good, no critical issues), recommendations, and gate status.
+
+Gate status: no CLAUDE.md anywhere, no Release Checklist section, no "before dark-factory prompt approve" instruction. Theref…
+[21:36:49] ## Prompt Audit: `prompts/3-docs-build-section.md`
+
+**Verdict: 8/10 — Good. No critical issues.**
+
+### DoD Checklist
+All boxes pass: `<summary>` (7 bullets), `<objective>`, `<context>`, numbered `<requirements>` 1–8, `<constraints>` with "Do NOT commit", runnable `<verification>`, repo-relative/container-absolute paths, no bare `git` commands, no operator-only commands, correct inbox location, valid single-digit prefix, `draft` status.
+
+### Failure Mode Coverage
+Spec failure modes are covered across the prompt set (001 = VERSION refusal/local-only guards, 002 = runner + security constraints, 003 = docs). No `go mod vendor`, no cross-repo writes, container-autonomous, no operator steps.
+
+### Documentation Placement
+Passes, except one gap:
+- **Minor** — `readme-guide.md` (more directly relevant to a README section) is not referenced; only `documentation-guide.md` is.
+
+### Code Reference Verification
+Every existing reference checks out: README headings (lines 16/64/72/86), `CHANGELOG.md:7`, `Makefile:3,5`, `Makefile.docker` origin/default/guard lines, `docs/dod.md`, both in-container coding guides, and all `.dark-factory.yaml` values.
+
+**State correction since the audit ran:** the `hack/` files (`build-cluster.sh`, `build-job.yaml`, `build-cluster-bootstrap.sh`, `cluster-alias.sh`, `dockerconfig.json.tpl`) now **exist and are committed** (they appeared at 21:33, after the auditor's read). Recommendation 2 below is therefore moot — no need to tell the agent they are "created by sibling prompt 002."
+
+### Recommendations (ranked)
+1. **Minor — add README guide to `<context>`:** append `/home/node/.claude/plugins/marketplaces/coding/docs/readme-guide.md`.
+2. ~~**Minor — note `hack/` arrives via sibling prompt 002.**~~ **Obsolete:** the files are now present in the repo.
+3. **Minor — plain-language summary:** change "parse-time makefile traps" → "makefile behaviours".
+4. **Moderate — close verification gaps:** requirements mandate section placement (between `## How It Works` and `## Configuration`) and both traps, but `<verification>` asserts neither. Add:
+   ```bash
+   awk '/^## How It Works/{h=NR} /^## Build/{b=NR} /^## Configuration/{c=NR} END{exit !(h<b && b<c)}' README.md
+   grep -q 'git describe' README.md
+   grep -q 'SERVICE' README.md
+   ```
+5. **Optional — narrow a constraint:** "one real cluster build" is the spec's operator ladder, not this docs prompt; reword to avoid implying the agent should attempt a build.
+
+### Strengths
+- Verification commands empirically fail before the change (confirmed again now: README has no `## Build`, CHANGELOG has no `cluster build` bullet).
+- Exact target prose supplied, with clear fence-stripping guidance.
+- README facts match the sibling implementation (cluster aliases, bootstrap arg, Job render/apply/wait/log, `MIRROR_IMAGES` coupling).
+- Correctly documentation-only; forbids touching `Makefile`, `Makefile.docker`, `Dockerfile`, `hack/`, `.dark-factory.yaml`, and `bborbe/nuke`.
+
+### Pre-approve gate status: **none declared**
+- No `CLAUDE.md` exists anywhere in the repo.
+- No "Release Checklist" section and no "before `dark-factory prompt approve`" instruction found in any `.md`/`.yaml` (only the spec's lane-config note, which is not a gate).
+- `.dark-factory.yaml` sets `validationPrompt: docs/dod.md`, but that is the **per-prompt Definition of Done**, not a declared pre-approve release gate.
+
+Because no gate is declared, there is nothing to walk before approval on that front. Note for context: `autoRelease: false` on this repo, so approval does **not** auto-ship — but the audit verdict still is not by itself "approval readiness" for the open Moderate verification gap in recommendation 4.
+[21:36:49] result: ## Prompt Audit: `prompts/3-docs-build-section.md`
+
+**Verdict: 8/10 — Good. No critical issues.**
+
+### DoD Checklist
+All boxes pass: `<summary>` (7 bullets), `<objective>`, `<context>`, numbered `<requirements>` 1–8, `<constraints>` with "Do NOT commit", runnable `<verification>`, repo-relative/container-absolute paths, no bare `git` commands, no operator-only commands, correct inbox location, valid single-digit prefix, `draft` status.
+
+### Failure Mode Coverage
+Spec failure modes are covered across the prompt set (001 = VERSION refusal/local-only guards, 002 = runner + security constraints, 003 = docs). No `go mod vendor`, no cross-repo writes, container-autonomous, no operator steps.
+
+### Documentation Placement
+Passes, except one gap:
+- **Minor** — `readme-guide.md` (more directly relevant to a README section) is not referenced; only `documentation-guide.md` is.
+
+### Code Reference Verification
+Every existing reference checks out: README headings (lines 16/64/72/86), `CHANGELOG.md:7`, `Makefile:3,5`, `Makefile.docker` origin/default/guard lines, `docs/dod.md`, both in-container coding guides, and all `.dark-factory.yaml` values.
+
+**State correction since the audit ran:** the `hack/` files (`build-cluster.sh`, `build-job.yaml`, `build-cluster-bootstrap.sh`, `cluster-alias.sh`, `dockerconfig.json.tpl`) now **exist and are committed** (they appeared at 21:33, after the auditor's read). Recommendation 2 below is therefore moot — no need to tell the agent they are "created by sibling prompt 002."
+
+### Recommendations (ranked)
+1. **Minor — add README guide to `<context>`:** append `/home/node/.claude/plugins/marketplaces/coding/docs/readme-guide.md`.
+2. ~~**Minor — note `hack/` arrives via sibling prompt 002.**~~ **Obsolete:** the files are now present in the repo.
+3. **Minor — plain-language summary:** change "parse-time makefile traps" → "makefile behaviours".
+4. **Moderate — close verification gaps:** requirements mandate section placement (between `## How It Works` and `## Configuration`) and both traps, but `<verification>` asserts neither. Add:
+   ```bash
+   awk '/^## How It Works/{h=NR} /^## Build/{b=NR} /^## Configuration/{c=NR} END{exit !(h<b && b<c)}' README.md
+   grep -q 'git describe' README.md
+   grep -q 'SERVICE' README.md
+   ```
+5. **Optional — narrow a constraint:** "one real cluster build" is the spec's operator ladder, not this docs prompt; reword to avoid implying the agent should attempt a build.
+
+### Strengths
+- Verification commands empirically fail before the change (confirmed again now: README has no `## Build`, CHANGELOG has no `cluster build` bullet).
+- Exact target prose supplied, with clear fence-stripping guidance.
+- README facts match the sibling implementation (cluster aliases, bootstrap arg, Job render/apply/wait/log, `MIRROR_IMAGES` coupling).
+- Correctly documentation-only; forbids touching `Makefile`, `Makefile.docker`, `Dockerfile`, `hack/`, `.dark-factory.yaml`, and `bborbe/nuke`.
+
+### Pre-approve gate status: **none declared**
+- No `CLAUDE.md` exists anywhere in the repo.
+- No "Release Checklist" section and no "before `dark-factory prompt approve`" instruction found in any `.md`/`.yaml` (only the spec's lane-config note, which is not a gate).
+- `.dark-factory.yaml` sets `validationPrompt: docs/dod.md`, but that is the **per-prompt Definition of Done**, not a declared pre-approve release gate.
+
+Because no gate is declared, there is nothing to walk before approval on that front. Note for context: `autoRelease: false` on this repo, so approval does **not** auto-ship — but the audit verdict still is not by itself "approval readiness" for the open Moderate verification gap in recommendation 4. | duration: 292611ms | cost: $2.0193 | tokens: 503 in / 3346 out
