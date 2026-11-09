@@ -1,5 +1,5 @@
-workflow: worktree
-pr: true
+workflow: direct
+pr: false
 autoRelease: false
 autoGeneratePrompts: true
 validationPrompt: docs/dod.md
