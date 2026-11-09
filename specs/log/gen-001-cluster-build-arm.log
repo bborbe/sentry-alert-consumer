@@ -1,0 +1,2019 @@
+[21:02:59] [init] session=91aa0afe model=deepseek-v4-flash-max[1m] cwd=/home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8 tools=25
+[21:03:00] [system: thinking_tokens]
+[21:03:00] [system: thinking_tokens]
+[21:03:00] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:01] [system: thinking_tokens]
+[21:03:02] [system: thinking_tokens]
+[21:03:02] [system: thinking_tokens]
+[21:03:02] 💭 Let me start by understanding the task. I need to:
+1. Invoke `prompt-creator` agent via Task tool (subagent_type: prompt-creator) with the spec path.
+2. Then run audit pass with `prompt-auditor` on each generated prompt.
+3. Return creator's summary + audit reports.
+4. Transition spec to prompted only if not daemon-managed.
+
+Let me first check the environment and the spec file. Let me read the spec to understand context, and check if DARK_FACTORY_MANAGED is set.
+
+Let me do a few things in paralle…
+[21:03:03] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/specs/in-progress/001-cluster-build-arm.md
+[21:03:03] $ echo "DARK_FACTORY_MANAGED=${DARK_FACTORY_MANAGED:-<unset>}"; pwd; ls -la prompts 2>/dev/null | head -50
+[21:03:04]   → 192 lines read
+[21:03:04] [system: thinking_tokens]
+[21:03:04] [system: thinking_tokens]
+[21:03:04] [system: thinking_tokens]
+[21:03:04] [system: thinking_tokens]
+[21:03:04] [system: thinking_tokens]
+[21:03:04] [system: thinking_tokens]
+[21:03:04] [system: thinking_tokens]
+[21:03:04] [system: thinking_tokens]
+[21:03:04] [system: thinking_tokens]
+[21:03:04] [system: thinking_tokens]
+[21:03:04] [system: thinking_tokens]
+[21:03:04] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] [system: thinking_tokens]
+[21:03:05] 💭 The spec is approved, status generating. DARK_FACTORY_MANAGED is unset, so host mode (Mode 2). Need to run mark-prompted at the end if creator succeeds with files.
+
+Now invoke prompt-creator agent via Task tool. I have Agent tool with subagent_type "dark-factory:prompt-creator".
+
+Let me construct the prompt. Pass spec path relative to repo root: `specs/in-progress/001-cluster-build-arm.md`. Output dir: `prompts/`. Non-interactive.
+
+Let me launch the agent.
+[21:03:07] [agent:dark-factory:prompt-creator] Generate prompts from spec
+    prompt: Generate dark-factory prompt files from the approved spec at `specs/in-progress/001-cluster-build-arm.md` (repo-root-relative path; the repo root is the curren…
+[21:03:07] [system: task_started]
+[21:03:08] [system: task_progress]
+[21:03:08] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/specs/in-progress/001-cluster-build-arm.md
+[21:03:08] [system: task_progress]
+[21:03:08] $ ls -la /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/
+[21:03:08]   → 192 lines read
+[21:03:11] [system: task_progress]
+[21:03:11] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile
+[21:03:11] [system: task_progress]
+[21:03:11] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile.docker
+[21:03:11] [system: task_progress]
+[21:03:11] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Dockerfile
+[21:03:11] [system: task_progress]
+[21:03:11] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/README.md
+[21:03:11] [system: task_progress]
+[21:03:11] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/.dark-factory.yaml
+[21:03:11] [system: task_progress]
+[21:03:11] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile.variables
+[21:03:11]   → 51 lines read
+[21:03:11]   → 7 lines read
+[21:03:11]   → 1 lines read
+[21:03:11]   → 90 lines read
+[21:03:11]   → 5 lines read
+[21:03:11]   → 22 lines read
+[21:03:14] [system: task_progress]
+[21:03:14] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/CHANGELOG.md
+[21:03:14] [system: task_progress]
+[21:03:14] $ ls -la prompts/ prompts/completed/ 2>/dev/null | head -80; echo "---docs---"; ls -la docs/; echo "---hack---"; ls -la hack/ 2>/dev/null || echo "no hack"; echo "---gitignore---"; cat .gitignore
+[21:03:14] [system: task_progress]
+[21:03:14] $ ls ~/.claude/plugins/marketplaces/coding/docs/*.md 2>/dev/null | head -60; echo "---df rules---"; ls ~/.claude/plugins/marketplaces/dark-factory/docs/rules/*.md 2>/dev/null
+[21:03:14]   → 86 lines read
+[21:03:14] ⚠ [Bash] error: Exit code 1\n/home/node/.claude/plugins/marketplaces/coding/docs/adr-guide.md\n/home/node/.claude/plugins/marketplaces/coding/docs/agent-command-development-guide.md\n/home/node/.claude/plugins/marketplaces/coding/docs/architecture-dimensions-guide.md\n/home/node/.claude/plugins/marketplaces/coding/docs/ast-grep-rule-writing-guide.md\n/home/node/.claude/plugins/marketplaces/coding/docs/astro-deve…
+[21:03:17] [system: task_progress]
+[21:03:17] $ ls /home/node/.claude/plugins/marketplaces/dark-factory/ 2>/dev/null; echo "---"; find /home/node/.claude/plugins/marketplaces/dark-factory -maxdepth 3 -name '*.md' 2>/dev/null | head -40
+[21:03:17] [system: task_progress]
+[21:03:17] $ ls -la ~/Documents/workspaces/ 2>/dev/null || echo "no workspaces"; echo "---agent-task-executor hack---"; ls -la ~/Documents/workspaces/agent-task-executor/hack/ 2>/dev/null || echo "no ate"; echo "…
+[21:03:17] [system: task_progress]
+[21:03:17] $ ls /home/node/.claude/plugins/marketplaces/ 2>/dev/null; echo "---coding docs relevant---"; ls /home/node/.claude/plugins/marketplaces/coding/docs/ | grep -iE 'makefile|docker|changelog|k8s|manifest|…
+[21:03:20] [system: task_progress]
+[21:03:20] $ cd /tmp && rm -rf ate gs && timeout 60 git clone --depth=1 https://github.com/bborbe/agent-task-executor.git ate 2>&1 | tail -3; echo "EXIT:$?"
+[21:03:20] [system: task_progress]
+[21:03:20] $ cd /tmp && timeout 60 git clone --depth=1 https://github.com/bborbe/go-skeleton.git gs 2>&1 | tail -3; echo "EXIT:$?"
+[21:03:23] [system: task_progress]
+[21:03:23] $ ls -la /tmp/ate/hack/ /tmp/gs/hack/; echo "=== ate Makefile.docker ==="; cat /tmp/ate/Makefile.docker; echo "=== gs Makefile.docker ==="; cat /tmp/gs/Makefile.docker
+[21:03:23] ⚠ [bash output]
+endif
+
+.PHONY: clean
+clean:
+ifeq ($(BUILD_TARGET),local)
+	docker rmi $(DOCKER_REGISTRY)/$(SERVICE):$(BRANCH) || true
+	docker builder prune --max-used-space 21474836480 -f || true
+endif
+
+.PHONY: apply
+apply:
+	@for i in $(DIRS); do \
+		cd $$i; \
+		echo "apply $${i}"; \
+		make apply; \
+		cd ..; \
+	done
+
+.PHONY: buca
+buca: build upload clean apply
+[21:03:24] [system: task_progress]
+[21:03:24] [read] /tmp/ate/hack/build-cluster.sh
+[21:03:24] [system: task_progress]
+[21:03:24] [read] /tmp/ate/hack/cluster-alias.sh
+[21:03:24] [system: task_progress]
+[21:03:24] [read] /tmp/ate/hack/build-job.yaml
+[21:03:24]   → 209 lines read
+[21:03:24]   → 174 lines read
+[21:03:24]   → 41 lines read
+[21:03:26] [system: task_progress]
+[21:03:26] [read] /tmp/gs/hack/build-cluster-bootstrap.sh
+[21:03:26] [system: task_progress]
+[21:03:26] [read] /tmp/gs/hack/dockerconfig.json.tpl
+[21:03:26] [system: task_progress]
+[21:03:26] $ echo "=== ate Dockerfile ==="; cat /tmp/ate/Dockerfile; echo "=== gs Dockerfile ==="; cat /tmp/gs/Dockerfile; echo "=== ate go version ==="; head -5 /tmp/ate/go.mod; echo "=== our go.mod ==="; head -…
+[21:03:26]   → 1 lines read
+[21:03:26]   → 75 lines read
+[21:04:16] [system: task_progress]
+[21:04:16] $ cd /tmp && mkdir -p mktest && cd mktest && printf 'X ?= local\n.PHONY: build\nbuild:\n\t@echo "hello:$$(date +%%s)"\n\techo runner\n' > Makefile && make --version | head -1 && echo "--- make -n ---" …
+[21:04:16] [system: task_progress]
+[21:04:16] $ cd /tmp/mktest && printf 'V_ORIGIN := $(origin VERSION)\nifeq ($(VERSION),)\n\tVERSION := defaulted\nendif\nT ?= local\nifneq ($(T),local)\nifeq ($(filter command line environment,$(V_ORIGIN)),)\n$(e…
+[21:04:18] [system: task_progress]
+[21:04:18] $ cd /tmp/mktest && printf 'T ?= local\nifneq ($(T),local)\nifneq ($(filter upload clean buca,$(MAKECMDGOALS)),)\n$(error upload, clean and buca are local-only; run them with BUILD_TARGET=local)\nendif…
+[21:04:40] [system: task_progress]
+[21:04:40] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile.precommit
+[21:04:40] [system: task_progress]
+[21:04:40] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/docs/dod.md
+[21:04:40] [system: task_progress]
+[21:04:40] $ cat /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/tools.env; echo "---"; ls /home/node/.claude/plugins/marketplaces/coding/docs/ | grep -iE 'makefile|dockerfil…
+[21:04:40]   → 108 lines read
+[21:04:40]   → 26 lines read
+[21:05:19] [system: task_progress]
+[21:05:19] $ git check-ignore -v prompts/ 2>/dev/null; echo "exit:$?"; echo "--- tracked prompts ---"; git ls-files | grep -i '^prompts/' || echo none; echo "--- git status short ---"; git status --short | head -…
+[21:05:19] [system: task_progress]
+[21:05:19] $ git log --oneline -5 && echo "--- branches ---" && git branch -a | head -20 && echo "--- HEAD sha ---" && git rev-parse HEAD && echo "--- tags ---" && git tag --sort=-creatordate | head -5
+[21:07:41] [system: task_progress]
+[21:07:41] $ date -u +%Y-%m-%dT%H:%M:%SZ; echo "--- verify spec basename ---"; basename /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/specs/in-progress/001-cluster-build-ar…
+[21:08:12] [system: task_progress]
+[21:08:12] [write] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/1-makefile-docker-dispatch.md (9878 chars)
+[21:08:12]   → File created successfully at: /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/pro…
+[21:08:41] [system: task_progress]
+[21:08:41] [write] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/2-hack-runner-and-module-build.md (8457 chars)
+[21:08:41]   → File created successfully at: /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/pro…
+[21:09:02] [system: task_progress]
+[21:09:02] [write] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md (7178 chars)
+[21:09:02]   → File created successfully at: /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/pro…
+[21:09:05] [system: task_progress]
+[21:09:05] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md (offset=40, limit=40)
+[21:09:05]   → 39 lines read
+[21:09:17] [system: task_progress]
+[21:09:17] [write] /tmp/mkcheck/Makefile (57 chars)
+[21:09:17] [system: task_progress]
+[21:09:17] [write] /tmp/mkcheck/Makefile.docker (3255 chars)
+[21:09:17]   → File created successfully at: /tmp/mkcheck/Makefile (file state is current in your context — no need to Read it back)
+[21:09:17]   → File created successfully at: /tmp/mkcheck/Makefile.docker (file state is current in your context — no need to Read it …
+[21:09:20] [system: task_progress]
+[21:09:20] $ cd /tmp/mkcheck && touch Dockerfile && echo "=== local -n ===" && make -n build > /tmp/local-build.txt 2>/tmp/local-err.txt; echo "exit:$?"; cat /tmp/local-build.txt; echo "--- err ---"; cat /tmp/loc…
+[21:09:20] ⚠ [bash output]
+TAG='probe' \
+DOCKERFILE='Dockerfile' \
+IMAGE='docker.io/bborbe/sentry-alert-consumer' \
+DOCKER_REGISTRY='docker.io' \
+PUSH='true' \
+PUSH_SECRET='buildkit-push' \
+TIMEOUT='3600' \
+hack/build-cluster.sh
+=== no version ===
+exit:2
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+Makefile.docker:29: *** the cluster arm needs an explicit VERSION; pass VERSION=<tag> on the command line or in the environment.  Stop.
+=== buca cluster ===
+exit:2
+Makefile.docker:34: *** upload, clean and buca are local-only; run them with BUILD_TARGET=local.  Stop.
+=== buca local ===
+exit:0
+docker push docker.io/bborbe/sentry-alert-consumer:
+docker rmi docker.io/bborbe/sentry-alert-consumer: || true
+[21:09:25] [system: task_progress]
+[21:09:25] $ cd /tmp/mkcheck && echo "=== anchored greps ==="; grep -c '^BUILD_TARGET' Makefile.docker; grep -cE '^[[:space:]]*hack/build-cluster\.sh' Makefile.docker; echo "=== bash -n copied files ==="; bash -n…
+[21:09:27] [system: task_progress]
+[21:09:27] $ grep -rn 'BUILD_TARGET' --exclude-dir=vendor --exclude-dir=prompts --exclude-dir=specs . | grep -vE '(Makefile\.docker|README\.md|CHANGELOG\.md|hack/)'; echo "leak-exit:$?"
+[21:09:43] [system: task_progress]
+[21:09:43] $ for f in /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/*.md; do echo "=== $f ==="; head -8 "$f"; echo "... sections:"; grep -oE '<(summary|objective|co…
+[21:09:49] [system: task_progress]
+[21:09:49] $ grep -nE 'Wait —|Actually —|Or better|Decision:|Correction:|On reflection|Let me reconsider' /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/*.md; echo "…
+[21:10:14] [system: task_progress]
+[21:10:14] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/1-makefile-docker-dispatch.md (offset=30, limit=100)
+[21:10:14]   → 99 lines read
+[21:10:20] [system: task_progress]
+[21:10:20] $ git -C /tmp/ate branch --show-current; git -C /tmp/gs branch --show-current; git -C /tmp/ate log -1 --oneline; git -C /tmp/gs log -1 --oneline
+[21:10:34] [system: task_progress]
+[21:10:34] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md (offset=30, limit=12)
+[21:10:34]   → 11 lines read
+[21:10:35] [system: task_progress]
+[21:10:35] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md (offset=78, limit=14)
+[21:10:35]   → 13 lines read
+[21:10:37] [system: task_progress]
+[21:10:37] [edit] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md
+    -    The literal invocation `make build BUILD_TARGET=<cluster…
+    +    Do not copy the outer `~~~~markdown` fence into the READ…
+[21:10:37] ⚠ [Edit] error: <tool_use_error>Error: No such tool available: Edit. Edit exists but is not enabled in this context. Use one of the available tools instead.</tool_use_error>
+[21:10:49] [system: task_progress]
+[21:10:49] [write] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md (7417 chars)
+[21:10:49]   → The file /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-sec…
+[21:10:54] [system: task_progress]
+[21:10:54] $ mkdir -p /tmp/docscheck && cp /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/README.md /tmp/docscheck/README.md && cp /home/node/.cache/github-dark-factory-agen…
+[21:10:58] [system: task_progress]
+[21:10:58] $ cp /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/CHANGELOG.md /tmp/docscheck/CHANGELOG2.md && perl -0pi -e 's/## Unreleased\n/## Unreleased\n\n- feat: cluster …
+[21:11:06] [system: task_progress]
+[21:11:06] $ ls -la /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/ && echo "--- spec link check ---" && grep -H '^spec:' /home/node/.cache/github-dark-factory-agent…
+[21:11:19] [system: task_progress]
+[21:11:19] $ rm -rf /tmp/realcheck && mkdir -p /tmp/realcheck && cd /tmp/realcheck && cp /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile /home/node/.cache/github-dar…
+[21:11:19] ⚠ [bash output]
+=== make -n build without .git ===
+exit:2
+--- out head ---
+--- err ---
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+Makefile.precommit:5: /tools.env: No such file or directory
+make: *** No rule to make target '/tools.env'.  Stop.
+[21:11:28] [system: task_progress]
+[21:11:28] $ cd /tmp/realcheck && echo "=== ROOTDIR set, no .git ===" && ROOTDIR="$PWD" make -n build > /tmp/realcheck-out2.txt 2>/tmp/realcheck-err2.txt; echo "exit:$?"; head -3 /tmp/realcheck-out2.txt; echo "--…
+[21:11:28] ⚠ [bash output]
+=== ROOTDIR set, no .git ===
+exit:0
+if [ -f "go.mod" ]; then \
+	echo "go.mod found, running go mod vendor..."; \
+	go mod vendor; \
+--- err ---
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+=== ROOTDIR set, cluster -n ===
+exit:0
+echo "docker.io/bborbe/sentry-alert-consumer:probe"
+hack/build-cluster.sh
+[21:11:40] [system: task_progress]
+[21:11:40] $ cp /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/1-makefile-docker-dispatch.md /tmp/p1.md && perl -pi -e 's/^make /ROOTDIR="\$PWD" make /mg; s/^if make…
+[21:11:43] [system: task_progress]
+[21:11:43] $ cd /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts && perl -pi -e 's/^make /ROOTDIR="\$PWD" make /mg; s/^if make /if ROOTDIR="\$PWD" make /mg' 1-makefile…
+[21:11:47] [system: task_progress]
+[21:11:47] $ awk '/<verification>/,/<\/verification>/' /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/1-makefile-docker-dispatch.md
+[21:11:57] [system: task_progress]
+[21:11:57] $ awk '/<verification>/,/<\/verification>/' /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/2-hack-runner-and-module-build.md
+[21:12:07] [system: task_updated]
+[21:12:07] [system: task_notification]
+[21:12:07]   ← agent reply: Created three prompts in execution order. All carry `spec: ["001-cluster-build-arm"]`.
+[21:12:08] [system: thinking_tokens]
+[21:12:08] [system: thinking_tokens]
+[21:12:08] [system: thinking_tokens]
+[21:12:08] [system: thinking_tokens]
+[21:12:08] [system: thinking_tokens]
+[21:12:08] [system: thinking_tokens]
+[21:12:09] [system: thinking_tokens]
+[21:12:09] [system: thinking_tokens]
+[21:12:09] [system: thinking_tokens]
+[21:12:09] 💭 Now run audit pass on each of the three prompt files. I can launch three prompt-auditor agents in parallel in one message.
+
+Let me first check the prompt files exist. Then launch 3 auditors concurrently.
+[21:12:09] $ ls -la prompts/*.md
+[21:12:10] [system: thinking_tokens]
+[21:12:10] [system: thinking_tokens]
+[21:12:10] [system: thinking_tokens]
+[21:12:10] [system: thinking_tokens]
+[21:12:10] [system: thinking_tokens]
+[21:12:10] 💭 Now launch three prompt-auditor agents in parallel. Each audits one path. I should ask them to return their full report verbatim.
+
+Note: the auditor subagent is dark-factory:prompt-auditor.
+[21:12:12] [agent:dark-factory:prompt-auditor] Audit prompt 1
+    prompt: Audit the dark-factory prompt file at `prompts/1-makefile-docker-dispatch.md` (repo-root-relative; the repo root is the current working directory) against the …
+[21:12:12] [system: task_started]
+[21:12:12] [agent:dark-factory:prompt-auditor] Audit prompt 2
+    prompt: Audit the dark-factory prompt file at `prompts/2-hack-runner-and-module-build.md` (repo-root-relative; the repo root is the current working directory) against …
+[21:12:12] [system: task_started]
+[21:12:12] [agent:dark-factory:prompt-auditor] Audit prompt 3
+    prompt: Audit the dark-factory prompt file at `prompts/3-docs-build-section.md` (repo-root-relative; the repo root is the current working directory) against the Prompt…
+[21:12:12] [system: task_started]
+[21:12:14] [system: task_progress]
+[21:12:14] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/1-makefile-docker-dispatch.md
+[21:12:14] [system: task_progress]
+[21:12:14] $ ls -la && echo "---CONFIG---" && dark-factory config 2>&1 | head -100
+[21:12:14]   → 187 lines read
+[21:12:14] [system: task_progress]
+[21:12:14] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md
+[21:12:14] [system: task_progress]
+[21:12:14] $ ls -la && echo "---CONFIG---" && cat .dark-factory.yaml 2>/dev/null || echo "no .dark-factory.yaml"
+[21:12:14]   → 143 lines read
+[21:12:15] [system: task_progress]
+[21:12:15] $ pwd && ls -la && echo "---PROMPTS---" && ls -la prompts/ 2>/dev/null && echo "---SPECS---" && ls -la specs/ 2>/dev/null
+[21:12:15] [system: task_progress]
+[21:12:15] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/2-hack-runner-and-module-build.md
+[21:12:15]   → 133 lines read
+[21:12:19] [system: task_progress]
+[21:12:19] $ echo "=== .dark-factory.yaml ===" && cat .dark-factory.yaml && echo "=== specs/in-progress ===" && ls -la specs/in-progress/ && echo "=== specs/completed ===" && ls -la specs/completed/ && echo "=== …
+[21:12:19] [system: task_progress]
+[21:12:19] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/specs/in-progress/001-cluster-build-arm.md
+[21:12:19]   → 192 lines read
+[21:12:19] [system: task_progress]
+[21:12:19] $ (dark-factory config 2>&1 || echo "dark-factory CLI unavailable") ; echo "---REMOTE---"; git remote get-url origin 2>&1; echo "---PROMPTS---"; ls -la prompts/ prompts/in-progress 2>&1; echo "---SPECS…
+[21:12:19] [system: task_progress]
+[21:12:19] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/specs/in-progress/001-cluster-build-arm.md
+[21:12:19] [system: task_progress]
+[21:12:19] $ cat .dark-factory.yaml && echo "---FULLCONFIG---" && dark-factory config 2>&1 | tail -40 && echo "---SPECS---" && ls -R specs prompts
+[21:12:19] [system: task_progress]
+[21:12:19] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile
+[21:12:19] [system: task_progress]
+[21:12:19] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile.docker
+[21:12:19] [system: task_progress]
+[21:12:19] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile.variables
+[21:12:19] [system: task_progress]
+[21:12:19] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile.precommit
+[21:12:19]   → 192 lines read
+[21:12:20]   → 1 lines read
+[21:12:20]   → 108 lines read
+[21:12:20]   → 51 lines read
+[21:12:20]   → 5 lines read
+[21:12:23] [system: task_progress]
+[21:12:23] $ echo "=== dark-factory config ===" && (dark-factory config 2>&1 || echo "EXIT:$?") && echo "=== .git ===" && cat .git && echo "=== Dockerfile ===" && cat -n Dockerfile && echo "=== Makefile.docker ==…
+[21:12:23] [system: task_progress]
+[21:12:23] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/1-makefile-docker-dispatch.md
+[21:12:23] [system: task_progress]
+[21:12:23] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md
+[21:12:23] ⚠ [bash output]
+     7	- [ ] `make precommit` passes (format + lint + test + security checks)
+     8	- [ ] No new linting warnings or errors
+     9	
+    10	## Code Quality
+    11	
+    12	- [ ] No `//nolint` without explanation
+    13	- [ ] Follows existing code patterns in the file being modified
+    14	
+    15	## Tests
+    16	
+    17	- [ ] New functions have tests
+    18	- [ ] Existing tests still pass
+    19	- [ ] Tests use Ginkgo/Gomega conventions
+    20	- [ ] Counterfeiter for mocks (`mocks/` dir)
+    21	
+    22	## Style
+    23	
+    24	- [ ] Functions over classes for stateless operations
+    25	- [ ] Error handling follows `github.com/bborbe/errors` patterns
+    26	- [ ] No absolute paths — all paths relative or using standard lib
+[21:12:23]   → 187 lines read
+[21:12:23]   → 143 lines read
+[21:12:26] [system: task_progress]
+[21:12:26] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/specs/in-progress/001-cluster-build-arm.md
+[21:12:26] [system: task_progress]
+[21:12:26] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/2-hack-runner-and-module-build.md
+[21:12:26] [system: task_progress]
+[21:12:26] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md
+[21:12:26] [system: task_progress]
+[21:12:26] $ ls -la docs && echo "---DOD---" && cat docs/dod.md 2>/dev/null | head -80 && echo "---PLUGINDOCS---" && ls -la /home/node/.claude/plugins/marketplaces/coding/docs/ 2>&1 | head -40 && echo "---YOLO---…
+[21:12:26]   → 133 lines read
+[21:12:26]   → 143 lines read
+[21:12:26] ⚠ [bash output]
+-rw-r--r--  1 node node 18770 Nov  3 22:45 go-composition.md
+-rw-r--r--  1 node node  9253 Nov  3 22:45 go-concurrency-patterns.md
+-rw-r--r--  1 node node  4334 Nov  3 22:45 go-context-cancellation-in-loops.md
+-rw-r--r--  1 node node  9738 Nov  3 22:45 go-cqrs.md
+-rw-r--r--  1 node node  8149 Nov  3 22:45 go-doc-best-practices.md
+-rw-r--r--  1 node node  9176 Nov  3 22:45 go-dockerfile-guide.md
+-rw-r--r--  1 node node 17421 Nov  3 22:45 go-efficient-service-guide.md
+-rw-r--r--  1 node node  7912 Nov  3 22:45 go-enum-type-pattern.md
+-rw-r--r--  1 node node 10940 Nov  3 22:45 go-error-wrapping-guide.md
+-rw-r--r--  1 node node 31684 Nov  3 22:45 go-factory-pattern.md
+-rw-r--r--  1 node node 11327 Nov  3 22:45 go-filter-pattern.md
+-rw-r--r--  1 node node 18781 Nov  3 22:45 go-functional-composition-pattern.md
+-rw-r--r--  1 node node 23957 Nov  3 22:45 go-functional-options-pattern.md
+-rw-r--r--  1 node node  6062 Nov  3 22:45 go-glog-guide.md
+-rw-r--r--  1 node node 14583 Nov  3 22:45 go-http-handler-refactoring-guide.md
+-rw-r--r--  1 node node 11391 Nov  3 22:45 go-http-service-guide.md
+-rw-r--r--  1 node node 15828 Nov  3 22:45 go-json-error-handler-guide.md
+-rw-r--r--  1 node node 12741 Nov  3 22:45 go-k8s-binary-conventions.md
+---YOLO---
+ls: cannot access '/home/node/.claude-yolo/plugins/marketplaces/coding/docs/': No such file or directory
+[21:12:26]   → 192 lines read
+[21:12:29] [system: task_progress]
+[21:12:29] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/README.md
+[21:12:29] [system: task_progress]
+[21:12:29] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile
+[21:12:29] [system: task_progress]
+[21:12:29] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile.docker
+[21:12:29] [system: task_progress]
+[21:12:29] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/docs/dod.md
+[21:12:29]   → 90 lines read
+[21:12:29]   → 26 lines read
+[21:12:29]   → 51 lines read
+[21:12:29]   → 5 lines read
+[21:12:32] [system: task_progress]
+[21:12:32] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/CHANGELOG.md
+[21:12:32] [system: task_progress]
+[21:12:32] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/1-makefile-docker-dispatch.md
+[21:12:32] [system: task_progress]
+[21:12:32] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/2-hack-runner-and-module-build.md
+[21:12:32]   → 86 lines read
+[21:12:32]   → 133 lines read
+[21:12:32]   → 187 lines read
+[21:12:56] [system: task_progress]
+[21:12:56] $ echo "=== docs dir ==="; ls -la docs/; echo "=== plugin docs candidate 1 ==="; ls -la /home/node/.claude/plugins/marketplaces/coding/docs/ 2>&1 | head -50; echo "=== plugin docs candidate 2 ==="; ls …
+[21:12:56] [system: task_progress]
+[21:12:56] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile.precommit
+[21:12:56] [system: task_progress]
+[21:12:56] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/Makefile.variables
+[21:12:56] ⚠ [bash output]
+-rw-r--r--  1 node node 11391 Nov  3 22:45 go-http-service-guide.md
+-rw-r--r--  1 node node 15828 Nov  3 22:45 go-json-error-handler-guide.md
+-rw-r--r--  1 node node 12741 Nov  3 22:45 go-k8s-binary-conventions.md
+-rw-r--r--  1 node node 26720 Nov  3 22:45 go-kubernetes-crd-controller-guide.md
+-rw-r--r--  1 node node  3288 Nov  3 22:45 go-library-guide.md
+-rw-r--r--  1 node node 11125 Nov  3 22:45 go-licensing-guide.md
+-rw-r--r--  1 node node 16156 Nov  3 22:45 go-linting-guide.md
+-rw-r--r--  1 node node 20048 Nov  3 22:45 go-logging-guide.md
+-rw-r--r--  1 node node  8879 Nov  3 22:45 go-makefile-commands.md
+-rw-r--r--  1 node node 33955 Nov  3 22:45 go-mocking-guide.md
+-rw-r--r--  1 node node  8546 Nov  3 22:45 go-mod-dependency-fix-guide.md
+-rw-r--r--  1 node node  5189 Nov  3 22:45 go-mod-replace-guide.md
+-rw-r--r--  1 node node  6857 Nov  3 22:45 go-package-layout-guide.md
+=== plugin docs candidate 2 ===
+ls: cannot access '/home/node/.claude-yolo/plugins/marketplaces/coding/docs/': No such file or directory
+=== specific files ===
+EXISTS /home/node/.claude/plugins/marketplaces/coding/docs/changelog-guide.md
+EXISTS /home/node/.claude/plugins/marketplaces/coding/docs/documentation-guide.md
+MISSING /home/node/.claude-yolo/plugins/marketplaces/coding/docs/changelog-guide.md
+MISSING /home/node/.claude-yolo/plugins/marketplaces/coding/docs/documentation-guide.md
+[21:12:56]   → 108 lines read
+[21:12:56]   → 1 lines read
+[21:13:02] [system: task_progress]
+[21:13:02] $ echo "=== Makefile.precommit ===" && cat -n Makefile.precommit && echo "=== Makefile.variables ===" && cat -n Makefile.variables && echo "=== coding docs in .claude-yolo ===" && ls -la ~/.claude-yolo…
+[21:13:02] [system: task_progress]
+[21:13:02] $ echo "=== CHANGELOG head ===" && sed -n '1,40p' CHANGELOG.md && echo "=== README headings ===" && grep -n '^#' README.md && echo "=== go.mod ===" && cat go.mod && echo "=== vendor exists? ===" && ls …
+[21:13:02] ⚠ [Bash] error: Exit code 2\n=== CHANGELOG head ===\n# Changelog\n\nAll notable changes to this project will be documented in this file.\n\nPlease choose versions by [Semantic Versioning](http://semver.org/).\n\n## Unreleased\n\n- chore: restate the do-not-merge contract in the gate workflow\n- chore: update Go to 1.27.3 and github.com/IBM/sarama to v1.61.1, github.com/bborbe/agent to v0.114.0, github.com/bborbe…
+[21:13:02] ⚠ [bash output]
+-rw-r--r--  1 node node  7388 Nov  3 22:45 go-patterns.md
+-rw-r--r--  1 node node  2550 Nov  3 22:45 go-precommit.md
+-rw-r--r--  1 node node 15364 Nov  3 22:45 go-prometheus-metrics-guide.md
+-rw-r--r--  1 node node  5032 Nov  3 22:45 go-security-linting.md
+-rw-r--r--  1 node node 18650 Nov  3 22:45 go-service-implementation-patterns.md
+-rw-r--r--  1 node node 21417 Nov  3 22:45 go-state-machine-pattern.md
+-rw-r--r--  1 node node 28157 Nov  3 22:45 go-test-types-guide.md
+-rw-r--r--  1 node node 20946 Nov  3 22:45 go-testing-guide.md
+-rw-r--r--  1 node node  5887 Nov  3 22:45 go-time-injection.md
+=== /home/node/.claude ===
+total 56
+drwxr-xr-x 1 node node 4096 Nov  9 21:03 .
+drwxr-xr-x 1 node node 4096 Nov  9 21:02 ..
+-rw------- 1 node node  748 Nov  9 21:03 .claude.json
+-rw-r--r-- 1 node node   24 Nov  9 21:03 .last-cleanup
+drwxr-xr-x 1 node node 4096 Nov  9 21:03 backups
+drwxr-xr-x 1 node node 4096 Nov  3 22:45 plugins
+drwxr-xr-x 4 node node 4096 Nov  9 21:03 projects
+drwxr-xr-x 3 node node 4096 Nov  9 21:03 session-env
+drwx------ 2 node node 4096 Nov  9 21:02 sessions
+[21:13:27] [system: task_progress]
+[21:13:27] $ echo "=== local sibling checkouts ==="; ls -d /home/node/Documents/workspaces/agent-task-executor /home/node/Documents/workspaces/go-skeleton 2>&1; echo "=== prompts completed ==="; ls -la prompts/co…
+[21:13:27] [system: task_progress]
+[21:13:27] $ echo "=== try shallow clone alias file ==="; tmp=$(mktemp -d); if git clone --depth=1 --branch master https://github.com/bborbe/agent-task-executor.git "$tmp/ate" >/tmp/clone.log 2>&1; then echo "CLO…
+[21:13:31] [system: task_progress]
+[21:13:31] $ echo "=== referenced docs ==="; for f in go-makefile-commands.md go-precommit.md git-workflow.md; do ls -la "/home/node/.claude/plugins/marketplaces/coding/docs/$f" 2>&1; done; echo "=== .claude vs .…
+[21:13:31] [system: task_progress]
+[21:13:31] $ echo "=== BUILD_TARGET in log/root files ==="; grep -rln 'BUILD_TARGET' . --exclude-dir=prompts --exclude-dir=specs --exclude-dir=.git 2>/dev/null; echo "=== make -n current build ==="; ROOTDIR="$PWD…
+[21:13:31] [system: task_progress]
+[21:13:31] $ echo "=== tools.env ==="; cat tools.env; echo "=== README headings ==="; grep -n '^## ' README.md; echo "=== CHANGELOG unreleased ==="; grep -n '^## ' CHANGELOG.md | head -10; echo "=== Dockerfile ==…
+[21:13:31] ⚠ [bash output]
+--pull \
+--no-cache \
+--rm=true \
+--platform=linux/amd64 \
+--build-arg DOCKER_REGISTRY=docker.io \
+--build-arg BUILD_GIT_COMMIT=$(git rev-parse --short HEAD) \
+--build-arg BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+-t docker.io/bborbe/sentry-alert-consumer:v0.2.5 \
+-f Dockerfile .
+=== make -n buca ===
+if [ -f "go.mod" ]; then \
+	echo "go.mod found, running go mod vendor..."; \
+	go mod vendor; \
+else \
+	echo "go.mod not found, skipping go mod vendor."; \
+fi
+if [ -z "v0.2.5" ]; then echo "ERROR: no VERSION set and no git tag found — set VERSION=vX.Y.Z or create a tag" >&2; exit 1; fi
+DOCKER_BUILDKIT=1 \
+docker build \
+--pull \
+[21:13:34] [system: task_progress]
+[21:13:34] $ cd /tmp && timeout 25 git ls-remote https://github.com/bborbe/agent-task-executor.git HEAD 2>&1 | head; echo "EXIT:${PIPESTATUS[0]}"; timeout 25 git ls-remote https://github.com/bborbe/go-skeleton.gi…
+[21:13:34] [system: task_progress]
+[21:13:34] $ echo "=== hidden files ===" && ls -la .github/workflows 2>/dev/null; echo "=== git remotes ==="; git remote -v 2>&1; echo "=== git log for prompts ==="; git log --oneline -5 2>&1; echo "=== hack refe…
+[21:13:35] ⚠ [bash output]
+specs/log/gen-001-cluster-build-arm.log:220:hack/build-cluster.sh
+specs/log/gen-001-cluster-build-arm.log:234:[21:09:25] $ cd /tmp/mkcheck && echo "=== anchored greps ==="; grep -c '^BUILD_TARGET' Makefile.docker; grep -cE '^[[:space:]]*hack/build-cluster\.sh' Makefile.docker; echo "=== bash -n copied files ==="; bash -n…
+specs/log/gen-001-cluster-build-arm.log:292:hack/build-cluster.sh
+prompts/2-hack-runner-and-module-build.md:23:- `Makefile.docker` — the cluster branch added by the previous prompt calls `hack/build-cluster.sh` and passes the runner's environment variables.
+prompts/2-hack-runner-and-module-build.md:33:- `https://github.com/bborbe/agent-task-executor.git` — `hack/build-cluster.sh`, `hack/cluster-alias.sh`, `hack/build-job.yaml`.
+prompts/2-hack-runner-and-module-build.md:34:- `https://github.com/bborbe/go-skeleton.git` — `hack/build-cluster-bootstrap.sh`, `hack/dockerconfig.json.tpl`.
+prompts/2-hack-runner-and-module-build.md:49:   cp "$tmp/agent-task-executor/hack/build-cluster.sh" hack/build-cluster.sh
+prompts/2-hack-runner-and-module-build.md:52:   cp "$tmp/go-skeleton/hack/build-cluster-bootstrap.sh" hack/build-cluster-bootstrap.sh
+prompts/2-hack-runner-and-module-build.md:54:   chmod +x hack/build-cluster.sh hack/cluster-alias.sh hack/build-cluster-bootstrap.sh
+prompts/2-hack-runner-and-module-build.md:55:   cmp "$tmp/agent-task-executor/hack/build-cluster.sh" hack/build-cluster.sh
+prompts/2-hack-runner-and-module-build.md:58:   cmp "$tmp/go-skeleton/hack/build-cluster-bootstrap.sh" hack/build-cluster-bootstrap.sh
+prompts/2-hack-runner-and-module-build.md:70:   | `hack/build-cluster.sh` | `755` |
+prompts/2-hack-runner-and-module-build.md:72:   | `hack/build-cluster-bootstrap.sh` | `755` |
+prompts/2-hack-runner-and-module-build.md:98:- The five `hack/` files are copied unmodified from `origin/master`: `hack/build-cluster.sh`, `hack/cluster-alias.sh` and `hack/build-job.yaml` from `agent-task-executor`, and `hack/build-cluster-bootstrap.sh` plus `hack/dockerconfig.json.tpl` from `go-skeleton`. `cluster-alias.sh` is required — the runner sources it and fails at that line without it.
+prompts/2-hack-runner-and-module-build.md:102:- `hack/build-cluster-bootstrap.sh` reads a TeamVault credential into a `600` temp file and removes it on every exit path. It is never echoed, never logged, and never written into the repo. Do not add a logging path that prints the rendered secret.
+prompts/2-hack-runner-and-module-build.md:115:test -f hack/build-cluster.sh
+prompts/2-hack-runner-and-module-build.md:118:test -f hack/build-cluster-bootstrap.sh
+prompts/2-hack-runner-and-module-build.md:122:bash -n hack/build-cluster.sh
+prompts/2-hack-runner-and-module-build.md:124:bash -n hack/build-cluster-bootstrap.sh
+specs/in-progress/001-cluster-build-arm.md:51:- [ ] **The local arm's command and tag are unchanged** — with no `BUILD_TARGET` set, `make -n build` prints the `docker build` recipe and no reference to `hack/build-cluster.sh`; `DOCKER_CONTEXT=orbstack make build` exits 0 and `docker image inspect docker.io/bborbe/sentry-alert-consumer:v0.2.5` exits 0 (`v0.2.5` is what `git describe --tags $(git rev-list --tags --max-count=1)` resolves today, so the tag is spelled out rather than left for the verifier to derive). Evidence: both commands' output, the recorded `docker context show` value, the exit code, and the inspected image id. ⚠️ The `DOCKER_CONTEXT=orbstack` pin is what carries the guarantee, not the ambient state: a docker context pointed at `sun` would make a bare `make build` build on the cluster and prove nothing about the local arm.
+[21:13:36] [system: task_progress]
+[21:13:36] $ tmp=$(mktemp -d); if git clone --depth=1 --branch master https://github.com/bborbe/go-skeleton.git "$tmp/gs" >/tmp/clone2.log 2>&1; then echo "CLONED"; echo "=== bootstrap usage/help ==="; grep -nE '…
+[21:13:36] [system: task_progress]
+[21:13:36] $ tmp=$(mktemp -d); if git clone --depth=1 --branch master https://github.com/bborbe/agent-task-executor.git "$tmp/ate" >/tmp/clone3.log 2>&1; then echo "CLONED"; echo "=== build-cluster.sh key lines =…
+[21:13:38] ⚠ [bash output]
+122:	-e "s|__PUSH_SECRET__|${PUSH_SECRET}|g" \
+131:# requested NAMESPACE would then watch a namespace the Job was never created in
+150:# A kubectl failure must not read as "no such Job": an RBAC denial, a missing
+157:# Job, or a healthy cluster refuses every build with a false message.
+160:if existing="$(kc -n "${NAMESPACE}" get job "${JOB_NAME}" --ignore-not-found -o name 2>"${kubectl_err}")"; then
+161:	[ -z "${existing}" ] || die "job ${NAMESPACE}/${JOB_NAME} already exists; delete it with: ${KUBE_HINT} -n ${NAMESPACE} delete job ${JOB_NAME}"
+163:	die "cannot read job ${NAMESPACE}/${JOB_NAME}: $(cat "${kubectl_err}")"
+168:	echo "build-cluster: job ${NAMESPACE}/${JOB_NAME} was not accepted; events:" >&2
+172:	die "could not create job ${NAMESPACE}/${JOB_NAME}"
+180:	succeeded="$(kc -n "${NAMESPACE}" get job "${JOB_NAME}" -o jsonpath='{.status.succeeded}' 2>/dev/null || true)"
+181:	failed="$(kc -n "${NAMESPACE}" get job "${JOB_NAME}" -o jsonpath='{.status.failed}' 2>/dev/null || true)"
+193:logs() {
+194:	kc -n "${NAMESPACE}" logs \
+195:		-l "job-name=${JOB_NAME}" --all-containers --prefix "$@" 2>/dev/null || true
+199:	logs --tail=-1 | grep -E 'pushing manifest for|containerimage\.digest' || true
+200:	echo "build-cluster: job ${NAMESPACE}/${JOB_NAME} succeeded"
+204:echo "build-cluster: job ${NAMESPACE}/${JOB_NAME} ${outcome}; last log lines:" >&2
+205:logs --tail=100 >&2
+207:	die "job ${NAMESPACE}/${JOB_NAME} did not finish within ${TIMEOUT}s (+120s grace)"
+209:die "job ${NAMESPACE}/${JOB_NAME} failed"
+[21:13:38] [system: task_progress]
+[21:13:38] $ rm -rf /tmp/ate /tmp/gs && timeout 120 git clone --depth=1 --branch master https://github.com/bborbe/agent-task-executor.git /tmp/ate >/dev/null 2>&1; echo "ate clone: $?"; timeout 120 git clone --de…
+[21:13:43] [system: task_progress]
+[21:13:43] $ echo "=== ate build-cluster.sh ===" && cat -n /tmp/ate/hack/build-cluster.sh
+[21:13:43] [system: task_progress]
+[21:13:43] $ echo "=== gs build-cluster-bootstrap.sh ===" && cat -n /tmp/gs/hack/build-cluster-bootstrap.sh && echo "=== gs dockerconfig.json.tpl ===" && cat -n /tmp/gs/hack/dockerconfig.json.tpl && echo "=== ate…
+[21:13:43] ⚠ [bash output]
+   190		fi
+   191	done
+   192	
+   193	logs() {
+   194		kc -n "${NAMESPACE}" logs \
+   195			-l "job-name=${JOB_NAME}" --all-containers --prefix "$@" 2>/dev/null || true
+   196	}
+   197	
+   198	if [ "${outcome}" = succeeded ]; then
+   199		logs --tail=-1 | grep -E 'pushing manifest for|containerimage\.digest' || true
+   200		echo "build-cluster: job ${NAMESPACE}/${JOB_NAME} succeeded"
+   201		exit 0
+   202	fi
+   203	
+   204	echo "build-cluster: job ${NAMESPACE}/${JOB_NAME} ${outcome}; last log lines:" >&2
+   205	logs --tail=100 >&2
+   206	if [ "${outcome}" = timeout ]; then
+   207		die "job ${NAMESPACE}/${JOB_NAME} did not finish within ${TIMEOUT}s (+120s grace)"
+   208	fi
+   209	die "job ${NAMESPACE}/${JOB_NAME} failed"
+[21:13:43] ⚠ [bash output]
+    22		;;
+    23	nukedev)
+    24		KUBECONFIG_PATH="${HOME}/.kube/nuke-dev"
+    25		KUBE_CONTEXT=nuke-dev
+    26		;;
+    27	nukeprod)
+    28		KUBECONFIG_PATH="${HOME}/.kube/nuke-prod"
+    29		KUBE_CONTEXT=nuke-prod
+    30		;;
+    31	esac
+    32	
+    33	# Every kubectl call goes through this, so the resolved kubeconfig and context
+    34	# cannot drift between the validation and the calls it guards.
+    35	kc() {
+    36		if [ -n "${KUBECONFIG_PATH}" ]; then
+    37			KUBECONFIG="${KUBECONFIG_PATH}" kubectl --context "${KUBE_CONTEXT}" "$@"
+    38		else
+    39			kubectl --context "${KUBE_CONTEXT}" "$@"
+    40		fi
+    41	}
+[21:13:47] [system: task_progress]
+[21:13:47] $ echo "=== ate build-job.yaml ===" && cat -n /tmp/ate/hack/build-job.yaml && echo "=== gs build-job.yaml (automount/DOCKER_REGISTRY) ===" && grep -nE 'automountServiceAccountToken|DOCKER_REGISTRY|secc…
+[21:13:50] [system: task_progress]
+[21:13:50] $ set -e\nT=$(mktemp -d)\ncp Makefile Makefile.variables Makefile.precommit tools.env Dockerfile "$T/"\nmkdir -p "$T/hack"\ncat > "$T/Makefile.docker" <<'EOF'\nDOCKER_REGISTRY ?= docker.io\n\nBUILD_TAR…
+[21:13:50] ⚠ [bash output]
+IMAGE='docker.io/bborbe/sentry-alert-consumer' \
+DOCKER_REGISTRY='docker.io' \
+PUSH='true' \
+PUSH_SECRET='buildkit-push' \
+TIMEOUT='3600' \
+hack/build-cluster.sh
+=== cluster build no VERSION (expect nonzero) ===
+exit=2
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+Makefile.docker:16: *** the cluster arm needs an explicit VERSION; pass VERSION=<tag> on the command line or in the environment.  Stop.
+=== cluster buca (expect nonzero) ===
+exit=2
+Makefile.docker:19: *** upload, clean and buca are local-only; run them with BUILD_TARGET=local.  Stop.
+=== local buca ===
+docker push docker.io/bborbe/sentry-alert-consumer:
+docker rmi docker.io/bborbe/sentry-alert-consumer: || true
+=== grep checks ===
+BUILD_TARGET col0: 1
+runner recipe: 1
+[21:13:59] [system: task_progress]
+[21:13:59] $ echo "=== .dark-factory.log (head/tail) ==="; head -20 .dark-factory.log; echo "..."; tail -20 .dark-factory.log; echo "=== size ==="; wc -l .dark-factory.log; echo "=== grep BUILD_TARGET in log ==="…
+[21:13:59] [system: task_progress]
+[21:13:59] $ echo "=== spec failure modes vs prompt 1 ==="; grep -n 'Failure Modes' -A20 specs/in-progress/001-cluster-build-arm.md | head -30; echo; echo "=== check sibling prompts spec frontmatter ==="; grep -H…
+[21:13:59] ⚠ [bash output]
+158-| The clone's commit epoch differs from the locally derived one | The build container refuses before `buildctl` runs and names both epochs | `git fetch`, then re-run |
+159-| A Job with the derived name already exists in `build` | The runner refuses and names the existing Job rather than overwriting it | Delete the finished Job, then re-run |
+160-| The runner is interrupted after `apply` | The Job keeps running in the cluster while the local invocation exits; the next run then hits the existing-Job refusal | Inspect `kubectlsun -n build get jobs`, read the pod's log, delete the Job once finished |
+161-| The build pod cannot reach the module proxy | The Job fails; the runner prints the last 100 log lines and the Job name | Inspect the Job logs; the local arm is unaffected |
+162-| The build pod is OOM-killed or throttled | The Job reports `failed`; the pod status carries `OOMKilled` or a CPU-throttling event | Raise the template's limits in the same change, or build locally for that one image |
+163-| The registry throttles or rejects the push | The build fails at the push step with the registry's own error | Re-check the `build` namespace secret, then re-run |
+164-| A caller-supplied `VERSION` names an already-released tag | No guard — the push replaces that tag irreversibly | Re-push the image from the released tag, then cut a new release |
+165-| The built tag is not the one nuke's `MIRROR_IMAGES` references | The push lands in Docker Hub and the mirror copies the stale `CONSUMER_TAG` (`v0.1.0`), so the deployment does not move to the new image | Bump `CONSUMER_TAG` in `bborbe/nuke`'s `sentry-alert-consumer/Makefile` — a separate deploy-side change, out of this spec's scope |
+166-| The local arm regresses | `make build` fails or tags differently | Revert the arm; the local path is the regression gate |
+167-
+168-## Security / Abuse Cases
+169-
+170-- The runner substitutes caller-supplied values into a manifest and into embedded shell, so every value is checked against a character whitelist and rejected for embedded newlines before rendering. Do not add a value path that bypasses that check.
+
+=== check sibling prompts spec frontmatter ===
+prompts/1-makefile-docker-dispatch.md:spec: ["001-cluster-build-arm"]
+prompts/3-docs-build-section.md:spec: ["001-cluster-build-arm"]
+prompts/2-hack-runner-and-module-build.md:spec: ["001-cluster-build-arm"]
+=== check .dark-factory config hideGit/workflow ===
+1:workflow: direct
+[21:14:07] [system: task_progress]
+[21:14:07] $ echo "=== go-dockerfile-guide mod/vendor mentions ===" && grep -nE '\-mod|vendor|readonly|go build' /home/node/.claude/plugins/marketplaces/coding/docs/go-dockerfile-guide.md | head -40; echo "=== k8…
+[21:14:07] [system: task_progress]
+[21:14:07] $ echo "=== prompts/log ==="; ls -la prompts/log/ 2>/dev/null; echo "=== spec gen log tail ==="; tail -n 60 specs/log/gen-001-cluster-build-arm.log 2>/dev/null
+[21:14:07] ⚠ [bash output]
+162-| The build pod is OOM-killed or throttled | The Job reports `failed`; the pod status carries `OOMKilled` or a CPU-throttling event | Raise the template's limits in the same change, or build locally for that one image |
+163-| The registry throttles or rejects the push | The build fails at the push step with the registry's own error | Re-check the `build` namespace secret, then re-run |
+164-| A caller-supplied `VERSION` names an already-released tag | No guard — the push replaces that tag irreversibly | Re-push the image from the released tag, then cut a new release |
+165-| The built tag is not the one nuke's `MIRROR_IMAGES` references | The push lands in Docker Hub and the mirror copies the stale `CONSUMER_TAG` (`v0.1.0`), so the deployment does not move to the new image | Bump `CONSUMER_TAG` in `bborbe/nuke`'s `sentry-alert-consumer/Makefile` — a separate deploy-side change, out of this spec's scope |
+166-| The local arm regresses | `make build` fails or tags differently | Revert the arm; the local path is the regression gate |
+167-
+168-## Security / Abuse Cases
+169-
+170-- The runner substitutes caller-supplied values into a manifest and into embedded shell, so every value is checked against a character whitelist and rejected for embedded newlines before rendering. Do not add a value path that bypasses that check.
+
+=== check sibling prompts spec frontmatter ===
+prompts/1-makefile-docker-dispatch.md:spec: ["001-cluster-build-arm"]
+prompts/3-docs-build-section.md:spec: ["001-cluster-build-arm"]
+prompts/2-hack-runner-and-module-build.md:spec: ["001-cluster-build-arm"]
+=== check .dark-factory config hideGit/workflow ===
+1:workflow: direct
+[21:14:07] [system: task_progress]
+[21:14:07] $ echo "=== go-dockerfile-guide mod/vendor mentions ===" && grep -nE '\-mod|vendor|readonly|go build' /home/node/.claude/plugins/marketplaces/coding/docs/go-dockerfile-guide.md | head -40; echo "=== k8…
+[21:14:07] [system: task_progress]
+[21:14:07] $ echo "=== prompts/log ==="; ls -la prompts/log/ 2>/dev/null; echo "=== spec gen log tail ==="; tail -n 60 specs/log/gen-001-cluster-build-arm.log 2>/dev/null
+[21:14:20] [system: task_progress]
+[21:14:20] $ echo "=== -mod=vendor outside prompts/specs ==="; grep -rn -- '-mod=vendor' . --exclude-dir=.git --exclude-dir=prompts --exclude-dir=specs --exclude-dir=node_modules 2>/dev/null; echo "=== vendor men…
+[21:14:22] [system: task_progress]
+[21:14:22] $ cd /tmp && timeout 60 git clone --depth=1 --branch master https://github.com/bborbe/agent-task-executor.git /tmp/ate 2>&1 | tail -5; echo "exit=$?"; ls /tmp/ate/hack 2>&1
+[21:14:22] [system: task_progress]
+[21:14:22] $ cd /tmp && timeout 60 git clone --depth=1 --branch master https://github.com/bborbe/go-skeleton.git /tmp/gs 2>&1 | tail -5; echo "exit=$?"; ls /tmp/gs/hack 2>&1
+[21:14:22] ⚠ [bash output]
+fatal: destination path '/tmp/ate' already exists and is not an empty directory.
+exit=0
+boilerplate.go.txt
+build-cluster.sh
+build-job.yaml
+cluster-alias.sh
+update-codegen.sh
+[21:14:22] ⚠ [bash output]
+fatal: destination path '/tmp/gs' already exists and is not an empty directory.
+exit=0
+build-cluster-bootstrap.sh
+build-cluster.sh
+build-job.yaml
+cluster-alias.sh
+dockerconfig.json.tpl
+[21:14:24] [system: task_progress]
+[21:14:24] $ echo "=== agent-task-executor build-cluster.sh ==="; cat /tmp/ate/hack/build-cluster.sh; echo "=== env vars referenced ==="; grep -oE '\$\{?[A-Z_][A-Z0-9_]*' /tmp/ate/hack/build-cluster.sh | tr -d '$…
+[21:14:24] ⚠ [bash output]
+BASH_SOURCE
+BUILD_TARGET
+DOCKERFILE
+DOCKER_REGISTRY
+IMAGE
+JOB_NAME
+KUBECONFIG_PATH
+KUBE_CONTEXT
+KUBE_HINT
+NAMESPACE
+PUSH
+PUSH_SECRET
+REF
+REPO_URL
+SCRIPT_DIR
+SOURCE_DATE_EPOCH
+TAG
+TEMPLATE
+TIMEOUT
+_
+[21:14:25] [system: task_progress]
+[21:14:25] $ grep -rni vendor README.md docs 2>/dev/null || echo "no vendor refs in README/docs"; ls CLAUDE.md 2>&1; echo "--- .gitignore ---"; cat .gitignore
+[21:14:39] [system: task_progress]
+[21:14:39] $ echo "=== bash -n source scripts ==="; bash -n /tmp/ate/hack/build-cluster.sh && echo "build-cluster OK"; bash -n /tmp/ate/hack/cluster-alias.sh && echo "cluster-alias OK"; bash -n /tmp/gs/hack/build…
+[21:14:43] [system: task_progress]
+[21:14:43] $ echo "=== diff cluster-alias.sh (ate vs gs) ==="; diff -u /tmp/ate/hack/cluster-alias.sh /tmp/gs/hack/cluster-alias.sh || true; echo "=== diff build-cluster.sh (ate vs gs) ==="; diff -u /tmp/ate/hack…
+[21:15:06] [system: task_progress]
+[21:15:06] $ echo "=== hideGit/worktree grep ==="; grep -nE '^\s*git\s' prompts/1-makefile-docker-dispatch.md || echo "no bare git commands"; echo "=== operator-only grep ==="; grep -nE '^\s*(docker |docker-compo…
+[21:15:06] [system: task_progress]
+[21:15:06] $ echo "=== go-makefile-commands.md key sections ==="; grep -nE '^#{1,3} |\.PHONY|column|tab|absolute|recursiv|VERSION|origin' /home/node/.claude/plugins/marketplaces/coding/docs/go-makefile-commands.m…
+[21:15:06] ⚠ [bash output]
+"io/ioutil"                          // io and os packages
+```
+
+## Error Checking (errcheck)
+
+Every error must be checked. Exceptions: `Close`, `Write`, `Fprint`.
+
+```go
+// ❌ BAD: errcheck will fail
+os.Remove(path)
+os.Chmod(path, 0600)
+
+// ✅ GOOD
+_ = os.Remove(path)  // cleanup, error irrelevant
+if err := os.Chmod(path, 0600); err != nil {
+    return errors.Wrap(ctx, err, "chmod")
+}
+```
+
+## License Headers (addlicense)
+[21:15:09] [system: task_progress]
+[21:15:09] $ go version 2>&1; echo "=== go help build -mod ==="; go help build 2>/dev/null | sed -n '/-mod mode/,/-overlay/p' | head -40; echo "=== go help modules vendor ==="; go help modules 2>/dev/null | grep …
+[21:15:10] [system: task_progress]
+[21:15:10] [read] /home/node/.claude/plugins/marketplaces/coding/docs/go-makefile-commands.md (offset=1, limit=120)
+[21:15:10]   → 119 lines read
+[21:15:23] [system: task_progress]
+[21:15:23] $ set -e; T=$(mktemp -d); cd "$T"; cat > go.mod <<'EOF'\nmodule example.com/vendtest\n\ngo 1.27.3\n\nrequire github.com/google/uuid v1.6.0\nEOF\ncat > main.go <<'EOF'\npackage main\n\nimport (\n	"fmt"\…
+[21:15:29] [system: task_progress]
+[21:15:29] $ set -e; T=$(mktemp -d); cd "$T"; cat > go.mod <<'EOF'\nmodule example.com/vendtest\n\ngo 1.27.3\n\nrequire github.com/google/uuid v1.6.0\nEOF\ncat > main.go <<'EOF'\npackage main\n\nimport (\n	"fmt"\…
+[21:15:32] [system: task_started]
+[21:15:32] [system: task_notification]
+[21:15:43] [system: task_progress]
+[21:15:43] $ cd /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8; echo "=== BUILD_TARGET refs (excl prompts/specs/vendor) ==="; grep -rn 'BUILD_TARGET' --exclude-dir=vendor --…
+[21:15:43] [system: task_progress]
+[21:15:43] $ cd /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8; echo "=== changelog guide relevant headings ==="; grep -nE '^#{1,3} ' /home/node/.claude/plugins/marketplaces…
+[21:15:47] [system: task_progress]
+[21:15:47] $ grep -n -i -A8 'vendor' /home/node/.claude/plugins/marketplaces/coding/docs/go-build-args-guide.md | head -80
+[21:16:32] [system: task_progress]
+[21:16:32] $ cd /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8; echo "=== make -n precommit (filtered) ==="; ROOTDIR="$PWD" make -n precommit 2>&1 | grep -nE '\bgit\b|docker…
+[21:16:32] [system: task_progress]
+[21:16:32] $ cd /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8; echo "=== README line count ==="; wc -l README.md; echo "=== test verification greps against baseline ==="; e…
+[21:16:35] [system: task_started]
+[21:16:51] [system: task_notification]
+[21:17:06] [system: task_progress]
+[21:17:06] $ T=$(mktemp -d); cp Makefile Makefile.variables Makefile.precommit tools.env "$T/"; mkdir -p "$T/hack"\n# Variant B: capture AFTER the default block (the ordering the prompt says must be avoided)\ncat…
+[21:17:06] ⚠ [bash output]
+=== Variant B: capture AFTER default, no VERSION (does guard fire?) ===
+exit=2
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+Makefile.docker:16: *** the cluster arm needs an explicit VERSION; pass VERSION=<tag> on the command line or in the environment.  Stop.
+=== Variant B: capture AFTER default, VERSION=probe ===
+exit=0
+echo "docker.io/bborbe/sentry-alert-consumer:probe"
+hack/build-cluster.sh
+=== Variant B: VERSION from environment, no VERSION ===
+exit=0
+echo "docker.io/bborbe/sentry-alert-consumer:probe"
+hack/build-cluster.sh
+[21:17:47] [system: task_progress]
+[21:17:47] $ tmp=$(mktemp -d); if git clone --depth=1 --branch master https://github.com/bborbe/agent-task-executor.git "$tmp/ate" >/tmp/clone4.log 2>&1; then echo "=== init container fetch lines ==="; grep -nE '…
+[21:17:59] [system: task_progress]
+[21:17:59] $ timeout 300 go build -mod=readonly -o /tmp/sac-main . 2>&1 | tail -20; echo "exit=${PIPESTATUS[0]}"; ls -la /tmp/sac-main 2>&1; rm -f /tmp/sac-main
+[21:18:02] [system: task_started]
+[21:19:11] [system: task_updated]
+[21:19:11] [system: task_notification]
+[21:19:11]   ← agent reply: # Prompt Audit Report: Makefile Docker Dispatch
+[21:19:13] [system: task_notification]
+[21:19:18] [system: task_updated]
+[21:19:18] [system: task_notification]
+[21:19:18]   ← agent reply: # Prompt Audit Report: Docs — README Build Section and Changelog Entry
+[21:20:33] [system: task_updated]
+[21:20:33] [system: task_notification]
+[21:20:33]   ← agent reply: # Prompt Audit Report: Hack Runner and Module Build
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] [system: thinking_tokens]
+[21:20:34] 💭 Now I need to:
+1. Return creator's summary + audit reports verbatim.
+2. Transition spec to prompted — since DARK_FACTORY_MANAGED is unset, and creator succeeded with 3 files.
+
+Let me run `dark-factory spec mark-prompted 001-cluster-build-arm`. Check the CLI exists.
+
+The command is `dark-factory spec mark-prompted <spec-basename>`. Let me run it.
+
+Also check spec status maybe. Let me run.
+[21:20:35] $ command -v dark-factory && dark-factory spec mark-prompted 001-cluster-build-arm; echo "exit=$?"
+[21:20:35] [system: thinking_tokens]
+[21:20:35] [system: thinking_tokens]
+[21:20:35] [system: thinking_tokens]
+[21:20:35] [system: thinking_tokens]
+[21:20:35] [system: thinking_tokens]
+[21:20:35] [system: thinking_tokens]
+[21:20:35] [system: thinking_tokens]
+[21:20:36] [system: thinking_tokens]
+[21:20:36] [system: thinking_tokens]
+[21:20:36] [system: thinking_tokens]
+[21:20:36] [system: thinking_tokens]
+[21:20:36] [system: thinking_tokens]
+[21:20:36] [system: thinking_tokens]
+[21:20:36] [system: thinking_tokens]
+[21:20:36] [system: thinking_tokens]
+[21:20:37] [system: thinking_tokens]
+[21:20:37] 💭 Now produce the final output with the required format. Include creator summary, then per-prompt audit reports verbatim.
+
+Let me format. The audit reports are long; I must include them verbatim as requested. Let me reproduce faithfully.
+
+I'll include the creator summary first, then audit findings per file.
+[21:21:40] ## Generated Prompts
+
+Created three prompts in execution order. All carry `spec: ["001-cluster-build-arm"]`.
+
+### Files created
+
+1. `prompts/1-makefile-docker-dispatch.md`
+2. `prompts/2-hack-runner-and-module-build.md`
+3. `prompts/3-docs-build-section.md`
+
+Row 0 (`.dark-factory.yaml`) was not emitted, as instructed. The working tree already carries the measured-working shape.
+
+### Key decisions
+
+- **Prompt 1** implements the dispatch exactly as the spec's constraints require: `BUILD_TARGET ?= local` at column 0; `VERSION_ORIGIN := $(origin VERSION)` captured before the existing `git describe` default; recursive `IMAGE = $(DOCKER_REGISTRY)/bborbe/$(SERVICE)` and `TAG = $(VERSION)`; two parse-time `$(error …)` guards inside `ifneq ($(BUILD_TARGET),local)`; and an `ifeq`-wrapped `build` target. The local recipe keeps `check-go-mod` and the same `docker build`; only the `-t` spelling becomes `$(IMAGE):$(TAG)` (identical resolved value) so repository and tag are composed once. No extra knobs (`ALLOW_DEFAULT_VERSION`, `BUILD_TIMEOUT`, etc.) were added.
+- **Prompt 2** copies the five `hack/` files unmodified via shallow clone from `agent-task-executor` and `go-skeleton`, with `cmp` to prove byte-identity, and replaces `-mod=vendor` with `-mod=readonly` in the Dockerfile (Go's default module mode, not `-mod=mod`).
+- **Prompt 3** adds the README `## Build` section and a CHANGELOG bullet under `## Unreleased` containing the literal phrase `cluster build`.
+- **Verification is git-free** because the daemon log shows `hideGit=true` (arg-sourced, not visible in `.dark-factory.yaml`). Make invocations are prefixed with `ROOTDIR="$PWD"` so the `Makefile.precommit` include chain works even when `.git` is masked. Real cluster builds and `docker image inspect` remain on the spec's Post-Deploy Rung-2 ladder, not in prompt verification.
+- I validated the Makefile target state in a scratch directory: `make -n` local prints `docker build` with no runner; cluster prints the composed reference then the runner; omitted `VERSION` and `buca` on a cluster target both exit 2 with the right messages; the anchored greps return 1; the five copied files pass `bash -n`.
+
+### Open questions / deviations to check at audit
+
+- The spec's leak check `grep -rn 'BUILD_TARGET' … | grep -vE '(…|specs/)'` does not exclude `prompts/`, but the prompt files themselves contain the token. I added `--exclude-dir=prompts` so the check passes while preserving intent.
+- The spec says the local arm's command "must not change"; I changed the `-t` expression spelling to `$(IMAGE):$(TAG)` (resolved value is byte-identical) to satisfy "composed once so the two cannot drift". If literal preservation is preferred, keep the original `-t $(DOCKER_REGISTRY)/bborbe/$(SERVICE):$(VERSION)`.
+- The Dockerfile replacement flag was left to the implementer by the spec; I chose `-mod=readonly` explicitly. Dropping the flag entirely is equally valid.
+- The five `hack/` files are copied from the current `origin/master`; if the source repos move, the copy will differ from what the spec author inspected. Pin commits if reproducibility is required.
+- `make precommit` is included per `docs/dod.md` and the daemon's validation command; it is heavy but is the project's gate.
+
+### Docs referenced in `<context>`
+
+In-container paths: `/home/node/.claude/plugins/marketplaces/coding/docs/go-makefile-commands.md`, `go-precommit.md`, `git-workflow.md`, `go-dockerfile-guide.md`, `k8s-manifest-guide.md`, `go-k8s-binary-conventions.md`, `changelog-guide.md`, `documentation-guide.md`; plus project `docs/dod.md`.
+
+Run `/audit-prompt <file>` on each before approving.
+
+## Audit Findings
+
+### prompts/1-makefile-docker-dispatch.md
+
+# Prompt Audit Report: Makefile Docker Dispatch
+
+**File**: `/home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/1-makefile-docker-dispatch.md`
+**Score**: 8/10
+**Status**: Good
+
+## DoD Checklist
+- [x] `<summary>` present and plain-language (8 bullets, no file paths/struct names; "cluster runner" is the only mild jargon)
+- [x] `<objective>` states end state (slightly implementation-level — see Recommendations)
+- [x] `<context>` present
+- [x] `<requirements>` numbered and specific (10 steps, exact code blocks)
+- [x] `<constraints>` present (copied from spec, includes "Do NOT commit")
+- [x] `<verification>` present with runnable command (but missing `set -e` — Critical 1)
+- [!] All paths repo-relative — three container-absolute doc paths in `<context>` (`/home/node/.claude/plugins/...`); they resolve in this image but are not backed by a declared mount in `dark-factory config` (see note)
+- [x] No bare `git ` commands in `<verification>` when target repo has `hideGit: true` / `workflow: worktree`. `.dark-factory.yaml` is `workflow: direct`, but the daemon capture in `.dark-factory.log` shows `hideGit=true hideGitSource=arg`; verification contains no `git` command (the `git describe`/`git rev-parse` strings are inside Makefile code blocks, and only `make -n` runs them at parse time, where the failure is harmless)
+- [x] No operator-only commands in `<verification>` (`docker build` appears only inside the Makefile recipe under `<requirements>`, not as an executed verification step)
+- [x] File in `prompts/` inbox (not `prompts/in-progress/`)
+- [x] Filename not prefixed with dark-factory global number; `1-` is the allowed multi-prompt ordering prefix (siblings `1-`, `2-`, `3-` for spec 001)
+- [x] Filename reflects primary change (`makefile-docker-dispatch` matches the objective)
+- [x] Status is `draft`
+
+## Failure Mode Coverage
+- [x] Spec failure modes addressed for this prompt's scope: `VERSION` omitted → req 4 + verification; local arm regression → verification; unknown target / short `REF` / existing Job / proxy / OOM / registry rejection → runner behavior owned by sibling prompt 2 (copied unmodified); "caller-supplied VERSION names a released tag" → spec explicitly says no guard; mirror-tag mismatch → nuke, out of scope
+- [x] Security concerns from spec addressed: character whitelist/newline constraint (constraints line 148), `REPO_URL`/`PUSH_SECRET` as literals (req 5, constraint line 149), no bypass path
+- [x] External calls have timeout/cancellation behavior: `TIMEOUT='3600'` passed to the runner, which enforces its own deadline
+- [!] New strings crossing the subprocess boundary (the 10 env-var names passed to `hack/build-cluster.sh`) have no contract test in the prompt set. I verified them against the real runner at `/tmp/ate/hack/build-cluster.sh`: all 10 (`BUILD_TARGET`, `REPO_URL`, `REF`, `TAG`, `DOCKERFILE`, `IMAGE`, `DOCKER_REGISTRY`, `PUSH`, `PUSH_SECRET`, `TIMEOUT`) match, and `NAMESPACE` is optional with a default. Correct, but untested (see Recommendation 1)
+- [x] No `go mod vendor` in `<requirements>` or `<verification>`
+- [x] No cross-repo writes (no clone + push)
+- [x] Container-autonomous (Makefile edits, `make -n`, `make precommit`; no kubectl/docker/PR steps)
+- [x] Sibling entry points covered: req 7 explicitly keeps `upload`/`clean`/`apply`/`buca` and relies on the parse-time guard; `apply` is a no-op and the spec does not require guarding it
+
+## Documentation Placement
+- [x] No inlined reusable cross-project pattern — the inlined Makefile recipes are the artifact itself, not CQRS/factory/test-bootstrap knowledge
+- [x] Existing project docs referenced: `docs/dod.md`
+- [x] Existing coding plugin docs referenced: `go-makefile-commands.md`, `go-precommit.md`, `git-workflow.md`
+- [x] Domain knowledge that outlives the prompt (two parse-time traps) is delegated to the README by prompt 3
+
+## Code Reference Verification
+| Reference | File | Status |
+|-----------|------|--------|
+| `Makefile:3` includes `Makefile.docker`; `Makefile:5` assigns `SERVICE` | `Makefile` | Correct |
+| `DOCKER_REGISTRY ?= docker.io` at top | `Makefile.docker:1` | Correct |
+| `VERSION` default `ifeq` block | `Makefile.docker:3-5` | Correct |
+| `build` target + local recipe | `Makefile.docker:7-20` | Correct |
+| `check-go-mod` target | `Makefile.docker:22-29` | Correct |
+| `upload`/`clean`/`apply`/`buca` | `Makefile.docker:31-51` | Correct |
+| `make precommit` gate | `Makefile.precommit:9` | Correct |
+| `ROOTDIR` | `Makefile.variables:1` | Correct |
+| `docs/dod.md` | `docs/dod.md` | Correct |
+| `hack/build-cluster.sh` | (absent) | Correct — prompt states it is created by the next prompt |
+| Reference docs (`go-makefile-commands.md`, `go-precommit.md`, `git-workflow.md`) | `/home/node/.claude/plugins/.../docs/` | Correct (all three exist) |
+| Runner env-var contract | `/tmp/ate/hack/build-cluster.sh` | Correct — all 10 names match the dispatch |
+
+## Coding Guidelines Compliance
+| Guideline | File | Status |
+|-----------|------|--------|
+| `make test` is the canonical verification, not `go build` | `go-makefile-commands.md` | Compliant — verification ends with `make precommit`, which includes `test` |
+| Go handler/error/factory/time-injection patterns | — | N/A — no Go code in requirements |
+| Test-only package-level mutable state | `go-composition.md` | N/A — no Go code |
+
+## YAGNI Pass (scope-creep detector)
+- [x] No opt-out flag for the behavior being shipped — `ALLOW_DEFAULT_VERSION` is explicitly excluded (req 8), matching the spec's Non-goals
+- [x] Every config field is demanded: `BUILD_TARGET`, `IMAGE`, `TAG`, `VERSION` all appear in the spec's Goal/Desired Behavior/Constraints
+- [x] No future-proofing knobs without a named consumer — `REPO_URL`, `PUSH_SECRET`, `DOCKERFILE`, `PUSH`, `TIMEOUT` are inline literals required by the runner interface, not configurable inputs
+- No findings.
+
+## Critical Issues
+
+### 1. Verification has no `set -e` — a broken arm can pass silently
+**Location**: `<verification>`, line 157 (the opening of the `bash` block).
+
+The block is a sequence of independent `test`/`grep`/`make` lines with no `set -e`. Only the last command (`make precommit`) determines the exit status, and `make precommit` never exercises `Makefile.docker`'s build arms. Concretely, if the cluster branch is broken (e.g. the guard fires for every `BUILD_TARGET`, so `make -n build BUILD_TARGET=sun ... VERSION=probe` errors and `/tmp/cluster-build.txt` is empty), every `grep -q` on that file fails silently, the no-version and local-only checks still "pass" (they expect errors), the leak check passes, and `make precommit` passes — the verification reports success for a broken dispatch. I reproduced this failure mode in a temp copy.
+
+**Find:**
+```
+```bash
+# The selector assignment exists at column 0.
+```
+**Replace:**
+```
+```bash
+set -euo pipefail
+
+# The selector assignment exists at column 0.
+```
+
+### 2. Missing positive local-`buca` check (half of spec AC6)
+**Location**: `<verification>`, lines 178-180.
+
+The spec's AC6 and Row 1 require both halves: `make -n buca` (local) prints `docker push` and `docker rmi`, **and** `make -n buca BUILD_TARGET=sun ...` is refused. The prompt verifies only the refusal. If the second guard's `endif` is misplaced so it sits outside the `ifneq ($(BUILD_TARGET),local)` block, local `buca` is refused while local `build` still works and every current check passes. The positive check is the regression gate the spec assigns to this prompt.
+
+**Find:**
+```
+# The local-only targets are refused at parse time when a cluster target is set.
+if ROOTDIR="$PWD" make -n buca BUILD_TARGET=sun REF=0123456789abcdef0123456789abcdef01234567 VERSION=probe > /tmp/local-only.txt 2>&1; then exit 1; fi
+grep -q 'local-only' /tmp/local-only.txt
+```
+**Replace:**
+```
+# The local-only targets are refused at parse time when a cluster target is set.
+if ROOTDIR="$PWD" make -n buca BUILD_TARGET=sun REF=0123456789abcdef0123456789abcdef01234567 VERSION=probe > /tmp/local-only.txt 2>&1; then exit 1; fi
+grep -q 'local-only' /tmp/local-only.txt
+
+# The local-only targets still run locally; the guard must not fire for the default arm.
+ROOTDIR="$PWD" make -n buca > /tmp/local-buca.txt
+grep -q 'docker push' /tmp/local-buca.txt
+grep -q 'docker rmi' /tmp/local-buca.txt
+```
+
+## Recommendations
+
+### 1. Add a dispatch→runner env-var contract test (prompt 2)
+The dispatch (lines 116-126) passes 10 env-var names to a subprocess. No test in the prompt set traverses that boundary; `make -n` only renders. I verified the names match `/tmp/ate/hack/build-cluster.sh`, so this is not a bug today, but a future rename on either side would fail at runtime. Add to **prompt 2's** `<verification>` (where the runner exists):
+
+```bash
+for v in BUILD_TARGET REPO_URL REF TAG DOCKERFILE IMAGE DOCKER_REGISTRY PUSH PUSH_SECRET TIMEOUT; do
+  grep -q "$v" hack/build-cluster.sh
+done
+```
+
+### 2. Correct the `VERSION_ORIGIN` ordering rationale (lines 60-61, and constraint line 145)
+The prompt says: "After it, `$(origin VERSION)` is `file` on every invocation and a guard written below it never fires." This is factually wrong for the guard as written. The step-4 guard is `ifeq ($(filter command line environment,$(VERSION_ORIGIN)),)`; `$(filter ...)` over `file` is empty, so the guard **does** fire when the capture sits after the default block. I tested a variant with the capture after the block: omitted `VERSION` still exits non-zero with the same message, and command-line/environment `VERSION` still passes. The ordering is not load-bearing for this guard (it would be for an `ifeq ($(origin VERSION),undefined)` guard). The code is correct either way; only the justification is misleading. The spec's constraint (line 125) shares the error.
+
+**Find:**
+```
+   The capture must run before that block. After it, `$(origin VERSION)` is `file` on every invocation and a guard written below it never fires.
+```
+**Replace:**
+```
+   Capture before that block so the recorded origin is `undefined` (not `file`) when no tag was supplied. The step-4 guard uses `$(filter command line environment,…)`, which refuses both `undefined` and `file`, so the ordering is not what makes the refusal fire; keep it because the spec freezes it.
+```
+Apply the same correction to the constraint at line 145.
+
+### 3. Test the environment-origin `VERSION` path
+The guard accepts `environment`, but only the command-line path is tested. Add after line 176:
+
+```bash
+# VERSION from the environment is also accepted.
+ROOTDIR="$PWD" VERSION=probe make -n build BUILD_TARGET=sun REF=0123456789abcdef0123456789abcdef01234567 > /tmp/env-version.txt
+grep -q 'docker.io/bborbe/sentry-alert-consumer:probe' /tmp/env-version.txt
+```
+
+### 4. Assert the cluster arm does not run `check-go-mod`
+Spec DB6/req 5 require the cluster branch to have no prerequisites. Current checks would still pass if `build: check-go-mod` were left in the `else` branch. Add after line 172:
+
+```bash
+if grep -q 'go mod vendor' /tmp/cluster-build.txt; then exit 1; fi
+```
+
+### 5. Harden the leak check
+Line 183 scans `.` with no `.git` or log exclusion. Under `hideGit: true` this is fine, but in a non-masked checkout `grep -r` descends into `.git`; and if the daemon ever logs prompt content to `.dark-factory.log` the check false-fails. Replace line 183 with:
+
+```bash
+test -z "$(grep -rn 'BUILD_TARGET' --exclude-dir=vendor --exclude-dir=.git --exclude-dir=prompts --exclude-dir=specs --exclude=.dark-factory.log . | grep -vE '(Makefile\.docker|README\.md|CHANGELOG\.md|hack/)')"
+```
+
+### 6. Objective wording
+The objective names variables and targets (`BUILD_TARGET`, `upload`/`clean`/`buca`), which the DoD asks to avoid except for frozen constraints. Consider:
+
+**Find:**
+```
+Change the Docker build makefile so `BUILD_TARGET` selects between the unchanged local arm (`local`, the default) and a cluster arm that dispatches a named commit to the copied cluster runner. Capture `VERSION`'s origin before the existing parse-time default so the cluster arm can refuse a defaulted tag, and reject `upload`/`clean`/`buca` at parse time when a cluster target is set.
+```
+**Replace:**
+```
+`make build` keeps producing the image locally exactly as today, while a caller can select a cluster arm that dispatches a named commit to the cluster runner; the cluster arm refuses to run without an explicitly supplied tag, and the local-only publish targets are refused when a cluster target is selected.
+```
+
+### 7. Confirm the in-container plugin-doc paths
+`dark-factory config` reports `claudeDir: ~/.claude-yolo`, while the prompt references `/home/node/.claude/plugins/...`. The paths resolve in this image (all three docs exist), but the project's own `docs/dod.md` says "No absolute paths". If the execution image mounts plugins elsewhere, these three context bullets dangle. Low priority — they are reference material, not required edits.
+
+## Strengths
+- Structure is complete and the requirements are precise enough to implement without guessing; the local recipe is preserved byte-for-byte and the composed `IMAGE`/`TAG` are explicitly recursive to survive the `Makefile:3`-before-`SERVICE` include order.
+- The parse-time `$(error …)` choice is correct and well-justified: recipe-level `exit 1` would be invisible to `make -n`.
+- I simulated the full proposed `Makefile.docker` and confirmed every intended behavior: local build unchanged, cluster arm prints the composed ref and calls the runner, omitted `VERSION` refuses, and cluster `buca` refuses at parse time.
+- The runner env-var contract matches the upstream `hack/build-cluster.sh` exactly, so the dispatch is wired correctly.
+- YAGNI is handled deliberately: `ALLOW_DEFAULT_VERSION` and the other copied knobs are explicitly excluded, and `REPO_URL`/`PUSH_SECRET` are literals per the spec's security section.
+- No hideGit, operator-only, `go mod vendor`, or cross-repo-write violations.
+
+## Summary
+This is a well-scoped, well-referenced prompt whose core logic is correct and was verified by simulation. The two must-fix items are verification robustness: add `set -euo pipefail` so a broken arm cannot pass silently, and add the positive local-`buca` check that spec AC6 assigns to this prompt. The remaining recommendations are contract-test and rationale improvements, not code defects.
+
+### prompts/2-hack-runner-and-module-build.md
+
+# Prompt Audit Report: Hack Runner and Module Build
+
+**File**: `prompts/2-hack-runner-and-module-build.md` (absolute: `/home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/2-hack-runner-and-module-build.md`)
+**Score**: 6/10
+**Status**: Needs Improvement (two Critical fixes required)
+
+## DoD Checklist
+- [x] `<summary>` present and plain-language (7 bullets, no paths/signatures)
+- [x] `<objective>` states end state (one sentence)
+- [x] `<context>` present
+- [x] `<requirements>` numbered and specific (8 steps, exact paths, old→new Dockerfile line)
+- [x] `<constraints>` present
+- [x] `<verification>` present with runnable commands
+- [!] All paths repo-relative (no absolute or `~/` paths) — **requirement 3 line 64 contains host home-relative paths**
+- [x] No bare `git ` commands in `<verification>` when target repo has `hideGit: true` OR `workflow: worktree` — target repo is `workflow: direct`, no `hideGit`, and `<verification>` has no `git` commands
+- [x] No operator-only commands in `<verification>` — only `ls`, `test`, `bash -n`, `grep`, `make precommit`, `make test`
+- [x] File in `prompts/` inbox (not `prompts/in-progress/`)
+- [x] Filename not prefixed with dark-factory global number — `2-` is the allowed single-digit sibling-ordering prefix
+- [x] Filename reflects primary change (`hack` runner + module build)
+- [x] Status is `draft` (valid)
+
+## Failure Mode Coverage
+- [x] Spec failure modes addressed: the copied runner/template cover unknown cluster, short/unpushed REF, epoch mismatch, existing Job, interruption, module-proxy failure, OOM, registry push failure; prompt 1 (sibling) covers the `VERSION` guard; module mode (requirement 5) addresses the clone-without-vendor path.
+- [x] Security concerns from spec addressed: constraints lines 100–104 mirror the spec's whitelist/newline, credential-handling, `automountServiceAccountToken: false`, seccomp/AppArmor, and DNS-sanitization points.
+- [x] External calls have timeout/cancellation behavior: the copied `build-cluster.sh` uses `TIMEOUT` and the Job template uses `activeDeadlineSeconds`; prompt 1 passes `TIMEOUT='3600'`.
+- [!] New value that crosses a library/toolchain boundary has no contract test: `-mod=readonly` is only grep-asserted (see Critical Issue 2).
+- [x] No `go mod vendor` instruction — requirement 7 is a **prohibition** ("Do not add a `go mod vendor` step anywhere"), not an instruction to run it. The only literal `go mod vendor` in the repo is the pre-existing `check-go-mod` target, which the prompt leaves untouched. Do not treat the mechanical grep as a violation here.
+- [x] No cross-repo writes: the two clones are read-only; no `git push` / `gh pr create` follows.
+- [x] Container-autonomous: no `kubectl`/deploy/PR steps, no operator-vs-agent split. (The host-path fallback is flagged separately as a path-portability Critical.)
+- [x] Sibling entry points: N/A — no Go setup/gate/validation function is edited. The cross-prompt dispatch→runner contract was checked manually and matches (see Code Reference Verification).
+
+## Documentation Placement
+- [x] No inlined reusable coding pattern (>10 lines); the clone block is a one-off copy recipe
+- [x] Existing project doc referenced (`docs/dod.md`)
+- [x] Existing coding plugin docs referenced (`go-dockerfile-guide.md`, `k8s-manifest-guide.md`, `go-k8s-binary-conventions.md` — all exist under `/home/node/.claude/plugins/marketplaces/coding/docs/`)
+- [x] Domain knowledge that outlives the prompt (mirror coupling, parse-time traps) is delegated to prompt 3 / README
+- [!] `go-build-args-guide.md § Vendor handling` is relevant to the deliberate move away from `-mod=vendor` and is not referenced (Recommendation)
+
+## Code Reference Verification
+| Reference | File | Status |
+|-----------|------|--------|
+| `Dockerfile` vendor line (requirement 5 old text) | `Dockerfile:7` | Correct — exact match |
+| `ARG DOCKER_REGISTRY=docker.io` / `${DOCKER_REGISTRY}` base images | `Dockerfile:1,2,10` | Correct |
+| `Makefile.docker` cluster branch "added by the previous prompt" | `Makefile.docker` | Correct forward dependency — absent now because prompt 1 has not run; prompt ordering supplies it |
+| `docs/dod.md` | `docs/dod.md` | Correct |
+| `go-dockerfile-guide.md` | `/home/node/.claude/plugins/marketplaces/coding/docs/go-dockerfile-guide.md` | Correct |
+| `k8s-manifest-guide.md` | `/home/node/.claude/plugins/marketplaces/coding/docs/k8s-manifest-guide.md` | Correct |
+| `go-k8s-binary-conventions.md` | `/home/node/.claude/plugins/marketplaces/coding/docs/go-k8s-binary-conventions.md` | Correct |
+| `agent-task-executor/hack/build-cluster.sh`, `cluster-alias.sh`, `build-job.yaml` | remote master (`eea4be1…`) | Correct — all exist; modes 755/755/644; `bash -n` clean |
+| `go-skeleton/hack/build-cluster-bootstrap.sh`, `dockerconfig.json.tpl` | remote master (`43f4fc9…`) | Correct — both exist; modes 755/644; `bash -n` clean |
+| Job template carries `automountServiceAccountToken: false` (ATE) and lacks it (go-skeleton) | `build-job.yaml` | Correct — verified |
+| Template passes `DOCKER_REGISTRY=docker.io` | `build-job.yaml:121` | Correct |
+| Runner sources `cluster-alias.sh` | `build-cluster.sh:31` | Correct |
+| Bootstrap uses `600` temp file + `trap … EXIT INT TERM` | `build-cluster-bootstrap.sh:41-43` | Correct |
+| Runner env vars (`BUILD_TARGET, REPO_URL, REF, TAG, IMAGE, PUSH_SECRET, DOCKERFILE, DOCKER_REGISTRY, PUSH, TIMEOUT`) | `build-cluster.sh:37-42` + prompt 1 dispatch | Correct — prompt 1 sets every required variable; `NAMESPACE` defaults to `build` |
+| `cluster-alias.sh` compatibility with go-skeleton's bootstrap | both repos | Correct — same `KUBECONFIG_PATH`/`KUBE_CONTEXT`/`kc()` mapping; ATE's copy is functionally compatible |
+
+## Coding Guidelines Compliance
+| Guideline | File | Status |
+|-----------|------|--------|
+| Dockerfile build flag vs. project pattern (`-mod=vendor`) | `go-dockerfile-guide.md`, `go-build-args-guide.md` | Deliberate spec-driven deviation (`-mod=readonly`) for the cluster arm; not a violation, but reference `go-build-args-guide.md § Vendor handling` in `<context>` |
+| Go code patterns (HTTP handlers, error wrapping, factory, time injection, test-only mutable state) | N/A | No Go code in `<requirements>` |
+
+## YAGNI Pass (scope-creep detector)
+- [x] No opt-out flag for the behavior the prompt ships (no `ALLOW_DEFAULT_VERSION`, no `BUILD_*` knobs — requirement 8 of prompt 1 and the spec's Non-goals reject them)
+- [x] Every config field/threshold/branch demanded by the spec's Goal or Desired Behavior
+- [x] No future-proofing knobs without a named consumer
+- Note: requirement 3's host-checkout fallback is extra scope, but it is spec-derived (Assumptions) rather than an invented knob. It is flagged as a Critical path-portability issue, not a YAGNI issue.
+
+## Critical Issues
+
+### 1. Host home-relative fallback path in `<requirements>` (path portability / container autonomy)
+
+**Line 64** (requirement 3):
+
+> `3. If `github.com` is unreachable, copy the same five files from a local sibling checkout instead: `~/Documents/workspaces/agent-task-executor/hack/` for the first three and `~/Documents/workspaces/go-skeleton/hack/` for the last two. The primary path is the clone; the fallback exists only for an offline container. Do not hand-write the files.`
+
+`~/Documents/workspaces/...` is a host home-relative path. Inside the dark-factory container it resolves to `/home/node/Documents/workspaces/...`, which does not exist (the host checkout is not mounted), so the "offline container" fallback is itself unusable. This is a Critical path-portability violation and a container-autonomy issue (the container cannot read the operator's home directory). The primary clone path is reachable (verified `git ls-remote` and shallow clone of both repos succeed), so the fallback is not needed.
+
+**Find (verbatim):**
+```
+3. If `github.com` is unreachable, copy the same five files from a local sibling checkout instead: `~/Documents/workspaces/agent-task-executor/hack/` for the first three and `~/Documents/workspaces/go-skeleton/hack/` for the last two. The primary path is the clone; the fallback exists only for an offline container. Do not hand-write the files.
+```
+
+**Replace with:**
+```
+3. If `github.com` is unreachable, stop and report the blocker; do not read host paths or hand-write the files. The container has no access to the operator's home directory, and the five files must be byte-identical to the source repositories.
+```
+
+### 2. No boundary contract test for the new `-mod=readonly` flag
+
+**Lines 76–88** (requirement 5) and **lines 126–128** (`<verification>`).
+
+The prompt changes the Dockerfile to `-mod=readonly`, a new value that crosses the Go toolchain boundary. The only check is `grep -q '\-mod=readonly' Dockerfile`, which asserts the literal string, not that the flag actually builds the root package without `vendor/`. A shape test does not satisfy the boundary-crossing rule. The cheap level-1 contract test is a subprocess invocation with the real flag; it is container-executable and verified to pass in this repo:
+
+```
+go build -mod=readonly -o /tmp/sentry-alert-consumer-build .
+```
+(exit 0, binary produced). The operator cluster build remains the deeper integration test, but the prompt-level contract test should be present.
+
+**Find (verbatim):**
+```
+# The Dockerfile no longer forces vendor mode.
+test "$(grep -c '\-mod=vendor' Dockerfile)" -eq 0
+grep -q '\-mod=readonly' Dockerfile
+
+ROOTDIR="$PWD" make precommit
+ROOTDIR="$PWD" make test
+```
+
+**Replace with:**
+```
+# The Dockerfile no longer forces vendor mode.
+test "$(grep -c '\-mod=vendor' Dockerfile)" -eq 0
+grep -q '\-mod=readonly' Dockerfile
+
+# The replacement flag actually builds the root package with no vendor/.
+go build -mod=readonly -o /tmp/sentry-alert-consumer-build .
+rm -f /tmp/sentry-alert-consumer-build
+
+ROOTDIR="$PWD" make precommit
+ROOTDIR="$PWD" make test
+```
+
+## Recommendations
+
+1. **Fix the inaccurate vendoring rationale in requirement 7 (line 92).** With `-mod=readonly` explicitly set, Go does **not** auto-select vendor mode; a leftover `vendor/` is ignored by the build (verified: explicit `-mod=readonly` built successfully from the module cache with the vendored package deleted, while the default `-mod` failed with `import lookup disabled by -mod=vendor`). The instruction (do not add a vendor step) is correct; only the rationale is wrong.
+
+   **Find (verbatim):**
+   ```
+   7. Do not add a `go mod vendor` step anywhere. The cluster arm builds a named ref, which need not be the local `HEAD`; host-side vendoring would leave a `vendor/` that `COPY .` picks up and Go would then select vendor mode automatically, reintroducing the local/cluster divergence. The existing `check-go-mod` target stays local-only and is not invoked by the cluster arm.
+   ```
+
+   **Replace with:**
+   ```
+   7. Do not add a `go mod vendor` step anywhere. The cluster arm builds a named ref, which need not be the local `HEAD`, so a host-side `vendor/` would not describe the code the Job builds. The Dockerfile's explicit `-mod=readonly` means any leftover `vendor/` is ignored by the build; the rule keeps the local and cluster source trees aligned. The existing `check-go-mod` target stays local-only and is not invoked by the cluster arm.
+   ```
+
+2. **Assert the file modes in `<verification>`.** Requirement 4 states 755/644, but the verification only checks existence. `cp` + `chmod +x` currently produce the right modes (verified), but a mode check makes the contract explicit. Add after the `test -f …` lines:
+   ```bash
+   test "$(stat -c '%a' hack/build-cluster.sh)" = 755
+   test "$(stat -c '%a' hack/cluster-alias.sh)" = 755
+   test "$(stat -c '%a' hack/build-cluster-bootstrap.sh)" = 755
+   test "$(stat -c '%a' hack/build-job.yaml)" = 644
+   test "$(stat -c '%a' hack/dockerconfig.json.tpl)" = 644
+   ```
+
+3. **Add a cross-prompt env-var contract check.** Prompt 2 copies the runner and asserts prompt 1 already passes its variables. The names match today, but a cheap static guard would catch drift at prompt 2 time:
+   ```bash
+   for v in BUILD_TARGET REPO_URL REF TAG IMAGE PUSH_SECRET; do
+     grep -q "$v=" Makefile.docker || { echo "Makefile.docker does not set $v"; exit 1; }
+   done
+   ```
+
+4. **Reference `go-build-args-guide.md § Vendor handling` in `<context>`.** The prompt deliberately moves away from the plugin's documented `-mod=vendor` pattern; citing the guide's vendor-handling section makes the deviation traceable. Add after line 30:
+   ```
+   - `/home/node/.claude/plugins/marketplaces/coding/docs/go-build-args-guide.md` — § Vendor handling
+   ```
+
+5. **Minor:** `ROOTDIR="$PWD" make test` is redundant — `make precommit` already depends on the `test` target. Keep it if you want an explicit test command, but it does not add coverage.
+
+6. **Minor:** Requirement 2 leaves the `mktemp -d` clone directory behind. Not a correctness issue; add `rm -rf "$tmp"` if you want a clean workspace.
+
+## Strengths
+
+- The Dockerfile edit is anchored with an exact old→new block that matches `Dockerfile:7` byte-for-byte, and the replacement is the spec's named default (`-mod=readonly`).
+- The copy step is guarded by `cmp` for every one of the five files, and the source selection is correct and deliberate: agent-task-executor's hardened Job template (with `automountServiceAccountToken: false`, `DOCKER_REGISTRY=docker.io`, and the init-container security context) and go-skeleton's bootstrap/template (which agent-task-executor lacks).
+- The env-var contract between prompt 1's dispatch and the copied `build-cluster.sh` was verified to match exactly (`BUILD_TARGET, REPO_URL, REF, TAG, IMAGE, PUSH_SECRET`, with `NAMESPACE` defaulting to `build`); the runner's whitelist regexes all accept the values prompt 1 produces.
+- The `cluster-alias.sh` copied from agent-task-executor is functionally compatible with go-skeleton's bootstrap (same alias mapping and `kc()` helper).
+- Security constraints are copied from the spec rather than paraphrased, and they match the actual template/script behavior.
+- The summary is reviewer-facing, plain language, and correctly frames the local arm as unchanged while the cluster arm gains a path.
+- The prompt is properly scoped to prompt 2 of the spec's decomposition (DBs 2, 6; ACs 2, 5, 7) and does not duplicate prompt 1 or prompt 3.
+
+## Summary
+
+Strong, well-anchored prompt with verified source files and a correct cross-prompt dispatch contract. Two Critical fixes are required before approval: replace the host `~/Documents/workspaces/...` fallback (line 64) with a container-safe blocker instruction, and add a container-executable `go build -mod=readonly` contract test so the changed Dockerfile flag is exercised rather than merely grep-asserted. The remaining recommendations (correct the vendor rationale, add mode/contract checks, reference `go-build-args-guide.md`) are quality improvements.
+
+### prompts/3-docs-build-section.md
+
+# Prompt Audit Report: Docs — README Build Section and Changelog Entry
+
+**File**: `/home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md`
+**Score**: 8/10
+**Status**: Good
+
+## DoD Checklist
+- [x] `<summary>` present and plain-language (7 bullets; minor note: bullets 1 and 6 name `README` / the unreleased heading)
+- [x] `<objective>` states end state (the WHY is implicit rather than stated)
+- [x] `<context>` present
+- [x] `<requirements>` numbered and specific (1–8, exact files and content)
+- [x] `<constraints>` present (includes "Do NOT commit")
+- [x] `<verification>` present with runnable command (`ROOTDIR="$PWD" make precommit`)
+- [!] All paths repo-relative — two `/home/node/.claude/plugins/...` plugin-doc references are container-absolute; they exist in this environment but are not repo-relative
+- [x] No bare `git ` commands in `<verification>` when target repo has `hideGit: true` OR `workflow: worktree` — `.dark-factory.yaml` is `workflow: direct`, no `hideGit`, and verification has no `git`
+- [x] No operator-only commands in `<verification>` — only `grep`, `awk`, `test`, and `make precommit`
+- [x] File in `prompts/` inbox (not `prompts/in-progress/`)
+- [x] Filename not prefixed with dark-factory global number — `3-` is the allowed single-digit multi-prompt ordering prefix for spec 001
+- [x] Filename reflects primary change (`3-docs-build-section.md` names the README build section)
+- [x] Status is `idea` or `draft` (`draft`)
+
+## Failure Mode Coverage
+- [x] Spec failure modes addressed in requirements (or N/A if no spec) — runtime failure modes (unknown cluster, short/unpushed `REF`, epoch mismatch, existing Job, module-proxy/OOM/registry failures) are implemented by the copied runner and dispatch in sibling prompts 1 and 2; this docs prompt covers the documentation-facing "built tag vs `MIRROR_IMAGES`" coupling in requirement 3. The spec's "caller-supplied `VERSION` names an already-released tag" row is explicitly a no-guard by spec, and the README does not claim otherwise.
+- [x] Security concerns from spec addressed (or N/A) — this prompt adds no security-relevant code; the whitelist, credential handling, and `automountServiceAccountToken: false` constraints live in prompts 1 and 2. Requirement 3 correctly avoids claiming the cluster pushes to the private registry.
+- [x] External calls have timeout/cancellation behavior specified — N/A (no external calls in this prompt)
+- [x] New constants / strings that flow through library validators have a test calling the validator — N/A (no new code)
+- [x] No `go mod vendor` in `<requirements>` or `<verification>` — the only build invocation is `make precommit`; no `go mod vendor`
+- [x] No cross-repo writes — no clone, push, or `gh pr create`
+- [x] Container-autonomous — the cluster/build commands (`make build BUILD_TARGET=...`, `hack/build-cluster-bootstrap.sh`, `make buca`) appear only inside the markdown block the agent is told to write into `README.md`; they are documentation content, not steps the agent executes. No `kubectl`, image push, or operator-vs-agent split.
+- [x] Sibling entry points covered — N/A (documentation-only prompt; no setup/gate function)
+
+## Documentation Placement
+- [x] No inlined reusable patterns (>10 lines) that should be in a doc — the inlined block is the README deliverable, not a reusable coding pattern
+- [x] Existing project docs referenced in `<context>` — `docs/dod.md`
+- [x] Existing coding plugin docs referenced in `<context>` — `changelog-guide.md`, `documentation-guide.md`
+- [x] Domain knowledge that outlives the prompt is in `project/docs/`, not inlined — the README is the durable home for the two-arm topology and parse-time traps, which is exactly what the spec requires
+
+## Code Reference Verification
+| Reference | File | Status |
+|-----------|------|--------|
+| Headings `How It Works`, `Configuration`, `Observability`, `Task Contract` | `README.md` | Correct |
+| `## Unreleased` exists | `CHANGELOG.md` | Correct |
+| `Makefile` line 3 includes `Makefile.docker`; line 5 assigns `SERVICE` | `Makefile` | Correct (lines 3 and 5) |
+| `VERSION` defaulted at parse time | `Makefile.docker` | Correct (lines 3–5) |
+| `docs/dod.md` | `docs/dod.md` | Correct |
+| `/home/node/.claude/plugins/marketplaces/coding/docs/changelog-guide.md` | plugin docs | Correct (exists in this container) |
+| `/home/node/.claude/plugins/marketplaces/coding/docs/documentation-guide.md` | plugin docs | Correct (exists in this container) |
+| Aliases `sun`, `nukedev`, `nukeprod` | `agent-task-executor/hack/cluster-alias.sh` | Correct (verified by clone) |
+| `hack/build-job.yaml`, `hack/build-cluster.sh`, `hack/build-cluster-bootstrap.sh` | not yet present | Expected — created by prompt 2; prompt 3 documents them as future content and does not read them |
+| `MIRROR_IMAGES` mirror coupling | spec / nuke | Correct per spec Non-goals and Failure Modes |
+
+Non-blocking observation: the README content says `REF` "must be a full 40-character commit SHA", while `hack/build-job.yaml` documents `REF` as a "git ref (branch, tag or commit)" and the runner's whitelist accepts branches/tags. The wording is stricter than the implementation but matches the spec's Verification (`REF=$(git rev-parse HEAD)`), so it is a safe usage instruction rather than an error.
+
+## Coding Guidelines Compliance
+| Guideline | File | Status |
+|-----------|------|--------|
+| Go code patterns | — | N/A (prompt contains no Go code) |
+| Test-only package-level mutable state | `go-composition.md` | N/A (no code) |
+
+## YAGNI Pass (scope-creep detector)
+- [x] No opt-out flag for the very behavior the prompt ships
+- [x] Every config field / threshold / branch is demanded by the linked spec's Goal or Desired Behavior — the README content is demanded by Desired Behavior 8 and Constraints line 134 (two-arm topology, mirror coupling, two parse-time traps); the changelog bullet is demanded by AC 8
+- [x] No "future-proofing" knobs without a named concrete consumer
+- Hits: none. Minor note: the "Before the first cluster build, provision the `build` namespace and the `buildkit-push` credential once" paragraph is slightly beyond AC 8's explicit clauses, but it aligns with the spec's Assumptions and operator verification and introduces no knob.
+
+## Critical Issues
+None. No blocking issues found.
+
+## Recommendations
+
+### 1. Add verification for requirement 4 (the two parse-time traps)
+Requirement 4 (line 97) requires both traps in the build section, but `<verification>` (lines 128–142) never checks them. An agent could omit them and still pass every verification command. Add two greps matching the provided content.
+
+Find:
+```
+# The changelog bullet is under Unreleased.
+awk '/^## /{s=$0} /cluster build/{print s}' CHANGELOG.md | grep -qx '## Unreleased'
+
+ROOTDIR="$PWD" make precommit
+```
+Replace with:
+```
+# The changelog bullet is under Unreleased.
+awk '/^## /{s=$0} /cluster build/{print s}' CHANGELOG.md | grep -qx '## Unreleased'
+
+# Both parse-time traps are documented.
+grep -q 'defaulted at parse time' README.md
+grep -q 'before it assigns' README.md
+
+ROOTDIR="$PWD" make precommit
+```
+
+### 2. Add a verification check for the section's placement
+Requirement 1 (line 35) requires the section between `## How It Works` and `## Configuration`, but the verification does not check ordering. Add an awk order check.
+
+Find:
+```
+# The exact cluster invocation is documented.
+test "$(grep -c 'BUILD_TARGET=<cluster> REF=<sha> VERSION=<tag>' README.md)" -ge 1
+```
+Replace with:
+```
+# The exact cluster invocation is documented.
+test "$(grep -c 'BUILD_TARGET=<cluster> REF=<sha> VERSION=<tag>' README.md)" -ge 1
+
+# The Build section sits between How It Works and Configuration.
+awk '/^## How It Works$/{h=NR} /^## Build$/{b=NR} /^## Configuration$/{c=NR} END{exit !(h && b && c && h < b && b < c)}' README.md
+```
+
+### 3. Confirm the container-absolute plugin-doc paths
+Lines 30–31 use `/home/node/.claude/plugins/marketplaces/coding/docs/...`. These paths exist in this audit container, but they are image paths rather than repo-relative paths and are not backed by a mount declared in `dark-factory config`. If the target `docker.io/bborbe/claude-yolo:v0.16.4` image places the coding plugin docs elsewhere, the agent silently cannot read them. Consider either confirming the target image path or adding a one-line fallback note. No find/replace is obvious because the absolute paths are useful; describe the change as: "Verify the target image exposes the coding plugin docs at these paths, or reference them by plugin name with a fallback location."
+
+### 4. Soften line-number anchoring in `<context>`
+Line 25 anchors on "line 3" and "line 5". The semantic description is already present, so treat the numbers as hints.
+
+Find:
+```
+- `Makefile` — note that line 3 includes `Makefile.docker` before line 5 assigns `SERVICE`.
+```
+Replace with:
+```
+- `Makefile` — note that it includes `Makefile.docker` (currently line 3) before it assigns `SERVICE` (currently line 5).
+```
+
+### 5. Optional: state the WHY in the objective
+Line 18 states what and where but not why.
+
+Find:
+```
+Add a build section to the README that documents the local and cluster arms, the mirror coupling, and the two parse-time makefile traps, and add a changelog bullet under `## Unreleased` recording the change.
+```
+Replace with:
+```
+Add a build section to the README that documents the local and cluster arms, the mirror coupling, and the two parse-time makefile traps so the new build path is discoverable and matches reality, and add a changelog bullet under `## Unreleased` recording the change.
+```
+
+### 6. Optional: strengthen the "buca local-only" check
+Line 133 only checks that `buca` appears, not that it is described as local-only. Consider adding:
+```
+grep -qi 'local-only' README.md
+```
+after the existing `buca` check. (The current check satisfies requirement 2's explicit condition; this is a quality improvement.)
+
+### 7. Optional: reference the spec in `<context>`
+The prompt copies the constraints but does not point at `specs/in-progress/001-cluster-build-arm.md`. Adding it to `<context>` would let the agent consult the Failure Modes / Security tables if the README wording needs clarification. Not required because the constraints are already inlined.
+
+## Strengths
+- Accurate code references: `Makefile` include order, `Makefile.docker`'s parse-time `VERSION` default, README headings, and the `## Unreleased` section all verified against the actual files.
+- The README content matches the implementation: the `sun` / `nukedev` / `nukeprod` aliases are correct against `agent-task-executor/hack/cluster-alias.sh`, and the runner behavior (Job render, apply, wait, log lines, Docker Hub push, bootstrap script) matches the copied sources.
+- Container-autonomy is handled correctly: the cluster and `buca` commands appear only as README content the agent writes, not as steps the agent executes; verification is limited to filesystem checks plus `make precommit`.
+- Verification distinguishes before vs after: all four baseline greps return 0/fail today, confirming the checks are meaningful.
+- Constraints are copied from the spec and include the "Do NOT commit" guard; the prompt is correctly scoped to documentation only and explicitly forbids touching the build files, `hack/`, `.dark-factory.yaml`, and `bborbe/nuke`.
+- Relevant plugin docs (`changelog-guide.md`, `documentation-guide.md`) and the project DoD are referenced rather than restated.
+
+## Summary
+This is a well-scoped, accurate documentation prompt with correct code references and container-safe verification. The main gap is verification coverage: requirement 4 (the two parse-time traps) and requirement 1's section placement are not checked, so an agent could omit them and still pass. Add those two checks; the remaining items (absolute plugin-doc paths, line-number hints, objective WHY) are quality improvements, not blockers.
+
+---
+
+**Spec transition:** `dark-factory spec mark-prompted 001-cluster-build-arm` ran in host mode (no `DARK_FACTORY_MANAGED`) and reported `prompted: 001-cluster-build-arm.md` (exit 0).
+[21:21:40] result: ## Generated Prompts
+
+Created three prompts in execution order. All carry `spec: ["001-cluster-build-arm"]`.
+
+### Files created
+
+1. `prompts/1-makefile-docker-dispatch.md`
+2. `prompts/2-hack-runner-and-module-build.md`
+3. `prompts/3-docs-build-section.md`
+
+Row 0 (`.dark-factory.yaml`) was not emitted, as instructed. The working tree already carries the measured-working shape.
+
+### Key decisions
+
+- **Prompt 1** implements the dispatch exactly as the spec's constraints require: `BUILD_TARGET ?= local` at column 0; `VERSION_ORIGIN := $(origin VERSION)` captured before the existing `git describe` default; recursive `IMAGE = $(DOCKER_REGISTRY)/bborbe/$(SERVICE)` and `TAG = $(VERSION)`; two parse-time `$(error …)` guards inside `ifneq ($(BUILD_TARGET),local)`; and an `ifeq`-wrapped `build` target. The local recipe keeps `check-go-mod` and the same `docker build`; only the `-t` spelling becomes `$(IMAGE):$(TAG)` (identical resolved value) so repository and tag are composed once. No extra knobs (`ALLOW_DEFAULT_VERSION`, `BUILD_TIMEOUT`, etc.) were added.
+- **Prompt 2** copies the five `hack/` files unmodified via shallow clone from `agent-task-executor` and `go-skeleton`, with `cmp` to prove byte-identity, and replaces `-mod=vendor` with `-mod=readonly` in the Dockerfile (Go's default module mode, not `-mod=mod`).
+- **Prompt 3** adds the README `## Build` section and a CHANGELOG bullet under `## Unreleased` containing the literal phrase `cluster build`.
+- **Verification is git-free** because the daemon log shows `hideGit=true` (arg-sourced, not visible in `.dark-factory.yaml`). Make invocations are prefixed with `ROOTDIR="$PWD"` so the `Makefile.precommit` include chain works even when `.git` is masked. Real cluster builds and `docker image inspect` remain on the spec's Post-Deploy Rung-2 ladder, not in prompt verification.
+- I validated the Makefile target state in a scratch directory: `make -n` local prints `docker build` with no runner; cluster prints the composed reference then the runner; omitted `VERSION` and `buca` on a cluster target both exit 2 with the right messages; the anchored greps return 1; the five copied files pass `bash -n`.
+
+### Open questions / deviations to check at audit
+
+- The spec's leak check `grep -rn 'BUILD_TARGET' … | grep -vE '(…|specs/)'` does not exclude `prompts/`, but the prompt files themselves contain the token. I added `--exclude-dir=prompts` so the check passes while preserving intent.
+- The spec says the local arm's command "must not change"; I changed the `-t` expression spelling to `$(IMAGE):$(TAG)` (resolved value is byte-identical) to satisfy "composed once so the two cannot drift". If literal preservation is preferred, keep the original `-t $(DOCKER_REGISTRY)/bborbe/$(SERVICE):$(VERSION)`.
+- The Dockerfile replacement flag was left to the implementer by the spec; I chose `-mod=readonly` explicitly. Dropping the flag entirely is equally valid.
+- The five `hack/` files are copied from the current `origin/master`; if the source repos move, the copy will differ from what the spec author inspected. Pin commits if reproducibility is required.
+- `make precommit` is included per `docs/dod.md` and the daemon's validation command; it is heavy but is the project's gate.
+
+### Docs referenced in `<context>`
+
+In-container paths: `/home/node/.claude/plugins/marketplaces/coding/docs/go-makefile-commands.md`, `go-precommit.md`, `git-workflow.md`, `go-dockerfile-guide.md`, `k8s-manifest-guide.md`, `go-k8s-binary-conventions.md`, `changelog-guide.md`, `documentation-guide.md`; plus project `docs/dod.md`.
+
+Run `/audit-prompt <file>` on each before approving.
+
+## Audit Findings
+
+### prompts/1-makefile-docker-dispatch.md
+
+# Prompt Audit Report: Makefile Docker Dispatch
+
+**File**: `/home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/1-makefile-docker-dispatch.md`
+**Score**: 8/10
+**Status**: Good
+
+## DoD Checklist
+- [x] `<summary>` present and plain-language (8 bullets, no file paths/struct names; "cluster runner" is the only mild jargon)
+- [x] `<objective>` states end state (slightly implementation-level — see Recommendations)
+- [x] `<context>` present
+- [x] `<requirements>` numbered and specific (10 steps, exact code blocks)
+- [x] `<constraints>` present (copied from spec, includes "Do NOT commit")
+- [x] `<verification>` present with runnable command (but missing `set -e` — Critical 1)
+- [!] All paths repo-relative — three container-absolute doc paths in `<context>` (`/home/node/.claude/plugins/...`); they resolve in this image but are not backed by a declared mount in `dark-factory config` (see note)
+- [x] No bare `git ` commands in `<verification>` when target repo has `hideGit: true` / `workflow: worktree`. `.dark-factory.yaml` is `workflow: direct`, but the daemon capture in `.dark-factory.log` shows `hideGit=true hideGitSource=arg`; verification contains no `git` command (the `git describe`/`git rev-parse` strings are inside Makefile code blocks, and only `make -n` runs them at parse time, where the failure is harmless)
+- [x] No operator-only commands in `<verification>` (`docker build` appears only inside the Makefile recipe under `<requirements>`, not as an executed verification step)
+- [x] File in `prompts/` inbox (not `prompts/in-progress/`)
+- [x] Filename not prefixed with dark-factory global number; `1-` is the allowed multi-prompt ordering prefix (siblings `1-`, `2-`, `3-` for spec 001)
+- [x] Filename reflects primary change (`makefile-docker-dispatch` matches the objective)
+- [x] Status is `draft`
+
+## Failure Mode Coverage
+- [x] Spec failure modes addressed for this prompt's scope: `VERSION` omitted → req 4 + verification; local arm regression → verification; unknown target / short `REF` / existing Job / proxy / OOM / registry rejection → runner behavior owned by sibling prompt 2 (copied unmodified); "caller-supplied VERSION names a released tag" → spec explicitly says no guard; mirror-tag mismatch → nuke, out of scope
+- [x] Security concerns from spec addressed: character whitelist/newline constraint (constraints line 148), `REPO_URL`/`PUSH_SECRET` as literals (req 5, constraint line 149), no bypass path
+- [x] External calls have timeout/cancellation behavior: `TIMEOUT='3600'` passed to the runner, which enforces its own deadline
+- [!] New strings crossing the subprocess boundary (the 10 env-var names passed to `hack/build-cluster.sh`) have no contract test in the prompt set. I verified them against the real runner at `/tmp/ate/hack/build-cluster.sh`: all 10 (`BUILD_TARGET`, `REPO_URL`, `REF`, `TAG`, `DOCKERFILE`, `IMAGE`, `DOCKER_REGISTRY`, `PUSH`, `PUSH_SECRET`, `TIMEOUT`) match, and `NAMESPACE` is optional with a default. Correct, but untested (see Recommendation 1)
+- [x] No `go mod vendor` in `<requirements>` or `<verification>`
+- [x] No cross-repo writes (no clone + push)
+- [x] Container-autonomous (Makefile edits, `make -n`, `make precommit`; no kubectl/docker/PR steps)
+- [x] Sibling entry points covered: req 7 explicitly keeps `upload`/`clean`/`apply`/`buca` and relies on the parse-time guard; `apply` is a no-op and the spec does not require guarding it
+
+## Documentation Placement
+- [x] No inlined reusable cross-project pattern — the inlined Makefile recipes are the artifact itself, not CQRS/factory/test-bootstrap knowledge
+- [x] Existing project docs referenced: `docs/dod.md`
+- [x] Existing coding plugin docs referenced: `go-makefile-commands.md`, `go-precommit.md`, `git-workflow.md`
+- [x] Domain knowledge that outlives the prompt (two parse-time traps) is delegated to the README by prompt 3
+
+## Code Reference Verification
+| Reference | File | Status |
+|-----------|------|--------|
+| `Makefile:3` includes `Makefile.docker`; `Makefile:5` assigns `SERVICE` | `Makefile` | Correct |
+| `DOCKER_REGISTRY ?= docker.io` at top | `Makefile.docker:1` | Correct |
+| `VERSION` default `ifeq` block | `Makefile.docker:3-5` | Correct |
+| `build` target + local recipe | `Makefile.docker:7-20` | Correct |
+| `check-go-mod` target | `Makefile.docker:22-29` | Correct |
+| `upload`/`clean`/`apply`/`buca` | `Makefile.docker:31-51` | Correct |
+| `make precommit` gate | `Makefile.precommit:9` | Correct |
+| `ROOTDIR` | `Makefile.variables:1` | Correct |
+| `docs/dod.md` | `docs/dod.md` | Correct |
+| `hack/build-cluster.sh` | (absent) | Correct — prompt states it is created by the next prompt |
+| Reference docs (`go-makefile-commands.md`, `go-precommit.md`, `git-workflow.md`) | `/home/node/.claude/plugins/.../docs/` | Correct (all three exist) |
+| Runner env-var contract | `/tmp/ate/hack/build-cluster.sh` | Correct — all 10 names match the dispatch |
+
+## Coding Guidelines Compliance
+| Guideline | File | Status |
+|-----------|------|--------|
+| `make test` is the canonical verification, not `go build` | `go-makefile-commands.md` | Compliant — verification ends with `make precommit`, which includes `test` |
+| Go handler/error/factory/time-injection patterns | — | N/A — no Go code in requirements |
+| Test-only package-level mutable state | `go-composition.md` | N/A — no Go code |
+
+## YAGNI Pass (scope-creep detector)
+- [x] No opt-out flag for the behavior being shipped — `ALLOW_DEFAULT_VERSION` is explicitly excluded (req 8), matching the spec's Non-goals
+- [x] Every config field is demanded: `BUILD_TARGET`, `IMAGE`, `TAG`, `VERSION` all appear in the spec's Goal/Desired Behavior/Constraints
+- [x] No future-proofing knobs without a named consumer — `REPO_URL`, `PUSH_SECRET`, `DOCKERFILE`, `PUSH`, `TIMEOUT` are inline literals required by the runner interface, not configurable inputs
+- No findings.
+
+## Critical Issues
+
+### 1. Verification has no `set -e` — a broken arm can pass silently
+**Location**: `<verification>`, line 157 (the opening of the `bash` block).
+
+The block is a sequence of independent `test`/`grep`/`make` lines with no `set -e`. Only the last command (`make precommit`) determines the exit status, and `make precommit` never exercises `Makefile.docker`'s build arms. Concretely, if the cluster branch is broken (e.g. the guard fires for every `BUILD_TARGET`, so `make -n build BUILD_TARGET=sun ... VERSION=probe` errors and `/tmp/cluster-build.txt` is empty), every `grep -q` on that file fails silently, the no-version and local-only checks still "pass" (they expect errors), the leak check passes, and `make precommit` passes — the verification reports success for a broken dispatch. I reproduced this failure mode in a temp copy.
+
+**Find:**
+```
+```bash
+# The selector assignment exists at column 0.
+```
+**Replace:**
+```
+```bash
+set -euo pipefail
+
+# The selector assignment exists at column 0.
+```
+
+### 2. Missing positive local-`buca` check (half of spec AC6)
+**Location**: `<verification>`, lines 178-180.
+
+The spec's AC6 and Row 1 require both halves: `make -n buca` (local) prints `docker push` and `docker rmi`, **and** `make -n buca BUILD_TARGET=sun ...` is refused. The prompt verifies only the refusal. If the second guard's `endif` is misplaced so it sits outside the `ifneq ($(BUILD_TARGET),local)` block, local `buca` is refused while local `build` still works and every current check passes. The positive check is the regression gate the spec assigns to this prompt.
+
+**Find:**
+```
+# The local-only targets are refused at parse time when a cluster target is set.
+if ROOTDIR="$PWD" make -n buca BUILD_TARGET=sun REF=0123456789abcdef0123456789abcdef01234567 VERSION=probe > /tmp/local-only.txt 2>&1; then exit 1; fi
+grep -q 'local-only' /tmp/local-only.txt
+```
+**Replace:**
+```
+# The local-only targets are refused at parse time when a cluster target is set.
+if ROOTDIR="$PWD" make -n buca BUILD_TARGET=sun REF=0123456789abcdef0123456789abcdef01234567 VERSION=probe > /tmp/local-only.txt 2>&1; then exit 1; fi
+grep -q 'local-only' /tmp/local-only.txt
+
+# The local-only targets still run locally; the guard must not fire for the default arm.
+ROOTDIR="$PWD" make -n buca > /tmp/local-buca.txt
+grep -q 'docker push' /tmp/local-buca.txt
+grep -q 'docker rmi' /tmp/local-buca.txt
+```
+
+## Recommendations
+
+### 1. Add a dispatch→runner env-var contract test (prompt 2)
+The dispatch (lines 116-126) passes 10 env-var names to a subprocess. No test in the prompt set traverses that boundary; `make -n` only renders. I verified the names match `/tmp/ate/hack/build-cluster.sh`, so this is not a bug today, but a future rename on either side would fail at runtime. Add to **prompt 2's** `<verification>` (where the runner exists):
+
+```bash
+for v in BUILD_TARGET REPO_URL REF TAG DOCKERFILE IMAGE DOCKER_REGISTRY PUSH PUSH_SECRET TIMEOUT; do
+  grep -q "$v" hack/build-cluster.sh
+done
+```
+
+### 2. Correct the `VERSION_ORIGIN` ordering rationale (lines 60-61, and constraint line 145)
+The prompt says: "After it, `$(origin VERSION)` is `file` on every invocation and a guard written below it never fires." This is factually wrong for the guard as written. The step-4 guard is `ifeq ($(filter command line environment,$(VERSION_ORIGIN)),)`; `$(filter ...)` over `file` is empty, so the guard **does** fire when the capture sits after the default block. I tested a variant with the capture after the block: omitted `VERSION` still exits non-zero with the same message, and command-line/environment `VERSION` still passes. The ordering is not load-bearing for this guard (it would be for an `ifeq ($(origin VERSION),undefined)` guard). The code is correct either way; only the justification is misleading. The spec's constraint (line 125) shares the error.
+
+**Find:**
+```
+   The capture must run before that block. After it, `$(origin VERSION)` is `file` on every invocation and a guard written below it never fires.
+```
+**Replace:**
+```
+   Capture before that block so the recorded origin is `undefined` (not `file`) when no tag was supplied. The step-4 guard uses `$(filter command line environment,…)`, which refuses both `undefined` and `file`, so the ordering is not what makes the refusal fire; keep it because the spec freezes it.
+```
+Apply the same correction to the constraint at line 145.
+
+### 3. Test the environment-origin `VERSION` path
+The guard accepts `environment`, but only the command-line path is tested. Add after line 176:
+
+```bash
+# VERSION from the environment is also accepted.
+ROOTDIR="$PWD" VERSION=probe make -n build BUILD_TARGET=sun REF=0123456789abcdef0123456789abcdef01234567 > /tmp/env-version.txt
+grep -q 'docker.io/bborbe/sentry-alert-consumer:probe' /tmp/env-version.txt
+```
+
+### 4. Assert the cluster arm does not run `check-go-mod`
+Spec DB6/req 5 require the cluster branch to have no prerequisites. Current checks would still pass if `build: check-go-mod` were left in the `else` branch. Add after line 172:
+
+```bash
+if grep -q 'go mod vendor' /tmp/cluster-build.txt; then exit 1; fi
+```
+
+### 5. Harden the leak check
+Line 183 scans `.` with no `.git` or log exclusion. Under `hideGit: true` this is fine, but in a non-masked checkout `grep -r` descends into `.git`; and if the daemon ever logs prompt content to `.dark-factory.log` the check false-fails. Replace line 183 with:
+
+```bash
+test -z "$(grep -rn 'BUILD_TARGET' --exclude-dir=vendor --exclude-dir=.git --exclude-dir=prompts --exclude-dir=specs --exclude=.dark-factory.log . | grep -vE '(Makefile\.docker|README\.md|CHANGELOG\.md|hack/)')"
+```
+
+### 6. Objective wording
+The objective names variables and targets (`BUILD_TARGET`, `upload`/`clean`/`buca`), which the DoD asks to avoid except for frozen constraints. Consider:
+
+**Find:**
+```
+Change the Docker build makefile so `BUILD_TARGET` selects between the unchanged local arm (`local`, the default) and a cluster arm that dispatches a named commit to the copied cluster runner. Capture `VERSION`'s origin before the existing parse-time default so the cluster arm can refuse a defaulted tag, and reject `upload`/`clean`/`buca` at parse time when a cluster target is set.
+```
+**Replace:**
+```
+`make build` keeps producing the image locally exactly as today, while a caller can select a cluster arm that dispatches a named commit to the cluster runner; the cluster arm refuses to run without an explicitly supplied tag, and the local-only publish targets are refused when a cluster target is selected.
+```
+
+### 7. Confirm the in-container plugin-doc paths
+`dark-factory config` reports `claudeDir: ~/.claude-yolo`, while the prompt references `/home/node/.claude/plugins/...`. The paths resolve in this image (all three docs exist), but the project's own `docs/dod.md` says "No absolute paths". If the execution image mounts plugins elsewhere, these three context bullets dangle. Low priority — they are reference material, not required edits.
+
+## Strengths
+- Structure is complete and the requirements are precise enough to implement without guessing; the local recipe is preserved byte-for-byte and the composed `IMAGE`/`TAG` are explicitly recursive to survive the `Makefile:3`-before-`SERVICE` include order.
+- The parse-time `$(error …)` choice is correct and well-justified: recipe-level `exit 1` would be invisible to `make -n`.
+- I simulated the full proposed `Makefile.docker` and confirmed every intended behavior: local build unchanged, cluster arm prints the composed ref and calls the runner, omitted `VERSION` refuses, and cluster `buca` refuses at parse time.
+- The runner env-var contract matches the upstream `hack/build-cluster.sh` exactly, so the dispatch is wired correctly.
+- YAGNI is handled deliberately: `ALLOW_DEFAULT_VERSION` and the other copied knobs are explicitly excluded, and `REPO_URL`/`PUSH_SECRET` are literals per the spec's security section.
+- No hideGit, operator-only, `go mod vendor`, or cross-repo-write violations.
+
+## Summary
+This is a well-scoped, well-referenced prompt whose core logic is correct and was verified by simulation. The two must-fix items are verification robustness: add `set -euo pipefail` so a broken arm cannot pass silently, and add the positive local-`buca` check that spec AC6 assigns to this prompt. The remaining recommendations are contract-test and rationale improvements, not code defects.
+
+### prompts/2-hack-runner-and-module-build.md
+
+# Prompt Audit Report: Hack Runner and Module Build
+
+**File**: `prompts/2-hack-runner-and-module-build.md` (absolute: `/home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/2-hack-runner-and-module-build.md`)
+**Score**: 6/10
+**Status**: Needs Improvement (two Critical fixes required)
+
+## DoD Checklist
+- [x] `<summary>` present and plain-language (7 bullets, no paths/signatures)
+- [x] `<objective>` states end state (one sentence)
+- [x] `<context>` present
+- [x] `<requirements>` numbered and specific (8 steps, exact paths, old→new Dockerfile line)
+- [x] `<constraints>` present
+- [x] `<verification>` present with runnable commands
+- [!] All paths repo-relative (no absolute or `~/` paths) — **requirement 3 line 64 contains host home-relative paths**
+- [x] No bare `git ` commands in `<verification>` when target repo has `hideGit: true` OR `workflow: worktree` — target repo is `workflow: direct`, no `hideGit`, and `<verification>` has no `git` commands
+- [x] No operator-only commands in `<verification>` — only `ls`, `test`, `bash -n`, `grep`, `make precommit`, `make test`
+- [x] File in `prompts/` inbox (not `prompts/in-progress/`)
+- [x] Filename not prefixed with dark-factory global number — `2-` is the allowed single-digit sibling-ordering prefix
+- [x] Filename reflects primary change (`hack` runner + module build)
+- [x] Status is `draft` (valid)
+
+## Failure Mode Coverage
+- [x] Spec failure modes addressed: the copied runner/template cover unknown cluster, short/unpushed REF, epoch mismatch, existing Job, interruption, module-proxy failure, OOM, registry push failure; prompt 1 (sibling) covers the `VERSION` guard; module mode (requirement 5) addresses the clone-without-vendor path.
+- [x] Security concerns from spec addressed: constraints lines 100–104 mirror the spec's whitelist/newline, credential-handling, `automountServiceAccountToken: false`, seccomp/AppArmor, and DNS-sanitization points.
+- [x] External calls have timeout/cancellation behavior: the copied `build-cluster.sh` uses `TIMEOUT` and the Job template uses `activeDeadlineSeconds`; prompt 1 passes `TIMEOUT='3600'`.
+- [!] New value that crosses a library/toolchain boundary has no contract test: `-mod=readonly` is only grep-asserted (see Critical Issue 2).
+- [x] No `go mod vendor` instruction — requirement 7 is a **prohibition** ("Do not add a `go mod vendor` step anywhere"), not an instruction to run it. The only literal `go mod vendor` in the repo is the pre-existing `check-go-mod` target, which the prompt leaves untouched. Do not treat the mechanical grep as a violation here.
+- [x] No cross-repo writes: the two clones are read-only; no `git push` / `gh pr create` follows.
+- [x] Container-autonomous: no `kubectl`/deploy/PR steps, no operator-vs-agent split. (The host-path fallback is flagged separately as a path-portability Critical.)
+- [x] Sibling entry points: N/A — no Go setup/gate/validation function is edited. The cross-prompt dispatch→runner contract was checked manually and matches (see Code Reference Verification).
+
+## Documentation Placement
+- [x] No inlined reusable coding pattern (>10 lines); the clone block is a one-off copy recipe
+- [x] Existing project doc referenced (`docs/dod.md`)
+- [x] Existing coding plugin docs referenced (`go-dockerfile-guide.md`, `k8s-manifest-guide.md`, `go-k8s-binary-conventions.md` — all exist under `/home/node/.claude/plugins/marketplaces/coding/docs/`)
+- [x] Domain knowledge that outlives the prompt (mirror coupling, parse-time traps) is delegated to prompt 3 / README
+- [!] `go-build-args-guide.md § Vendor handling` is relevant to the deliberate move away from `-mod=vendor` and is not referenced (Recommendation)
+
+## Code Reference Verification
+| Reference | File | Status |
+|-----------|------|--------|
+| `Dockerfile` vendor line (requirement 5 old text) | `Dockerfile:7` | Correct — exact match |
+| `ARG DOCKER_REGISTRY=docker.io` / `${DOCKER_REGISTRY}` base images | `Dockerfile:1,2,10` | Correct |
+| `Makefile.docker` cluster branch "added by the previous prompt" | `Makefile.docker` | Correct forward dependency — absent now because prompt 1 has not run; prompt ordering supplies it |
+| `docs/dod.md` | `docs/dod.md` | Correct |
+| `go-dockerfile-guide.md` | `/home/node/.claude/plugins/marketplaces/coding/docs/go-dockerfile-guide.md` | Correct |
+| `k8s-manifest-guide.md` | `/home/node/.claude/plugins/marketplaces/coding/docs/k8s-manifest-guide.md` | Correct |
+| `go-k8s-binary-conventions.md` | `/home/node/.claude/plugins/marketplaces/coding/docs/go-k8s-binary-conventions.md` | Correct |
+| `agent-task-executor/hack/build-cluster.sh`, `cluster-alias.sh`, `build-job.yaml` | remote master (`eea4be1…`) | Correct — all exist; modes 755/755/644; `bash -n` clean |
+| `go-skeleton/hack/build-cluster-bootstrap.sh`, `dockerconfig.json.tpl` | remote master (`43f4fc9…`) | Correct — both exist; modes 755/644; `bash -n` clean |
+| Job template carries `automountServiceAccountToken: false` (ATE) and lacks it (go-skeleton) | `build-job.yaml` | Correct — verified |
+| Template passes `DOCKER_REGISTRY=docker.io` | `build-job.yaml:121` | Correct |
+| Runner sources `cluster-alias.sh` | `build-cluster.sh:31` | Correct |
+| Bootstrap uses `600` temp file + `trap … EXIT INT TERM` | `build-cluster-bootstrap.sh:41-43` | Correct |
+| Runner env vars (`BUILD_TARGET, REPO_URL, REF, TAG, IMAGE, PUSH_SECRET, DOCKERFILE, DOCKER_REGISTRY, PUSH, TIMEOUT`) | `build-cluster.sh:37-42` + prompt 1 dispatch | Correct — prompt 1 sets every required variable; `NAMESPACE` defaults to `build` |
+| `cluster-alias.sh` compatibility with go-skeleton's bootstrap | both repos | Correct — same `KUBECONFIG_PATH`/`KUBE_CONTEXT`/`kc()` mapping; ATE's copy is functionally compatible |
+
+## Coding Guidelines Compliance
+| Guideline | File | Status |
+|-----------|------|--------|
+| Dockerfile build flag vs. project pattern (`-mod=vendor`) | `go-dockerfile-guide.md`, `go-build-args-guide.md` | Deliberate spec-driven deviation (`-mod=readonly`) for the cluster arm; not a violation, but reference `go-build-args-guide.md § Vendor handling` in `<context>` |
+| Go code patterns (HTTP handlers, error wrapping, factory, time injection, test-only mutable state) | N/A | No Go code in `<requirements>` |
+
+## YAGNI Pass (scope-creep detector)
+- [x] No opt-out flag for the behavior the prompt ships (no `ALLOW_DEFAULT_VERSION`, no `BUILD_*` knobs — requirement 8 of prompt 1 and the spec's Non-goals reject them)
+- [x] Every config field/threshold/branch demanded by the spec's Goal or Desired Behavior
+- [x] No future-proofing knobs without a named consumer
+- Note: requirement 3's host-checkout fallback is extra scope, but it is spec-derived (Assumptions) rather than an invented knob. It is flagged as a Critical path-portability issue, not a YAGNI issue.
+
+## Critical Issues
+
+### 1. Host home-relative fallback path in `<requirements>` (path portability / container autonomy)
+
+**Line 64** (requirement 3):
+
+> `3. If `github.com` is unreachable, copy the same five files from a local sibling checkout instead: `~/Documents/workspaces/agent-task-executor/hack/` for the first three and `~/Documents/workspaces/go-skeleton/hack/` for the last two. The primary path is the clone; the fallback exists only for an offline container. Do not hand-write the files.`
+
+`~/Documents/workspaces/...` is a host home-relative path. Inside the dark-factory container it resolves to `/home/node/Documents/workspaces/...`, which does not exist (the host checkout is not mounted), so the "offline container" fallback is itself unusable. This is a Critical path-portability violation and a container-autonomy issue (the container cannot read the operator's home directory). The primary clone path is reachable (verified `git ls-remote` and shallow clone of both repos succeed), so the fallback is not needed.
+
+**Find (verbatim):**
+```
+3. If `github.com` is unreachable, copy the same five files from a local sibling checkout instead: `~/Documents/workspaces/agent-task-executor/hack/` for the first three and `~/Documents/workspaces/go-skeleton/hack/` for the last two. The primary path is the clone; the fallback exists only for an offline container. Do not hand-write the files.
+```
+
+**Replace with:**
+```
+3. If `github.com` is unreachable, stop and report the blocker; do not read host paths or hand-write the files. The container has no access to the operator's home directory, and the five files must be byte-identical to the source repositories.
+```
+
+### 2. No boundary contract test for the new `-mod=readonly` flag
+
+**Lines 76–88** (requirement 5) and **lines 126–128** (`<verification>`).
+
+The prompt changes the Dockerfile to `-mod=readonly`, a new value that crosses the Go toolchain boundary. The only check is `grep -q '\-mod=readonly' Dockerfile`, which asserts the literal string, not that the flag actually builds the root package without `vendor/`. A shape test does not satisfy the boundary-crossing rule. The cheap level-1 contract test is a subprocess invocation with the real flag; it is container-executable and verified to pass in this repo:
+
+```
+go build -mod=readonly -o /tmp/sentry-alert-consumer-build .
+```
+(exit 0, binary produced). The operator cluster build remains the deeper integration test, but the prompt-level contract test should be present.
+
+**Find (verbatim):**
+```
+# The Dockerfile no longer forces vendor mode.
+test "$(grep -c '\-mod=vendor' Dockerfile)" -eq 0
+grep -q '\-mod=readonly' Dockerfile
+
+ROOTDIR="$PWD" make precommit
+ROOTDIR="$PWD" make test
+```
+
+**Replace with:**
+```
+# The Dockerfile no longer forces vendor mode.
+test "$(grep -c '\-mod=vendor' Dockerfile)" -eq 0
+grep -q '\-mod=readonly' Dockerfile
+
+# The replacement flag actually builds the root package with no vendor/.
+go build -mod=readonly -o /tmp/sentry-alert-consumer-build .
+rm -f /tmp/sentry-alert-consumer-build
+
+ROOTDIR="$PWD" make precommit
+ROOTDIR="$PWD" make test
+```
+
+## Recommendations
+
+1. **Fix the inaccurate vendoring rationale in requirement 7 (line 92).** With `-mod=readonly` explicitly set, Go does **not** auto-select vendor mode; a leftover `vendor/` is ignored by the build (verified: explicit `-mod=readonly` built successfully from the module cache with the vendored package deleted, while the default `-mod` failed with `import lookup disabled by -mod=vendor`). The instruction (do not add a vendor step) is correct; only the rationale is wrong.
+
+   **Find (verbatim):**
+   ```
+   7. Do not add a `go mod vendor` step anywhere. The cluster arm builds a named ref, which need not be the local `HEAD`; host-side vendoring would leave a `vendor/` that `COPY .` picks up and Go would then select vendor mode automatically, reintroducing the local/cluster divergence. The existing `check-go-mod` target stays local-only and is not invoked by the cluster arm.
+   ```
+
+   **Replace with:**
+   ```
+   7. Do not add a `go mod vendor` step anywhere. The cluster arm builds a named ref, which need not be the local `HEAD`, so a host-side `vendor/` would not describe the code the Job builds. The Dockerfile's explicit `-mod=readonly` means any leftover `vendor/` is ignored by the build; the rule keeps the local and cluster source trees aligned. The existing `check-go-mod` target stays local-only and is not invoked by the cluster arm.
+   ```
+
+2. **Assert the file modes in `<verification>`.** Requirement 4 states 755/644, but the verification only checks existence. `cp` + `chmod +x` currently produce the right modes (verified), but a mode check makes the contract explicit. Add after the `test -f …` lines:
+   ```bash
+   test "$(stat -c '%a' hack/build-cluster.sh)" = 755
+   test "$(stat -c '%a' hack/cluster-alias.sh)" = 755
+   test "$(stat -c '%a' hack/build-cluster-bootstrap.sh)" = 755
+   test "$(stat -c '%a' hack/build-job.yaml)" = 644
+   test "$(stat -c '%a' hack/dockerconfig.json.tpl)" = 644
+   ```
+
+3. **Add a cross-prompt env-var contract check.** Prompt 2 copies the runner and asserts prompt 1 already passes its variables. The names match today, but a cheap static guard would catch drift at prompt 2 time:
+   ```bash
+   for v in BUILD_TARGET REPO_URL REF TAG IMAGE PUSH_SECRET; do
+     grep -q "$v=" Makefile.docker || { echo "Makefile.docker does not set $v"; exit 1; }
+   done
+   ```
+
+4. **Reference `go-build-args-guide.md § Vendor handling` in `<context>`.** The prompt deliberately moves away from the plugin's documented `-mod=vendor` pattern; citing the guide's vendor-handling section makes the deviation traceable. Add after line 30:
+   ```
+   - `/home/node/.claude/plugins/marketplaces/coding/docs/go-build-args-guide.md` — § Vendor handling
+   ```
+
+5. **Minor:** `ROOTDIR="$PWD" make test` is redundant — `make precommit` already depends on the `test` target. Keep it if you want an explicit test command, but it does not add coverage.
+
+6. **Minor:** Requirement 2 leaves the `mktemp -d` clone directory behind. Not a correctness issue; add `rm -rf "$tmp"` if you want a clean workspace.
+
+## Strengths
+
+- The Dockerfile edit is anchored with an exact old→new block that matches `Dockerfile:7` byte-for-byte, and the replacement is the spec's named default (`-mod=readonly`).
+- The copy step is guarded by `cmp` for every one of the five files, and the source selection is correct and deliberate: agent-task-executor's hardened Job template (with `automountServiceAccountToken: false`, `DOCKER_REGISTRY=docker.io`, and the init-container security context) and go-skeleton's bootstrap/template (which agent-task-executor lacks).
+- The env-var contract between prompt 1's dispatch and the copied `build-cluster.sh` was verified to match exactly (`BUILD_TARGET, REPO_URL, REF, TAG, IMAGE, PUSH_SECRET`, with `NAMESPACE` defaulting to `build`); the runner's whitelist regexes all accept the values prompt 1 produces.
+- The `cluster-alias.sh` copied from agent-task-executor is functionally compatible with go-skeleton's bootstrap (same alias mapping and `kc()` helper).
+- Security constraints are copied from the spec rather than paraphrased, and they match the actual template/script behavior.
+- The summary is reviewer-facing, plain language, and correctly frames the local arm as unchanged while the cluster arm gains a path.
+- The prompt is properly scoped to prompt 2 of the spec's decomposition (DBs 2, 6; ACs 2, 5, 7) and does not duplicate prompt 1 or prompt 3.
+
+## Summary
+
+Strong, well-anchored prompt with verified source files and a correct cross-prompt dispatch contract. Two Critical fixes are required before approval: replace the host `~/Documents/workspaces/...` fallback (line 64) with a container-safe blocker instruction, and add a container-executable `go build -mod=readonly` contract test so the changed Dockerfile flag is exercised rather than merely grep-asserted. The remaining recommendations (correct the vendor rationale, add mode/contract checks, reference `go-build-args-guide.md`) are quality improvements.
+
+### prompts/3-docs-build-section.md
+
+# Prompt Audit Report: Docs — README Build Section and Changelog Entry
+
+**File**: `/home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md`
+**Score**: 8/10
+**Status**: Good
+
+## DoD Checklist
+- [x] `<summary>` present and plain-language (7 bullets; minor note: bullets 1 and 6 name `README` / the unreleased heading)
+- [x] `<objective>` states end state (the WHY is implicit rather than stated)
+- [x] `<context>` present
+- [x] `<requirements>` numbered and specific (1–8, exact files and content)
+- [x] `<constraints>` present (includes "Do NOT commit")
+- [x] `<verification>` present with runnable command (`ROOTDIR="$PWD" make precommit`)
+- [!] All paths repo-relative — two `/home/node/.claude/plugins/...` plugin-doc references are container-absolute; they exist in this environment but are not repo-relative
+- [x] No bare `git ` commands in `<verification>` when target repo has `hideGit: true` OR `workflow: worktree` — `.dark-factory.yaml` is `workflow: direct`, no `hideGit`, and verification has no `git`
+- [x] No operator-only commands in `<verification>` — only `grep`, `awk`, `test`, and `make precommit`
+- [x] File in `prompts/` inbox (not `prompts/in-progress/`)
+- [x] Filename not prefixed with dark-factory global number — `3-` is the allowed single-digit multi-prompt ordering prefix for spec 001
+- [x] Filename reflects primary change (`3-docs-build-section.md` names the README build section)
+- [x] Status is `idea` or `draft` (`draft`)
+
+## Failure Mode Coverage
+- [x] Spec failure modes addressed in requirements (or N/A if no spec) — runtime failure modes (unknown cluster, short/unpushed `REF`, epoch mismatch, existing Job, module-proxy/OOM/registry failures) are implemented by the copied runner and dispatch in sibling prompts 1 and 2; this docs prompt covers the documentation-facing "built tag vs `MIRROR_IMAGES`" coupling in requirement 3. The spec's "caller-supplied `VERSION` names an already-released tag" row is explicitly a no-guard by spec, and the README does not claim otherwise.
+- [x] Security concerns from spec addressed (or N/A) — this prompt adds no security-relevant code; the whitelist, credential handling, and `automountServiceAccountToken: false` constraints live in prompts 1 and 2. Requirement 3 correctly avoids claiming the cluster pushes to the private registry.
+- [x] External calls have timeout/cancellation behavior specified — N/A (no external calls in this prompt)
+- [x] New constants / strings that flow through library validators have a test calling the validator — N/A (no new code)
+- [x] No `go mod vendor` in `<requirements>` or `<verification>` — the only build invocation is `make precommit`; no `go mod vendor`
+- [x] No cross-repo writes — no clone, push, or `gh pr create`
+- [x] Container-autonomous — the cluster/build commands (`make build BUILD_TARGET=...`, `hack/build-cluster-bootstrap.sh`, `make buca`) appear only inside the markdown block the agent is told to write into `README.md`; they are documentation content, not steps the agent executes. No `kubectl`, image push, or operator-vs-agent split.
+- [x] Sibling entry points covered — N/A (documentation-only prompt; no setup/gate function)
+
+## Documentation Placement
+- [x] No inlined reusable patterns (>10 lines) that should be in a doc — the inlined block is the README deliverable, not a reusable coding pattern
+- [x] Existing project docs referenced in `<context>` — `docs/dod.md`
+- [x] Existing coding plugin docs referenced in `<context>` — `changelog-guide.md`, `documentation-guide.md`
+- [x] Domain knowledge that outlives the prompt is in `project/docs/`, not inlined — the README is the durable home for the two-arm topology and parse-time traps, which is exactly what the spec requires
+
+## Code Reference Verification
+| Reference | File | Status |
+|-----------|------|--------|
+| Headings `How It Works`, `Configuration`, `Observability`, `Task Contract` | `README.md` | Correct |
+| `## Unreleased` exists | `CHANGELOG.md` | Correct |
+| `Makefile` line 3 includes `Makefile.docker`; line 5 assigns `SERVICE` | `Makefile` | Correct (lines 3 and 5) |
+| `VERSION` defaulted at parse time | `Makefile.docker` | Correct (lines 3–5) |
+| `docs/dod.md` | `docs/dod.md` | Correct |
+| `/home/node/.claude/plugins/marketplaces/coding/docs/changelog-guide.md` | plugin docs | Correct (exists in this container) |
+| `/home/node/.claude/plugins/marketplaces/coding/docs/documentation-guide.md` | plugin docs | Correct (exists in this container) |
+| Aliases `sun`, `nukedev`, `nukeprod` | `agent-task-executor/hack/cluster-alias.sh` | Correct (verified by clone) |
+| `hack/build-job.yaml`, `hack/build-cluster.sh`, `hack/build-cluster-bootstrap.sh` | not yet present | Expected — created by prompt 2; prompt 3 documents them as future content and does not read them |
+| `MIRROR_IMAGES` mirror coupling | spec / nuke | Correct per spec Non-goals and Failure Modes |
+
+Non-blocking observation: the README content says `REF` "must be a full 40-character commit SHA", while `hack/build-job.yaml` documents `REF` as a "git ref (branch, tag or commit)" and the runner's whitelist accepts branches/tags. The wording is stricter than the implementation but matches the spec's Verification (`REF=$(git rev-parse HEAD)`), so it is a safe usage instruction rather than an error.
+
+## Coding Guidelines Compliance
+| Guideline | File | Status |
+|-----------|------|--------|
+| Go code patterns | — | N/A (prompt contains no Go code) |
+| Test-only package-level mutable state | `go-composition.md` | N/A (no code) |
+
+## YAGNI Pass (scope-creep detector)
+- [x] No opt-out flag for the very behavior the prompt ships
+- [x] Every config field / threshold / branch is demanded by the linked spec's Goal or Desired Behavior — the README content is demanded by Desired Behavior 8 and Constraints line 134 (two-arm topology, mirror coupling, two parse-time traps); the changelog bullet is demanded by AC 8
+- [x] No "future-proofing" knobs without a named concrete consumer
+- Hits: none. Minor note: the "Before the first cluster build, provision the `build` namespace and the `buildkit-push` credential once" paragraph is slightly beyond AC 8's explicit clauses, but it aligns with the spec's Assumptions and operator verification and introduces no knob.
+
+## Critical Issues
+None. No blocking issues found.
+
+## Recommendations
+
+### 1. Add verification for requirement 4 (the two parse-time traps)
+Requirement 4 (line 97) requires both traps in the build section, but `<verification>` (lines 128–142) never checks them. An agent could omit them and still pass every verification command. Add two greps matching the provided content.
+
+Find:
+```
+# The changelog bullet is under Unreleased.
+awk '/^## /{s=$0} /cluster build/{print s}' CHANGELOG.md | grep -qx '## Unreleased'
+
+ROOTDIR="$PWD" make precommit
+```
+Replace with:
+```
+# The changelog bullet is under Unreleased.
+awk '/^## /{s=$0} /cluster build/{print s}' CHANGELOG.md | grep -qx '## Unreleased'
+
+# Both parse-time traps are documented.
+grep -q 'defaulted at parse time' README.md
+grep -q 'before it assigns' README.md
+
+ROOTDIR="$PWD" make precommit
+```
+
+### 2. Add a verification check for the section's placement
+Requirement 1 (line 35) requires the section between `## How It Works` and `## Configuration`, but the verification does not check ordering. Add an awk order check.
+
+Find:
+```
+# The exact cluster invocation is documented.
+test "$(grep -c 'BUILD_TARGET=<cluster> REF=<sha> VERSION=<tag>' README.md)" -ge 1
+```
+Replace with:
+```
+# The exact cluster invocation is documented.
+test "$(grep -c 'BUILD_TARGET=<cluster> REF=<sha> VERSION=<tag>' README.md)" -ge 1
+
+# The Build section sits between How It Works and Configuration.
+awk '/^## How It Works$/{h=NR} /^## Build$/{b=NR} /^## Configuration$/{c=NR} END{exit !(h && b && c && h < b && b < c)}' README.md
+```
+
+### 3. Confirm the container-absolute plugin-doc paths
+Lines 30–31 use `/home/node/.claude/plugins/marketplaces/coding/docs/...`. These paths exist in this audit container, but they are image paths rather than repo-relative paths and are not backed by a mount declared in `dark-factory config`. If the target `docker.io/bborbe/claude-yolo:v0.16.4` image places the coding plugin docs elsewhere, the agent silently cannot read them. Consider either confirming the target image path or adding a one-line fallback note. No find/replace is obvious because the absolute paths are useful; describe the change as: "Verify the target image exposes the coding plugin docs at these paths, or reference them by plugin name with a fallback location."
+
+### 4. Soften line-number anchoring in `<context>`
+Line 25 anchors on "line 3" and "line 5". The semantic description is already present, so treat the numbers as hints.
+
+Find:
+```
+- `Makefile` — note that line 3 includes `Makefile.docker` before line 5 assigns `SERVICE`.
+```
+Replace with:
+```
+- `Makefile` — note that it includes `Makefile.docker` (currently line 3) before it assigns `SERVICE` (currently line 5).
+```
+
+### 5. Optional: state the WHY in the objective
+Line 18 states what and where but not why.
+
+Find:
+```
+Add a build section to the README that documents the local and cluster arms, the mirror coupling, and the two parse-time makefile traps, and add a changelog bullet under `## Unreleased` recording the change.
+```
+Replace with:
+```
+Add a build section to the README that documents the local and cluster arms, the mirror coupling, and the two parse-time makefile traps so the new build path is discoverable and matches reality, and add a changelog bullet under `## Unreleased` recording the change.
+```
+
+### 6. Optional: strengthen the "buca local-only" check
+Line 133 only checks that `buca` appears, not that it is described as local-only. Consider adding:
+```
+grep -qi 'local-only' README.md
+```
+after the existing `buca` check. (The current check satisfies requirement 2's explicit condition; this is a quality improvement.)
+
+### 7. Optional: reference the spec in `<context>`
+The prompt copies the constraints but does not point at `specs/in-progress/001-cluster-build-arm.md`. Adding it to `<context>` would let the agent consult the Failure Modes / Security tables if the README wording needs clarification. Not required because the constraints are already inlined.
+
+## Strengths
+- Accurate code references: `Makefile` include order, `Makefile.docker`'s parse-time `VERSION` default, README headings, and the `## Unreleased` section all verified against the actual files.
+- The README content matches the implementation: the `sun` / `nukedev` / `nukeprod` aliases are correct against `agent-task-executor/hack/cluster-alias.sh`, and the runner behavior (Job render, apply, wait, log lines, Docker Hub push, bootstrap script) matches the copied sources.
+- Container-autonomy is handled correctly: the cluster and `buca` commands appear only as README content the agent writes, not as steps the agent executes; verification is limited to filesystem checks plus `make precommit`.
+- Verification distinguishes before vs after: all four baseline greps return 0/fail today, confirming the checks are meaningful.
+- Constraints are copied from the spec and include the "Do NOT commit" guard; the prompt is correctly scoped to documentation only and explicitly forbids touching the build files, `hack/`, `.dark-factory.yaml`, and `bborbe/nuke`.
+- Relevant plugin docs (`changelog-guide.md`, `documentation-guide.md`) and the project DoD are referenced rather than restated.
+
+## Summary
+This is a well-scoped, accurate documentation prompt with correct code references and container-safe verification. The main gap is verification coverage: requirement 4 (the two parse-time traps) and requirement 1's section placement are not checked, so an agent could omit them and still pass. Add those two checks; the remaining items (absolute plugin-doc paths, line-number hints, objective WHY) are quality improvements, not blockers.
+
+---
+
+**Spec transition:** `dark-factory spec mark-prompted 001-cluster-build-arm` ran in host mode (no `DARK_FACTORY_MANAGED`) and reported `prompted: 001-cluster-build-arm.md` (exit 0). | duration: 1120698ms | cost: $10.1965 | tokens: 467 in / 13677 out

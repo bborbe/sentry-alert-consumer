@@ -1,0 +1,292 @@
+[21:31:57] [init] session=4f04eb00 model=deepseek-v4-flash-max[1m] cwd=/home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8 tools=25
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:58] [system: thinking_tokens]
+[21:31:59] [system: thinking_tokens]
+[21:31:59] [system: thinking_tokens]
+[21:31:59] 💭 The user invoked the `/dark-factory:audit-prompt` command with args `prompts/3-docs-build-section.md`. The command instructions say to invoke the `prompt-auditor` agent through the Task tool (Agent tool) with subagent_type `prompt-auditor`. Let me do that, and also check the project CLAUDE.md for a release gate.
+
+Let me first read the prompt file and CLAUDE.md, and invoke the agent. Actually the command says invoke the agent. Let me launch the agent and read CLAUDE.md in parallel.
+
+Wait, the age…
+[21:32:00] I'll invoke the prompt-auditor agent and check the project's gate requirements in parallel.
+
+
+[21:32:01] [agent:dark-factory:prompt-auditor] Audit dark-factory prompt
+    prompt: Audit the dark-factory prompt file at `prompts/3-docs-build-section.md` against the Prompt Definition of Done. Evaluate its structure, code references, and qua…
+[21:32:01] [system: task_started]
+[21:32:02] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/CLAUDE.md
+[21:32:02] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md
+[21:32:02] ⚠ [Read] error: File does not exist. Note: your current working directory is /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8.
+[21:32:02]   → 144 lines read
+[21:32:04] [system: task_progress]
+[21:32:04] [read] /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/3-docs-build-section.md
+[21:32:04] [system: task_progress]
+[21:32:04] $ ls -la && echo "---CONFIG---" && cat .dark-factory.yaml 2>/dev/null || echo "no .dark-factory.yaml"
+[21:32:04]   → 144 lines read
+[21:32:07] [system: task_progress]
+[21:32:07] $ echo "===Makefile===" && cat -n Makefile && echo "===Makefile.docker===" && cat -n Makefile.docker && echo "===ls hack===" && ls -la hack 2>&1 || echo "NO hack dir" && echo "===ls prompts===" && ls -…
+[21:32:07] [system: task_progress]
+[21:32:07] $ echo "===README===" && cat -n README.md && echo "===CHANGELOG head===" && head -40 CHANGELOG.md | cat -n
+[21:32:07] ⚠ [bash output]
+    21	  exception/message, which nothing can dedup. Two events of one issue on the
+    22	  same day therefore produced two analyzer tasks even though the lookup had
+    23	  resolved both to the same issue (measured 2026-10-19 on prod: 3 of 16
+    24	  forwarded records). The re-key covers every successful enrichment, so the
+    25	  32-hex derived hashes collapse too.
+    26	
+    27	## v0.2.4
+    28	
+    29	- fix: publish an analyzer task only for `forwarded` records. A `rejected` or
+    30	  `upstream_error` event was never stored by Sentry, so it has no issue identity
+    31	  and `deriveIssueKey` falls back to the per-event `event-<event_id>` key, which
+    32	  nothing can dedup — one task per rejected event, measured 2026-10-18 on dev at
+    33	  73 of 74 processed records, against a ~12/day baseline. Non-forwarded records
+    34	  are now counted as `messages_total{result="skipped_non_forwarded"}` and skipped
+    35	  before parsing; `events_total{outcome}` still counts every outcome, so the
+    36	  rejection rate stays alertable on its own.
+    37	
+    38	## v0.2.3
+    39	
+    40	- fix: report `eventAge` on the `enriched` line as the offset to the **first lookup attempt** rather than the offset to the log line. The field is read as evidence that a lookup happened inside Sentry's ingest-indexing window, but `time.Since(eventTime)` was evaluated *after* `IssueRef` returned, so it folded the dedicated 404 schedule's +1/+3/+6/+10 s waits into the number: a fresh event that retried before succeeding read as an old one, which is precisely the distinction the field exists to make. Observed on dev 2026-10-14 — an event logged `eventAge=7.615s` whose actual first lookup ran at +0.632 s, leaving the parent task's `eventAge < 3 s` criterion readable only by deriving the offset from raw log timestamps. The clock is now injected (`libtime.CurrentDateTimeGetter`) rather than read from `time.Now()`, so the specs assert the logged value exactly, and they are pinned to fail against the previous expression.
+[21:32:07] ⚠ [bash output]
+===ls specs===
+specs:
+completed
+in-progress
+log
+
+specs/completed:
+
+specs/in-progress:
+001-cluster-build-arm.md
+
+specs/log:
+audit-001-cluster-build-arm-1-makefile-docker-dispatch.md.jsonl
+audit-001-cluster-build-arm-1-makefile-docker-dispatch.md.log
+audit-001-cluster-build-arm-2-hack-runner-and-module-build.md.jsonl
+audit-001-cluster-build-arm-2-hack-runner-and-module-build.md.log
+audit-001-cluster-build-arm-3-docs-build-section.md.jsonl
+audit-001-cluster-build-arm-3-docs-build-section.md.log
+gen-001-cluster-build-arm.jsonl
+gen-001-cluster-build-arm.log
+[21:32:10] [system: task_progress]
+[21:32:10] $ echo "===prompts/in-progress===" && ls -la prompts/in-progress && echo "===prompts/completed===" && ls -la prompts/completed && echo "===prompts/log===" && ls -la prompts/log && echo "===spec===" && …
+[21:32:13] [system: task_progress]
+[21:32:13] $ sed -n '1,200p' /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/specs/in-progress/001-cluster-build-arm.md
+[21:32:13] [system: task_progress]
+[21:32:13] $ echo "===002 sibling===" && cat -n /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/in-progress/002-hack-runner-and-module-build.md
+[21:32:13] ⚠ [bash output]
+- The build container runs as an unprivileged user with the sandbox profiles relaxed because rootless BuildKit requires it. That relaxation is deliberate and must not be copied to the clone init container.
+- `hack/build-cluster-bootstrap.sh` reads a TeamVault credential into a `600` temp file and removes it on every exit path. It is never echoed, never logged, and never written into the repo. Do not add a logging path that prints the rendered secret.
+- `VERSION` is caller-controlled and becomes an image tag and a Job name. The tag is whitelisted and the Job name is sanitized to a valid DNS name, truncated, and stripped of trailing separators.
+
+## Suggested Decomposition
+
+Prompts should be generated in this order — each row is a single prompt with a clear scope.
+
+| # | Prompt focus | Covers DBs | Covers ACs | Depends on |
+|---|---|---|---|---|
+| 0 | **Not a prompt.** `.dark-factory.yaml` → `workflow: direct` + `pr: false` (the measured-working shape), keeping `autoRelease: false`, `autoGeneratePrompts: true` and `validationPrompt: docs/dod.md`, plus `defaultBranch: master` and `autoMerge: false`. Pre-landed and **committed** on the branch before approval. Satisfies AC 8's `.dark-factory.yaml` clause, so no prompt re-implements it. | 7 | 8 (config clause only) | — |
+| 1 | The `Makefile.docker` dispatch: the `BUILD_TARGET` split, `IMAGE`/`TAG`, the explicitness capture before the default, the composed-reference echo, and local-only `upload`/`clean`/`buca` | 1, 2, 3, 4, 5 | 1, 3, 4, 6 | row 0 |
+| 2 | The build path itself: the five `hack/` files and the module-mode image build | 2, 6 | 2, 5, 7 | prompt 1 (the dispatch calls the runner) |
+| 3 | Docs: the README build section and the CHANGELOG bullet | 8 | 8 | — |
+
+Rationale: row 0 is pre-landed rather than prompted because the lane config must be correct **before** the agent is asked to run — a prompt that fixes the config it is itself running under is a chicken-and-egg. With it in place, prompt 1 establishes the dispatch, prompt 2 supplies the runner it calls and the Dockerfile change that lets it work from a clone, and prompt 3 is independent and touches no build logic.
+
+## Do-Nothing Option
+
+Leaving this repo without a cluster arm keeps one nukeprod watcher's image tied to the Mac. Every rebuild, every release cut while the operator is away from this machine, and every future unattended pipeline needs a human at the keyboard for this one repo — while its siblings build themselves. The cost is not the one build; it is that the automation has a hole shaped exactly like the repo nobody is watching.
+[21:32:34] [system: task_progress]
+[21:32:34] $ (dark-factory config 2>&1 || echo "dark-factory config unavailable") | head -60; echo "===docs==="; ls -la docs; echo "===dod==="; cat docs/dod.md 2>/dev/null | head -60
+[21:32:34] [system: task_progress]
+[21:32:34] $ for p in /home/node/.claude/plugins/marketplaces/coding/docs/changelog-guide.md /home/node/.claude/plugins/marketplaces/coding/docs/documentation-guide.md /home/node/.claude-yolo/plugins/marketplaces…
+[21:32:34] ⚠ [bash output]
+- [ ] `make precommit` passes (format + lint + test + security checks)
+- [ ] No new linting warnings or errors
+
+## Code Quality
+
+- [ ] No `//nolint` without explanation
+- [ ] Follows existing code patterns in the file being modified
+
+## Tests
+
+- [ ] New functions have tests
+- [ ] Existing tests still pass
+- [ ] Tests use Ginkgo/Gomega conventions
+- [ ] Counterfeiter for mocks (`mocks/` dir)
+
+## Style
+
+- [ ] Functions over classes for stateless operations
+- [ ] Error handling follows `github.com/bborbe/errors` patterns
+- [ ] No absolute paths — all paths relative or using standard lib
+[21:32:37] [system: task_progress]
+[21:32:37] $ dark-factory config 2>/dev/null | grep -niE 'mount|volume|/docs|workspace|claude|/home' | head -40; echo "===full tail==="; dark-factory config 2>/dev/null | tail -40
+[21:32:37] [system: task_progress]
+[21:32:37] $ echo "===README headings==="; grep -nE '^## ' README.md; echo "===CHANGELOG unreleased==="; grep -n '^## ' CHANGELOG.md | head; echo "===hack refs anywhere==="; grep -rn 'build-cluster\|build-job\|cl…
+[21:32:46] [system: task_progress]
+[21:32:46] $ which dark-factory; dark-factory --help 2>&1 | head -40; echo "===find source==="; find / -maxdepth 6 -type d -name 'dark-factory' 2>/dev/null | head; echo "===grep mount handling in go pkg==="; grep…
+[21:32:46] ⚠ [bash output]
+  prompt approve <id>    Approve a prompt (move from inbox to queue)
+  prompt requeue <id>    Reset a prompt's status to queued
+  prompt cancel <id>     Cancel an approved or executing prompt
+  prompt retry           Shorthand for prompt requeue --failed
+  prompt complete <id>   Complete a prompt (triggers commit/push)
+  prompt unapprove <id>  Unapprove a prompt (move back to inbox, reset to draft)
+  prompt reject <id> --reason <text>  Reject a prompt (move to rejected/, terminal state)
+  prompt show <id>       Show details for a single prompt
+
+  spec list              List specs
+  spec status            Show spec status
+  spec approve <id>      Approve a spec
+  spec unapprove <id>    Unapprove a spec (move back to inbox, reset to draft)
+  spec complete <id>        Mark a verified spec as completed
+  spec mark-prompted <id>  Mark a spec as prompted (transitions approved/generating to prompted)
+  spec reject <id> --reason <text>    Reject a spec and all linked prompts (move to rejected/, terminal state)
+  spec show <id>         Show details for a single spec
+
+...
+</persisted-output>
+[21:32:48] [system: task_progress]
+[21:32:48] $ find / -type d -path '*dark-factory*' -name 'pkg' 2>/dev/null | head; find /home/node -maxdepth 5 -type d -name 'dark-factory*' 2>/dev/null | head; ls /home/node/go/pkg/mod/github.com/bborbe 2>/dev/n…
+[21:32:48] [system: task_progress]
+[21:32:48] $ strings /home/node/go/bin/dark-factory 2>/dev/null | grep -iE '/home/node/\.claude|\.claude-yolo|/claude|mount.*claude|plugins/marketplaces' | sort -u | head -40
+[21:32:50] ⚠ [bash output]
+/home/node/dark-factory-marketplace/pkg/claudeargv/envoverlay.go
+Update CHANGELOG.md following `/home/node/.claude/docs/changelog-guide.md`. Create `## Unreleased` if missing, extend it if it already exists.
+github.com/bborbe/dark-factory/pkg/claudeargv.EnvOverlay
+invalid Trailer key already registeredunknown status codeCounts http requestContent-Disposition/debug/pprof/symbolshutdown failed: %vverificationCommand:/home/node/.claudemax_prompt_durationdark-factory.prompt 
+renumber specsspecs/rejectedmake precommit~/.claude-yolocontainerImageautoRetryLimitworkflowSourceenvProjectOnly/api/v1/statusread inbox dir on zero Valueunknown method: extra text: unsafe.PointeruserArenaStateGC (dedicated)read mem statsupdatemaxprocsgcstoptheworldprofstackdepthtraceallocfreeGC assist waitfinalizer waitsync.Cond.WaitSIGABRT: abortunsafe pointers.allocCount= Value of type runtime: mmap(nil elem type! to finalizer  finalizers + GC worker initruntime: full=runtime: want=scan: class L MB; allocated allspans arrayscavenge indexno deferreturnbad restart PC, called from
+runtime: sp=abi mismatchout of rangewrong timerstrace bufferCased_LetterOther_LetterOther_NumberOther_SymbolSpacing_MarkCypro_MinoanGurung_KhemaMeetei_MayekPahawh_HmongSora_SompengSyloti_Nagrinot pollable152587890625762939453125invalid baseinvalid typecount in direxecution_idparse-errorsonly status  has status /sendMessagegit checkout--abbrev-refsymbolic-refCHANGELOG.mdcloning repocreating taggit push taggh pr create (truncated)^\d+-.*\.md$httpmuxgo121Cookie.ValuemoreSpecific100-continuestatus code Multi-StatusNot ModifiedUnauthorizedI'm a teapotNot Extendedproxyconnectsleep for %vwait commandcontent_sizeconfig_mount.claude.jsondocker rm -f--entrypoint--pids-limit[websearch] 
+unknown backend %q, valid values: %sdocker.io/bborbe/claude-yolo:v0.16.4reflect: NumField of non-struct typeTime.UnmarshalBinary: invalid lengthmethod ABI and value ABI don't alignreflect.Value.Equal: values of type bytes: Repeat output length overflowbytes.Reader.ReadAt: negative offsetbytes.Reader.Seek: negative positionlfstack node allocated from the heap) is larger than maximum page size (objects with pointers must be zeroedruntime: invalid typeBitsBulkBarrieruncaching span but s.allocCount == 0Scan trace for cleanup/finalizer on /memory/classes/metadata/other:bytes/sched/goroutines/running:goroutines/sched/goroutines/waiting:goroutines/sched/goroutines-created:goroutines/sched/pauses/stopping/other:secondsspanQueue.destroy on non-empty queueuser arena span is on the wrong listruntime: marked free object in span runtime: unblock on closing polldescruntime: inconsistent write deadlineruntime: netpoll: eventfd ready for runtime: sudog with non-nil waitlinkruntime: mcall called on m->g0 stackfatal: recursive switchToCrashStack
+[21:32:50] ⚠ [bash output]
+/home/node/dark-factory-marketplace/pkg
+/home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/pkg
+/home/node/.claude/plugins/cache/dark-factory/dark-factory/0.198.11/pkg
+/home/node/dark-factory-marketplace
+/home/node/.claude/plugins/cache/dark-factory
+/home/node/.claude/plugins/cache/dark-factory/dark-factory
+agent@v0.138.0
+argument
+boltkv@v1.16.1
+collection@v1.20.17
+collection@v1.21.6
+cqrs@v0.6.15
+errors@v1.5.15
+errors@v1.6.6
+http@v1.26.16
+http@v1.26.32
+[21:32:51] [system: task_progress]
+[21:32:51] $ grep -rn 'claudeDir\|ClaudeDir\|\.claude-yolo\|Mounts\|mount' /home/node/dark-factory-marketplace/pkg --include='*.go' | grep -iE 'claude|mount' | head -60
+[21:32:51] ⚠ [bash output]
+/home/node/dark-factory-marketplace/pkg/cmd/healthcheck/probes.go:255:// mountProbe boots a throwaway container via the shared launch path and
+/home/node/dark-factory-marketplace/pkg/cmd/healthcheck/probes.go:257:type mountProbe struct {
+/home/node/dark-factory-marketplace/pkg/cmd/healthcheck/probes.go:265:	return &mountProbe{policy: policy, runner: r}
+/home/node/dark-factory-marketplace/pkg/cmd/healthcheck/probes.go:268:func (m *mountProbe) Name() string {
+/home/node/dark-factory-marketplace/pkg/cmd/healthcheck/probes.go:269:	return "mount"
+/home/node/dark-factory-marketplace/pkg/cmd/healthcheck/probes.go:272:func (m *mountProbe) Run(ctx context.Context) error {
+/home/node/dark-factory-marketplace/pkg/cmd/healthcheck/probes.go:277:		op:            "docker run mount probe",
+/home/node/dark-factory-marketplace/pkg/cmd/healthcheck/probes.go:279:		command:       []string{"-c", mountProbeCommand},
+/home/node/dark-factory-marketplace/pkg/cmd/healthcheck/probes.go:281:		failurePrefix: "workspace mount not writable",
+/home/node/dark-factory-marketplace/pkg/cmd/healthcheck/probes.go:286:// container probes (boot, mount, claude) need to launch one one-shot container, check
+/home/node/dark-factory-marketplace/pkg/cmd/healthcheck/probes.go:291:	category      string            // probe name ("boot", "mount", "claude")
+/home/node/dark-factory-marketplace/pkg/cmd/healthcheck/probes.go:300:// runContainerProbe is the shared body of bootProbe.Run, mountProbe.Run, claudeProbe.Run.
+/home/node/dark-factory-marketplace/pkg/config/loader.go:119:	ExtraMounts            []ExtraMount         `yaml:"extraMounts,omitempty"`
+/home/node/dark-factory-marketplace/pkg/config/loader.go:120:	ClaudeDir              *string              `yaml:"claudeDir"`
+/home/node/dark-factory-marketplace/pkg/config/loader.go:336:	mergePartialEnvAndMounts(cfg, partial)
+/home/node/dark-factory-marketplace/pkg/config/loader.go:369:	if partial.ClaudeDir != nil {
+/home/node/dark-factory-marketplace/pkg/config/loader.go:370:		cfg.ClaudeDir = *partial.ClaudeDir
+/home/node/dark-factory-marketplace/pkg/config/loader.go:380:func mergePartialEnvAndMounts(cfg *Config, partial *partialConfig) {
+/home/node/dark-factory-marketplace/pkg/config/loader.go:384:	if partial.ExtraMounts != nil {
+/home/node/dark-factory-marketplace/pkg/config/loader.go:385:		cfg.ExtraMounts = partial.ExtraMounts
+[21:32:53] [system: task_progress]
+[21:32:53] $ grep -rn 'func BuildDockerRunArgs' /home/node/dark-factory-marketplace/pkg; echo "---"; grep -rn 'ResolvedClaudeDir\|/.claude\|claudeDir' /home/node/dark-factory-marketplace/pkg/executor /home/node/d…
+[21:32:58] [system: task_progress]
+[21:32:58] $ echo "HOME=$HOME"; ls -la /home/node/.claude-yolo 2>&1 | head; echo "--- .claude ---"; ls -la /home/node/.claude 2>&1 | head; echo "--- claude-yolo plugins ---"; ls -la /home/node/.claude-yolo/plugin…
+[21:32:58] ⚠ [Bash] error: Exit code 2\nHOME=/home/node\nls: cannot access '/home/node/.claude-yolo': No such file or directory\n--- .claude ---\ntotal 56\ndrwxr-xr-x 1 node node 4096 Nov  9 21:32 .\ndrwxr-xr-x 1 node node 4096 Nov  9 21:02 ..\n-rw------- 1 node node  848 Nov  9 21:32 .claude.json\n-rw-r--r-- 1 node node   24 Nov  9 21:03 .last-cleanup\ndrwxr-xr-x 1 node node 4096 Nov  9 21:32 backups\ndrwxr-xr-x 1 node no…
+[21:33:22] [system: task_progress]
+[21:33:23] $ echo "===dod full==="; cat /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/docs/dod.md; echo; echo "===changelog-guide==="; cat /home/node/.claude/plugins/market…
+[21:33:23] ⚠ [bash output]
+* MAJOR version when you make incompatible API changes,
+* MINOR version when you add functionality in a backwards-compatible manner, and
+* PATCH version when you make backwards-compatible bug fixes.
+
+## Unreleased
+
+- feat: Add SpecWatcher to monitor specs/ for approved status changes
+- fix: Remove stale Docker container before starting a new executor run
+
+## v1.5.0
+
+- feat: Add FuncRunner interface for executing functions with custom behavior
+- fix: Fix WaiterUntil to handle equal times correctly
+```
+
+### RULE changelog/preamble-frozen (MUST)
+
+**Owner**: agent-auditor
+...
+</persisted-output>
+[21:33:24] [system: task_progress]
+[21:33:24] $ sed -n '1,200p' /home/node/.claude/projects/-home-node--cache-github-dark-factory-agent-work-03747306-83e4-562c-aa21-2038ffefaab8/4f04eb00-3f34-48be-bbe7-cc3a03019efc/tool-results/bcx7439ij.txt | tai…
+[21:33:24] ⚠ [bash output]
+- Name the exact type, function, command, or package touched
+- Include versions for dependency updates
+- Add brief context for non-obvious changes
+
+## Anti-Patterns
+
+❌ `- Add SpecWatcher` — missing prefix, bump detection fails
+✅ `- feat: Add SpecWatcher to monitor specs/ for approved status changes`
+
+❌ `- feat: update go and deps` — wrong prefix (chore), and too vague
+✅ `- chore: Update Go from 1.25.5 to 1.26.0`
+✅ `- chore: Update github.com/bborbe/errors to v1.5.2`
+
+❌ `- fix: refactor` — what was refactored?
+✅ `- refactor: Extract worktree cleanup to reduce cognitive complexity`
+
+❌ `- test: add tests` — for what?
+✅ `- test: Add processor test suite covering retry and failure paths (12 tests)`
+
+❌ `- fix: fix bug` — which bug?
+[21:33:26] [system: task_progress]
+[21:33:26] $ grep -nE 'RULE|README|build|section|headings|## ' /home/node/.claude/plugins/marketplaces/coding/docs/documentation-guide.md | head -60
+[21:33:26] [system: task_progress]
+[21:33:26] $ echo "===prompt 001 (sibling) relevant==="; sed -n '1,80p' /home/node/.cache/github-dark-factory-agent/work/03747306-83e4-562c-aa21-2038ffefaab8/prompts/in-progress/001-makefile-docker-dispatch.md
