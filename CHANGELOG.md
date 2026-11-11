@@ -6,6 +6,8 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+- chore: bump the go directive to 1.27.4 for GO-2026-6859 (stdlib MaxBytesReader header race)
+- fix: derive `task_identifier` from the issue key alone instead of `(issue-key, date)`, so an issue that already has an open task is not given a fresh daily copy — the controller resolves the create to the existing file and refuses it while that task is non-terminal, reopening it once terminal
 - feat: add a `BUILD_TARGET` selector to `Makefile.docker` so `build` can dispatch the cluster runner (`hack/build-cluster.sh`) with a named commit while the default `local` arm keeps the existing `docker build` command and tag
 - chore: add the `hack/` cluster-build helpers (`build-cluster.sh`, `cluster-alias.sh`, `build-job.yaml`, `build-cluster-bootstrap.sh`, `dockerconfig.json.tpl`) and switch the `Dockerfile` build from `-mod=vendor` to `-mod=readonly` so a fresh clone without `vendor/` builds from the module proxy
 - chore: restate the do-not-merge contract in the gate workflow

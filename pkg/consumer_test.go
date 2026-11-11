@@ -250,7 +250,7 @@ var _ = ginkgo.Describe("Consumer", func() {
 			// fields below derive from Issue.Key, which is "event-abc123" before
 			// the re-key and "42" after it.
 			gomega.Expect(string(cmd.TaskIdentifier)).To(gomega.Equal(
-				pkg.DeriveTaskIDKafka("42", "2026-09-09").String(),
+				pkg.DeriveTaskIDKafka("42").String(),
 			))
 			gomega.Expect(cmd.Title).To(gomega.Equal("Analyze Sentry issue 42 - 2026-09-09"))
 		})
