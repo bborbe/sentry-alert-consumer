@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v0.3.0
 
 - chore: bump the go directive to 1.27.4 for GO-2026-6859 (stdlib MaxBytesReader header race)
 - fix: derive `task_identifier` from the issue key alone instead of `(issue-key, date)`, so an issue that already has an open task is not given a fresh daily copy — the controller resolves the create to the existing file and refuses it while that task is non-terminal, reopening it once terminal
