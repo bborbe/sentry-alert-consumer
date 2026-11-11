@@ -1,7 +1,7 @@
 # sentry-alert-consumer
 
 Consumes the `{branch}-raw-sentry-alert-input` Kafka topic and publishes one
-`CreateTaskCommand` per derived (issue-key, date) so the `sentry-analyzer-agent`
+`CreateTaskCommand` per derived issue key so the `sentry-analyzer-agent`
 can classify each alert — replacing the `sentry-collector-agent`'s token-REST
 fan-out as the trigger of the Sentry pipeline.
 
@@ -44,17 +44,21 @@ For each message on the alert topic:
    A rejected event was never stored by Sentry, so its lookup is a guaranteed
    404 that only burns quota — it is skipped. On a **successful** lookup the
    issue key itself is replaced by the numeric id, so
-   `UUID5("kafka:" + issue-key + ":" + date)` collapses a same-day repeat of one
-   issue into a single task. A miss (forwarded but dropped by quota) or any
+   `UUID5("kafka:" + issue-key)` collapses every repeat of one
+   issue into a single task, not only a same-day one. A miss (forwarded but dropped by quota) or any
    lookup failure keeps the derived key and still publishes the task:
    enrichment never drops an alert. The `event-<event_id>` and body-hash
    fallbacks therefore remain only for those miss and failure paths — they are
    not dead code.
-6. **Publish one `CreateTaskCommand`** per (issue-key, date). Task identity is
-   `UUID5("kafka:" + issue-key + ":" + date)` over the same namespace as the
+6. **Publish one `CreateTaskCommand`** per issue key. Task identity is
+   `UUID5("kafka:" + issue-key)` over the same namespace as the
    collector's `/create-tasks`, so the two identity spaces never collide and
    controller dedup makes re-emits (including full-topic replays after a
-   restart) a no-op.
+   restart) a no-op. The date is not part of the key: the controller resolves a
+   later day's create to the existing file, refusing it while that task is
+   non-terminal and reopening it once terminal — so an issue with an open task
+   never gets a second copy, and an issue that recurs after its analysis
+   finished is analysed again.
 
 The emitted task contract is preserved from `cmd/create-tasks`:
 `task_type: sentry-issue-analyzer`, `assignee: sentry-analyzer-agent`, `stage`

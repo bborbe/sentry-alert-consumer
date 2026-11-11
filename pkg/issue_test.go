@@ -57,7 +57,7 @@ var _ = ginkgo.Describe("BuildIssue", func() {
 			gomega.Expect(err).To(gomega.Not(gomega.HaveOccurred()))
 			gomega.Expect(issue.Key).To(gomega.Not(gomega.HavePrefix("event-")))
 			keys[issue.Key] = struct{}{}
-			taskIDs[pkg.DeriveTaskIDKafka(issue.Key, issue.Date).String()] = struct{}{}
+			taskIDs[pkg.DeriveTaskIDKafka(issue.Key).String()] = struct{}{}
 		}
 		gomega.Expect(keys).To(gomega.HaveLen(1))
 		gomega.Expect(taskIDs).To(gomega.HaveLen(1))

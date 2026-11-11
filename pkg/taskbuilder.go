@@ -35,7 +35,7 @@ type TaskConfig struct {
 //   - issue_url carries the canonical Sentry issue URL when enriched, and is
 //     empty otherwise (the envelope carries no permalink)
 func BuildCreateCommand(issue Issue, cfg TaskConfig) task.CreateCommand {
-	taskIDStr := DeriveTaskIDKafka(issue.Key, issue.Date).String()
+	taskIDStr := DeriveTaskIDKafka(issue.Key).String()
 	shortID := issue.Key
 	if issue.NumericID != "" {
 		shortID = issue.NumericID

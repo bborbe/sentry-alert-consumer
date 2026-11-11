@@ -113,11 +113,16 @@ var _ = ginkgo.Describe("BuildCreateCommand", func() {
 			To(gomega.Not(gomega.ContainSubstring("sentry:")))
 	})
 
-	ginkgo.It("derives a fresh task per date", func() {
+	ginkgo.It("keeps one task identifier per key across dates (no daily duplicate)", func() {
 		other := issue
 		other.Date = "2026-09-10"
 		cmd1 := pkg.BuildCreateCommand(issue, cfg)
 		cmd2 := pkg.BuildCreateCommand(other, cfg)
-		gomega.Expect(cmd1.TaskIdentifier).To(gomega.Not(gomega.Equal(cmd2.TaskIdentifier)))
+		// The controller resolves a create to the file its identifier index
+		// already holds, so a stable identifier is what stops the next day's
+		// alert from materializing a second task for the same issue.
+		gomega.Expect(cmd1.TaskIdentifier).To(gomega.Equal(cmd2.TaskIdentifier))
+		gomega.Expect(cmd1.Frontmatter["task_identifier"]).
+			To(gomega.Equal(cmd2.Frontmatter["task_identifier"]))
 	})
 })
