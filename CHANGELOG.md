@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 Please choose versions by [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+- chore: remove 5 stale vulnerability ignore IDs
+- ci: install Trivy from a pinned, checksum-verified release tarball so the test job stops failing on the removed `apt-key` helper
+
 ## v0.3.0
 
 - chore: bump the go directive to 1.27.4 for GO-2026-6859 (stdlib MaxBytesReader header race)
